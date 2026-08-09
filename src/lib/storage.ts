@@ -28,10 +28,7 @@ const BUCKET = process.env.R2_BUCKET_NAME!;
 const UPLOAD_URL_TTL_SECONDS = 300;
 const DOWNLOAD_URL_TTL_SECONDS = 3600;
 
-export async function getUploadUrl(
-  fileKey: string,
-  contentType: string
-): Promise<string> {
+export async function getUploadUrl(fileKey: string, contentType: string): Promise<string> {
   const command = new PutObjectCommand({
     Bucket: BUCKET,
     Key: fileKey,

@@ -90,11 +90,11 @@ export function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-sm animate-card-in">
-      <h1 className="font-display text-3xl text-foreground">
+    <div className="animate-card-in w-full max-w-sm">
+      <h1 className="font-display text-foreground text-3xl">
         {step === "email" ? "Sign in" : "Check your email"}
       </h1>
-      <p className="mt-2 text-sm text-secondary">
+      <p className="text-secondary mt-2 text-sm">
         {step === "email"
           ? "Enter your email and we'll send a 6-digit code."
           : `We sent a code to ${email}.`}
@@ -103,7 +103,7 @@ export function LoginForm() {
       {step === "email" ? (
         <form action={requestAction} className="mt-8 space-y-4">
           <div>
-            <label htmlFor="email" className="text-sm text-secondary">
+            <label htmlFor="email" className="text-secondary text-sm">
               Email
             </label>
             <input
@@ -115,7 +115,7 @@ export function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="mt-1.5 w-full rounded-lg border border-bg-elevated bg-bg-surface px-4 py-2.5 text-foreground outline-none transition-colors focus-visible:border-accent-primary"
+              className="border-bg-elevated bg-bg-surface text-foreground focus-visible:border-accent-primary mt-1.5 w-full rounded-lg border px-4 py-2.5 transition-colors outline-none"
             />
           </div>
 
@@ -123,7 +123,7 @@ export function LoginForm() {
             <p
               role="status"
               className={
-                requestState.success ? "text-sm text-state-success" : "text-sm text-state-warning"
+                requestState.success ? "text-state-success text-sm" : "text-state-warning text-sm"
               }
             >
               {requestState.message}
@@ -133,7 +133,7 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={isRequesting}
-            className="w-full rounded-lg bg-accent-primary py-2.5 font-medium text-foreground transition-transform active:scale-[0.98] disabled:opacity-60"
+            className="bg-accent-primary text-foreground w-full rounded-lg py-2.5 font-medium transition-transform active:scale-[0.98] disabled:opacity-60"
           >
             {isRequesting ? "Sending..." : "Send code"}
           </button>
@@ -158,13 +158,13 @@ export function LoginForm() {
                 aria-label={`Digit ${i + 1}`}
                 onChange={(e) => handleDigitChange(i, e.target.value)}
                 onKeyDown={(e) => handleDigitKeyDown(i, e)}
-                className="h-12 w-11 rounded-lg border border-bg-elevated bg-bg-surface text-center font-mono text-lg text-foreground outline-none transition-all focus-visible:border-accent-primary focus-visible:shadow-[0_0_0_3px_rgba(217,113,75,0.25)]"
+                className="border-bg-elevated bg-bg-surface text-foreground focus-visible:border-accent-primary h-12 w-11 rounded-lg border text-center font-mono text-lg transition-all outline-none focus-visible:shadow-[0_0_0_3px_rgba(217,113,75,0.25)]"
               />
             ))}
           </div>
 
           {verifyError && (
-            <p role="alert" className="text-sm text-state-warning">
+            <p role="alert" className="text-state-warning text-sm">
               {verifyError}
             </p>
           )}
@@ -172,7 +172,7 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={isVerifying}
-            className="w-full rounded-lg bg-accent-primary py-2.5 font-medium text-foreground transition-transform active:scale-[0.98] disabled:opacity-60"
+            className="bg-accent-primary text-foreground w-full rounded-lg py-2.5 font-medium transition-transform active:scale-[0.98] disabled:opacity-60"
           >
             {isVerifying ? "Verifying..." : "Verify & continue"}
           </button>
@@ -206,9 +206,9 @@ export function LoginForm() {
 function Divider() {
   return (
     <div className="flex items-center gap-3 py-1">
-      <div className="h-px flex-1 bg-bg-elevated" />
-      <span className="text-xs text-secondary">or</span>
-      <div className="h-px flex-1 bg-bg-elevated" />
+      <div className="bg-bg-elevated h-px flex-1" />
+      <span className="text-secondary text-xs">or</span>
+      <div className="bg-bg-elevated h-px flex-1" />
     </div>
   );
 }
@@ -219,13 +219,25 @@ function GoogleButton({ onClick, loading }: { onClick: () => void; loading: bool
       type="button"
       onClick={onClick}
       disabled={loading}
-      className="flex w-full items-center justify-center gap-3 rounded-lg border border-bg-elevated bg-bg-surface py-2.5 font-medium text-foreground transition-colors hover:bg-bg-elevated disabled:opacity-60"
+      className="border-bg-elevated bg-bg-surface text-foreground hover:bg-bg-elevated flex w-full items-center justify-center gap-3 rounded-lg border py-2.5 font-medium transition-colors disabled:opacity-60"
     >
       <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-        <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62Z" />
-        <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 0 0 9 18Z" />
-        <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.98A9 9 0 0 0 0 9c0 1.45.35 2.83.98 4.03l2.97-2.33Z" />
-        <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .98 4.97l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58Z" />
+        <path
+          fill="#4285F4"
+          d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62Z"
+        />
+        <path
+          fill="#34A853"
+          d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 0 0 9 18Z"
+        />
+        <path
+          fill="#FBBC05"
+          d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.98A9 9 0 0 0 0 9c0 1.45.35 2.83.98 4.03l2.97-2.33Z"
+        />
+        <path
+          fill="#EA4335"
+          d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .98 4.97l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58Z"
+        />
       </svg>
       {loading ? "Redirecting..." : "Continue with Google"}
     </button>

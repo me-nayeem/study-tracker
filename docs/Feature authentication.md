@@ -42,7 +42,7 @@ writes data.
    creates a new `EmailOtp` row (hashed code, 10-minute expiry) and
    sends it via Resend.
 2. User submits the code → client calls `signIn("credentials", { email,
-   code })` → NextAuth invokes `authorize()` in `lib/auth.ts`.
+code })` → NextAuth invokes `authorize()` in `lib/auth.ts`.
 3. `authorize()` re-validates with Zod, checks a separate rate limiter
    (10 verify attempts / 10 min per email — a different attack shape
    than the request limiter), looks up the latest `EmailOtp` row,
@@ -59,22 +59,22 @@ control back, so no OTP step applies to this path.
 
 ## Key files
 
-| File | Responsibility |
-|---|---|
-| `schemas/auth.ts` | Zod schemas for OTP request/verify |
-| `actions/auth.ts` | `requestOtp` Server Action |
-| `lib/auth.ts` | NextAuth config — providers, callbacks, `authorize()` |
-| `lib/rate-limit.ts` | Upstash limiters (`otpRequestLimiter`, `otpVerifyLimiter`) |
-| `lib/email.ts` | Resend wrapper |
-| `lib/prisma.ts` | Prisma client singleton |
-| `lib/storage.ts` | R2 presigned upload/download URLs |
-| `lib/dal.ts` | Authoritative session/role checks |
-| `proxy.ts` | Optimistic route protection |
-| `types/next-auth.d.ts` | Module augmentation for `id`/`role` |
-| `app/api/auth/[...nextauth]/route.ts` | NextAuth route handler |
-| `components/auth/login-form.tsx` | Login UI logic |
-| `components/auth/mastery-constellation.tsx` | Signature visual |
-| `app/(auth)/login/page.tsx` | Login page layout |
+| File                                        | Responsibility                                             |
+| ------------------------------------------- | ---------------------------------------------------------- |
+| `schemas/auth.ts`                           | Zod schemas for OTP request/verify                         |
+| `actions/auth.ts`                           | `requestOtp` Server Action                                 |
+| `lib/auth.ts`                               | NextAuth config — providers, callbacks, `authorize()`      |
+| `lib/rate-limit.ts`                         | Upstash limiters (`otpRequestLimiter`, `otpVerifyLimiter`) |
+| `lib/email.ts`                              | Resend wrapper                                             |
+| `lib/prisma.ts`                             | Prisma client singleton                                    |
+| `lib/storage.ts`                            | R2 presigned upload/download URLs                          |
+| `lib/dal.ts`                                | Authoritative session/role checks                          |
+| `proxy.ts`                                  | Optimistic route protection                                |
+| `types/next-auth.d.ts`                      | Module augmentation for `id`/`role`                        |
+| `app/api/auth/[...nextauth]/route.ts`       | NextAuth route handler                                     |
+| `components/auth/login-form.tsx`            | Login UI logic                                             |
+| `components/auth/mastery-constellation.tsx` | Signature visual                                           |
+| `app/(auth)/login/page.tsx`                 | Login page layout                                          |
 
 ## Environment variables required
 

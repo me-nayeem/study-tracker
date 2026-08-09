@@ -30,21 +30,10 @@ export function MasteryConstellation() {
   ];
 
   return (
-    <svg
-      viewBox="0 0 380 260"
-      className="h-full w-full"
-      role="presentation"
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 380 260" className="h-full w-full" role="presentation" aria-hidden="true">
       <g className="opacity-40" stroke="var(--accent-primary)" strokeWidth="0.5">
         {links.map(([a, b], i) => (
-          <line
-            key={i}
-            x1={dots[a].cx}
-            y1={dots[a].cy}
-            x2={dots[b].cx}
-            y2={dots[b].cy}
-          />
+          <line key={i} x1={dots[a].cx} y1={dots[a].cy} x2={dots[b].cx} y2={dots[b].cy} />
         ))}
       </g>
       {dots.map((dot, i) => (

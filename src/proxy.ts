@@ -28,11 +28,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (
-    path.startsWith("/manager") &&
-    token.role !== "ADMIN" &&
-    token.role !== "MANAGER"
-  ) {
+  if (path.startsWith("/manager") && token.role !== "ADMIN" && token.role !== "MANAGER") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

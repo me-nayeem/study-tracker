@@ -35,10 +35,7 @@ export const authOptions: AuthOptions = {
 
         const { email, code } = parsed.data;
 
-        const { success: withinLimit } = await checkRateLimit(
-          otpVerifyLimiter,
-          email
-        );
+        const { success: withinLimit } = await checkRateLimit(otpVerifyLimiter, email);
         if (!withinLimit) return null;
 
         const otp = await prisma.emailOtp.findFirst({

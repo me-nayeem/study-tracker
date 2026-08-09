@@ -1,20 +1,13 @@
 import * as z from "zod";
 
 export const RequestOtpSchema = z.object({
-  email: z
-    .email({ error: "Enter a valid email address." })
-    .trim()
-    .toLowerCase(),
+  email: z.email({ error: "Enter a valid email address." }).trim().toLowerCase(),
 });
 
 export type RequestOtpInput = z.infer<typeof RequestOtpSchema>;
 
-
 export const VerifyOtpSchema = z.object({
-  email: z
-    .email({ error: "Enter a valid email address." })
-    .trim()
-    .toLowerCase(),
+  email: z.email({ error: "Enter a valid email address." }).trim().toLowerCase(),
   code: z
     .string()
     .trim()

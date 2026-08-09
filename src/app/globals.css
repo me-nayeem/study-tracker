@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #17140F;
-  --foreground: #F3ECE3;
+  --background: #17140f;
+  --foreground: #f3ece3;
 
-  --bg-surface: #211D18;
-  --bg-elevated: #2B2620;
-  --text-secondary: #A79A8A;
+  --bg-surface: #211d18;
+  --bg-elevated: #2b2620;
+  --text-secondary: #a79a8a;
 
-  --accent-primary: #D9714B;
-  --accent-gamify: #E3A857;
+  --accent-primary: #d9714b;
+  --accent-gamify: #e3a857;
 
-  --state-success: #7CA982;
-  --state-warning: #C75C4A;
-  --state-premium: #B8935A;
+  --state-success: #7ca982;
+  --state-warning: #c75c4a;
+  --state-premium: #b8935a;
 }
 
 @theme inline {
@@ -42,7 +42,6 @@ body {
   font-family: var(--font-body), sans-serif;
 }
 
-
 @media (prefers-reduced-motion: no-preference) {
   .constellation-dot {
     animation: dot-pulse 3.2s ease-in-out infinite;
@@ -54,7 +53,8 @@ body {
 }
 
 @keyframes dot-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.35;
     transform: scale(1);
   }
