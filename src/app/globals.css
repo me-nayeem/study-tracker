@@ -1,26 +1,76 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #17140F;
+  --foreground: #F3ECE3;
+
+  --bg-surface: #211D18;
+  --bg-elevated: #2B2620;
+  --text-secondary: #A79A8A;
+
+  --accent-primary: #D9714B;
+  --accent-gamify: #E3A857;
+
+  --state-success: #7CA982;
+  --state-warning: #C75C4A;
+  --state-premium: #B8935A;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-text-secondary: var(--text-secondary);
+
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-gamify: var(--accent-gamify);
+
+  --color-state-success: var(--state-success);
+  --color-state-warning: var(--state-warning);
+  --color-state-premium: var(--state-premium);
+
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), sans-serif;
+}
+
+
+@media (prefers-reduced-motion: no-preference) {
+  .constellation-dot {
+    animation: dot-pulse 3.2s ease-in-out infinite;
+  }
+
+  .animate-card-in {
+    animation: card-in 0.5s ease-out;
+  }
+}
+
+@keyframes dot-pulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

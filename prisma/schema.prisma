@@ -1,0 +1,773 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+
+enum Role {
+  STUDENT
+  MANAGER 
+  ADMIN  
+}
+
+enum GroupType {
+  SCIENCE
+  ARTS
+  COMMERCE
+}
+
+enum EducationLevel {
+  SSC
+  HSC
+}
+
+enum Board {
+  DHAKA
+  RAJSHAHI
+  CUMILLA
+  JASHORE
+  CHATTOGRAM
+  BARISHAL
+  SYLHET
+  DINAJPUR
+  MYMENSINGH
+  MADRASAH
+  TECHNICAL
+}
+
+
+enum MasteryStatus {
+  NOT_STARTED   
+  IN_PROGRESS   
+  AWAITING_QUIZ 
+  MASTERED      
+  NEEDS_REVIEW  
+}
+
+enum ResourceKind {
+  VIDEO
+  PAID_ITEM
+}
+
+enum VideoType {
+  ONESHOT
+  FULL_LECTURE
+  PAID_BATCH
+}
+
+enum AccessType {
+  FREE
+  SUBSCRIPTION
+  BATCH_PURCHASE
+}
+
+enum QuizContext {
+  AUTO_VALIDATION
+  PRACTICE
+}
+
+enum SessionType {
+  POMODORO
+  FREE_STUDY
+}
+
+enum StudySessionStatus {
+  ACTIVE
+  PAUSED
+  ENDED
+  ABANDONED 
+}
+
+enum PointReason {
+  CHAPTER_MASTERED
+  QUIZ_ATTEMPT
+  STREAK_BONUS
+  MANUAL_ADJUSTMENT
+  EXTERNAL_EXAM_RESULT
+  NOTE_UPLOADED
+  PLAYLIST_REVIEWED
+}
+
+enum ScoringMode {
+  FLAT       
+  PER_MARK   
+  PER_WEIGHT 
+}
+
+enum LeaderboardMetric {
+  STUDY_TIME
+  MASTER_SCORE
+}
+
+enum LeaderboardPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+  ALL_TIME
+}
+
+enum TodoSourceType {
+  MANUAL
+  ROUTINE_GENERATED
+  EXAM_REMINDER
+}
+
+enum SpecialVideoTag {
+  ONE_SHOT
+  ADMISSION
+  MOTIVATION
+  TRICK
+  OTHER
+}
+
+enum NoteModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ExamResultStatus {
+  PENDING
+  MATCHED
+  UNMATCHED
+  DISPUTED
+}
+
+enum NotificationType {
+  DAILY_REMINDER
+  STREAK_RISK
+  RECOMMENDATION
+  PACE_ALERT
+  SYSTEM
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum OtpPurpose {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?   @db.VarChar(120)
+  email         String?   @unique @db.VarChar(255)
+  emailVerified DateTime?
+  passwordHash  String?   @db.VarChar(255)
+  image         String?   @db.VarChar(255)
+  role          Role      @default(STUDENT)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  studentProfile StudentProfile?
+
+  purchases     Purchase[]
+  subscription  Subscription?
+  notifications Notification[]
+  auditLogs     AuditLog[]       @relation("StaffAuditLogs") 
+
+  @@index([role])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model EmailOtp {
+  id         String     @id @default(cuid())
+  email      String     @db.VarChar(255)
+  codeHash   String     @db.VarChar(255)
+  purpose    OtpPurpose
+  expiresAt  DateTime
+  attempts   Int        @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime   @default(now())
+
+  @@index([email, purpose])
+}
+
+
+model StudentProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trackId         String
+  track           Track     @relation(fields: [trackId], references: [id], onDelete: Restrict)
+  board           Board?
+  institutionName String?   @db.VarChar(160)
+  phoneNumber     String?   @unique @db.VarChar(20) 
+  streakCount     Int       @default(0)
+  lastActiveAt    DateTime?
+
+  totalPoints Int @default(0)
+  level       Int @default(1)
+
+  createdAt DateTime @default(now())
+
+  topicProgress        TopicProgress[]
+  chapterMasteries     ChapterMastery[]
+  quizAttempts         QuizAttempt[]
+  studySessions        StudySession[]
+  studyRoutines        StudyRoutine[]
+  pointTransactions    PointTransaction[]
+  notes                StudentNote[]
+  playlistReviews      PlaylistReview[]
+  examResults          ExamResult[]
+  todoItems            TodoItem[]
+  leaderboardSnapshots LeaderboardSnapshot[]
+
+  @@index([trackId, totalPoints])
+}
+
+model Track {
+  id         String         @id @default(cuid())
+  name       String         @db.VarChar(120) 
+  level      EducationLevel
+  group      GroupType
+  batchYear  Int
+  examDate   DateTime?
+  isArchived Boolean        @default(false)
+  createdAt  DateTime       @default(now())
+
+  subjects        Subject[]
+  studentProfiles StudentProfile[]
+
+  @@unique([level, group, batchYear])
+}
+
+model Subject {
+  id         String  @id @default(cuid())
+  trackId    String
+  track      Track   @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  name       String  @db.VarChar(80) 
+  order      Int     @default(0)
+  isArchived Boolean @default(false)
+
+  papers            Paper[]
+  studyRoutineItems StudyRoutineItem[]
+
+  @@unique([trackId, name])
+}
+
+model Paper {
+  id         String  @id @default(cuid())
+  subjectId  String
+  subject    Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  name       String  @db.VarChar(40)
+  order      Int     @default(0)
+  isArchived Boolean @default(false)
+
+  chapters Chapter[]
+
+  @@unique([subjectId, name])
+}
+
+model Chapter {
+  id      String @id @default(cuid())
+  paperId String
+  paper   Paper  @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  name    String @db.VarChar(160)
+  order   Int    @default(0)
+  examWeight Float @default(1.0)
+  masteryPassPercent Int @default(70)
+
+  isArchived Boolean @default(false)
+
+  topics           Topic[]
+  chapterMasteries ChapterMastery[]
+  quizzes          Quiz[]
+  playlists        ChapterPlaylist[]
+  specialVideos    ChapterSpecialVideo[]
+  studentNotes     StudentNote[]
+  officialNotes    OfficialNote[]
+  externalExams    ExternalExam[]
+  todoItems        TodoItem[]
+
+  @@unique([paperId, name])
+}
+
+model Topic {
+  id         String  @id @default(cuid())
+  chapterId  String
+  chapter    Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  name       String  @db.VarChar(160)
+  order      Int     @default(0)
+  isArchived Boolean @default(false)
+
+  topicProgress TopicProgress[]
+  resources     Resource[]
+  externalExams ExternalExam[] 
+
+  @@unique([chapterId, name])
+}
+
+model TopicProgress {
+  id        String         @id @default(cuid())
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  topicId   String
+  topic     Topic          @relation(fields: [topicId], references: [id], onDelete: Restrict)
+
+  readDone        Boolean   @default(false)
+  lectureDone     Boolean   @default(false)
+  solvedDone      Boolean   @default(false)
+  updatedAt       DateTime  @updatedAt
+  clientUpdatedAt DateTime?
+
+  @@unique([studentId, topicId])
+  @@index([topicId])
+}
+
+
+model ChapterMastery {
+  id        String @id @default(cuid())
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  chapterId String
+  chapter   Chapter        @relation(fields: [chapterId], references: [id], onDelete: Restrict)
+
+  status           MasteryStatus @default(NOT_STARTED)
+  markedCompleteAt DateTime?
+  masteredAt       DateTime?
+
+  quizAttempts QuizAttempt[]
+
+  @@unique([studentId, chapterId])
+  @@index([chapterId, status])
+}
+
+
+model Quiz {
+  id        String   @id @default(cuid())
+  chapterId String
+  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  title     String   @default("Validation quiz") @db.VarChar(160)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+}
+
+model QuizQuestion {
+  id           String  @id @default(cuid())
+  quizId       String
+  quiz         Quiz    @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  questionText String
+  options      Json
+  correctIndex Int
+  explanation  String?
+  order        Int     @default(0)
+}
+
+model QuizAttempt {
+  id               String          @id @default(cuid())
+  studentId        String
+  student          StudentProfile  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  quizId           String
+  quiz             Quiz            @relation(fields: [quizId], references: [id], onDelete: Restrict)
+  chapterMasteryId String?
+  chapterMastery   ChapterMastery? @relation(fields: [chapterMasteryId], references: [id], onDelete: SetNull)
+
+  context QuizContext @default(AUTO_VALIDATION)
+
+  score          Int
+  totalQuestions Int
+
+  answers     Json
+  attemptedAt DateTime @default(now())
+
+  @@index([studentId])
+  @@index([quizId])
+}
+
+
+model ChapterPlaylist {
+  id            String   @id @default(cuid())
+  chapterId     String
+  chapter       Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  title         String   @db.VarChar(160)
+  youtubeUrl    String   @db.VarChar(255)
+  addedByUserId String?
+  order         Int      @default(0)
+  isArchived    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  reviews PlaylistReview[]
+
+  @@index([chapterId])
+}
+
+
+model PlaylistReview {
+  id         String          @id @default(cuid())
+  playlistId String
+  playlist   ChapterPlaylist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  studentId  String
+  student    StudentProfile  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  rating     Int             // 1-5
+  comment    String?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([playlistId, studentId]) 
+  @@index([playlistId])
+}
+
+
+model ChapterSpecialVideo {
+  id            String          @id @default(cuid())
+  chapterId     String
+  chapter       Chapter         @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  tag           SpecialVideoTag
+  title         String          @db.VarChar(160)
+  url           String          @db.VarChar(255)
+  order         Int             @default(0)
+  isArchived    Boolean         @default(false)
+  addedByUserId String?
+  createdAt     DateTime        @default(now())
+
+  @@index([chapterId, tag])
+}
+
+
+model StudentNote {
+  id                 String               @id @default(cuid())
+  studentId          String
+  student            StudentProfile       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  chapterId          String
+  chapter            Chapter              @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  title              String               @db.VarChar(160)
+  fileUrl            String               @db.VarChar(255)
+  isPublic           Boolean              @default(false)
+  moderationStatus   NoteModerationStatus @default(PENDING) 
+  moderatedByUserId  String?
+  pointsAwarded      Boolean              @default(false) 
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@index([chapterId, isPublic, moderationStatus])
+  @@index([studentId])
+}
+
+
+model OfficialNote {
+  id              String     @id @default(cuid())
+  chapterId       String
+  chapter         Chapter    @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  title           String     @db.VarChar(160)
+  fileUrl         String     @db.VarChar(255)
+  accessType      AccessType @default(SUBSCRIPTION)
+  order           Int        @default(0)
+  isArchived      Boolean    @default(false)
+  createdByUserId String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([chapterId])
+}
+
+
+
+model Resource {
+  id        String       @id @default(cuid())
+  topicId   String
+  topic     Topic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  kind      ResourceKind
+  videoType VideoType? 
+
+  title           String  @db.VarChar(160)
+  url             String? @db.VarChar(255)
+  body            String?
+  instructorName  String? @db.VarChar(120)
+  durationMinutes Int?
+
+  accessType  AccessType @default(FREE)
+  paidBatchId String?
+  paidBatch   PaidBatch? @relation(fields: [paidBatchId], references: [id], onDelete: Restrict)
+
+  order          Int      @default(0)
+  addedByAdminId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([topicId, kind])
+  @@index([paidBatchId])
+}
+
+model PaidBatch {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(160)
+  description String?
+  priceCents  Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  resources Resource[]
+  purchases Purchase[]
+}
+
+model Purchase {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  paidBatchId      String
+  paidBatch        PaidBatch @relation(fields: [paidBatchId], references: [id], onDelete: Restrict)
+  amountPaidCents  Int
+  paymentReference String?   @db.VarChar(160)
+  purchasedAt      DateTime  @default(now())
+
+  @@unique([userId, paidBatchId])
+  @@index([paidBatchId])
+}
+
+model Plan {
+  id         String   @id @default(cuid())
+  name       String   @db.VarChar(80)
+  priceCents Int
+  interval   String   @db.VarChar(20)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id               String             @id @default(cuid())
+  userId           String             @unique
+  user             User               @relation(fields: [userId], references: [id], onDelete: Restrict)
+  planId           String?
+  plan             Plan?              @relation(fields: [planId], references: [id], onDelete: SetNull)
+  status           SubscriptionStatus @default(TRIALING)
+  currentPeriodEnd DateTime?
+  createdAt        DateTime           @default(now())
+}
+
+
+
+model ExternalExam {
+  id        String  @id @default(cuid())
+  chapterId String
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  topicId   String? 
+  topic     Topic?  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  title       String @db.VarChar(160)
+  externalUrl String @db.VarChar(255)
+  provider    String @db.VarChar(80)
+  accessType AccessType @default(FREE)
+
+  scheduledAt DateTime
+  maxMarks    Float
+  createdAt   DateTime @default(now())
+
+  results   ExamResult[]
+  todoItems TodoItem[]
+
+  @@index([chapterId])
+  @@index([topicId])
+}
+
+model ExamResult {
+  id        String       @id @default(cuid())
+  examId    String
+  exam      ExternalExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  phoneNumberUsed    String            @db.VarChar(20) 
+  marksObtained      Float?
+  breakdown          Json? 
+  status             ExamResultStatus  @default(PENDING)
+  rawPayload         Json?
+  fetchedAt          DateTime?
+  reconciledByUserId String?
+  createdAt          DateTime          @default(now())
+
+  @@unique([examId, studentId])
+  @@index([studentId])
+  @@index([status])
+}
+
+
+model StudySession {
+  id              String             @id @default(cuid())
+  studentId       String
+  student         StudentProfile     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId       String?
+  chapterId       String?
+  type            SessionType        @default(POMODORO)
+  status          StudySessionStatus @default(ACTIVE)
+  startedAt       DateTime
+  lastHeartbeatAt DateTime?
+  endedAt         DateTime?
+  durationSeconds Int?
+
+  @@index([studentId, startedAt])
+  @@index([status, lastHeartbeatAt]) 
+}
+
+model StudyRoutine {
+  id        String   @id @default(cuid())
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title     String   @default("My routine") @db.VarChar(120)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items StudyRoutineItem[]
+
+  @@index([studentId, isActive])
+}
+
+model StudyRoutineItem {
+  id          String       @id @default(cuid())
+  routineId   String
+  routine     StudyRoutine @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int 
+  startMinute Int 
+  endMinute   Int
+  subjectId   String?
+  subject     Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  label       String?      @db.VarChar(160)
+
+  @@index([routineId, dayOfWeek])
+}
+
+model TodoItem {
+  id              String         @id @default(cuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title           String         @db.VarChar(200)
+  dueDate         DateTime?
+  completed       Boolean        @default(false)
+  sourceType      TodoSourceType @default(MANUAL)
+  linkedChapterId String?
+  linkedChapter   Chapter?       @relation(fields: [linkedChapterId], references: [id], onDelete: SetNull)
+  linkedExamId    String?
+  linkedExam      ExternalExam?  @relation(fields: [linkedExamId], references: [id], onDelete: SetNull)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([studentId, completed])
+}
+
+
+model PointTransaction {
+  id          String      @id @default(cuid())
+  studentId   String
+  student     StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  points      Int
+  reason      PointReason
+  referenceId String? 
+  createdAt   DateTime    @default(now())
+
+  @@index([studentId, createdAt])
+}
+
+model LevelThreshold {
+  level     Int     @id
+  minPoints Int     @unique
+  title     String? @db.VarChar(60)
+}
+
+model PointRule {
+  id          String      @id @default(cuid())
+  reason      PointReason @unique
+  scoringMode ScoringMode @default(FLAT)
+  value       Float // meaning depends on scoringMode — see enum comment
+  isActive    Boolean     @default(true)
+  updatedAt   DateTime    @updatedAt
+}
+
+model LeaderboardSnapshot {
+  id        String            @id @default(cuid())
+  studentId String
+  student   StudentProfile    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  trackId   String // denormalized to avoid a join on every leaderboard read
+  metric    LeaderboardMetric
+  period    LeaderboardPeriod
+  periodKey String 
+  value     Int 
+  updatedAt DateTime          @updatedAt
+
+  @@unique([studentId, metric, period, periodKey])
+  @@index([trackId, metric, period, periodKey, value])
+}
+
+
+model Notification {
+  id           String           @id @default(cuid())
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         NotificationType
+  title        String           @db.VarChar(160)
+  body         String
+  isRead       Boolean          @default(false)
+  scheduledFor DateTime?
+  createdAt    DateTime         @default(now())
+
+  @@index([userId, isRead])
+}
+
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  admin      User     @relation("StaffAuditLogs", fields: [adminId], references: [id], onDelete: Restrict)
+  action     String   @db.VarChar(80)
+  entityType String   @db.VarChar(40)
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+}
