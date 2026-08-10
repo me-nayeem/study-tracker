@@ -6,7 +6,7 @@
 
   --bg-surface: #211d18;
   --bg-elevated: #2b2620;
-  --text-secondary: #a79a8a;
+  --text-text-secondary: #a79a8a;
 
   --accent-primary: #d9714b;
   --accent-gamify: #e3a857;
@@ -22,7 +22,7 @@
 
   --color-bg-surface: var(--bg-surface);
   --color-bg-elevated: var(--bg-elevated);
-  --color-text-secondary: var(--text-secondary);
+  --color-text-text-secondary: var(--text-text-secondary);
 
   --color-accent-primary: var(--accent-primary);
   --color-accent-gamify: var(--accent-gamify);

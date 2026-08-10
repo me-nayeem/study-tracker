@@ -79,14 +79,14 @@ export function LoginForm() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/");
       router.refresh();
     });
   }
 
   async function handleGoogleSignIn() {
     setIsGoogleLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
+    await signIn("google", { callbackUrl: "/" });
   }
 
   return (
@@ -94,7 +94,7 @@ export function LoginForm() {
       <h1 className="font-display text-foreground text-3xl">
         {step === "email" ? "Sign in" : "Check your email"}
       </h1>
-      <p className="text-secondary mt-2 text-sm">
+      <p className="text-text-secondary mt-2 text-sm">
         {step === "email"
           ? "Enter your email and we'll send a 6-digit code."
           : `We sent a code to ${email}.`}
@@ -103,7 +103,7 @@ export function LoginForm() {
       {step === "email" ? (
         <form action={requestAction} className="mt-8 space-y-4">
           <div>
-            <label htmlFor="email" className="text-secondary text-sm">
+            <label htmlFor="email" className="text-text-text-secondary text-sm">
               Email
             </label>
             <input
@@ -181,7 +181,7 @@ export function LoginForm() {
             <button
               type="button"
               onClick={() => setStep("email")}
-              className="text-secondary underline-offset-4 hover:underline"
+              className="text-text-secondary underline-offset-4 hover:underline"
             >
               Change email
             </button>
@@ -207,7 +207,7 @@ function Divider() {
   return (
     <div className="flex items-center gap-3 py-1">
       <div className="bg-bg-elevated h-px flex-1" />
-      <span className="text-secondary text-xs">or</span>
+      <span className="text-text-secondary text-xs">or</span>
       <div className="bg-bg-elevated h-px flex-1" />
     </div>
   );
