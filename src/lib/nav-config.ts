@@ -67,3 +67,10 @@ export const STAFF_NAV: StaffNavEntry[] = [
     },
   },
 ];
+
+export type StudentNavItem = {
+  label: string;
+  href: string;
+};
+
+export const STUDENT_NAV: StudentNavItem[] = [{ label: "Dashboard", href: "/dashboard" }];
