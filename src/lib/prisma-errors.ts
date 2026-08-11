@@ -68,13 +68,9 @@ export function handlePrismaError(err: unknown, entityLabel: string): ActionStat
     }
   }
 
-  if (
-  err instanceof TopicDeleteBlockedError ||
-  err instanceof LastAdminError ||
-  err instanceof ChapterAlreadySubmittedError
-) {
-  return { success: false, error: err.message };
-}
+  if (err instanceof ChapterAlreadySubmittedError) {
+    return { success: false, error: err.message };
+  }
 
   console.error(`[curriculum] unexpected error on ${entityLabel}:`, err);
   return { success: false, error: "Something went wrong. Please try again." };

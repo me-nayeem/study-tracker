@@ -42,6 +42,7 @@ is unique; a duplicate submission surfaces a clean "already exists" error
 rather than a raw database error.
 
 **Flow (`completeOnboarding` Server Action):**
+
 1. Reject if the user already has a `StudentProfile` (redirect to dashboard).
 2. Validate input via `OnboardingSchema` (Zod).
 3. Resolve a `Track` via the matching rule below.
@@ -102,20 +103,20 @@ page (progress tracking, out of scope for this feature).
 
 ## File Reference
 
-| Path                                             | Purpose                                    |
-|---------------------------------------------------|----------------------------------------------|
-| `lib/track-matching.ts`                           | `matchTrackForLevelGroup` — track assignment rule |
-| `lib/student-data.ts`                             | `getStudentProfile`, `getStudentDashboardData` |
-| `schemas/onboarding.ts`                           | Zod validation for onboarding input        |
-| `actions/onboarding.ts`                           | `completeOnboarding` Server Action         |
-| `app/(student)/layout.tsx`                        | Base student gate (`requireUser` only)     |
-| `app/(student)/onboarding/page.tsx`               | Onboarding page + already-onboarded redirect |
-| `app/(student)/(app)/layout.tsx`                  | Profile gate + `StudentShell`              |
-| `app/(student)/(app)/dashboard/page.tsx`          | Dashboard page                             |
-| `components/student/onboarding-form.tsx`          | Onboarding form UI                         |
-| `components/student/subject-list.tsx`             | Subject → paper → chapter tree UI          |
-| `components/student/student-shell.tsx`, `student-sidebar.tsx`, `student-topbar.tsx` | Student layout shell |
-| `components/shared/classes.ts`                    | Shared form/button style primitives        |
+| Path                                                                                | Purpose                                           |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `lib/track-matching.ts`                                                             | `matchTrackForLevelGroup` — track assignment rule |
+| `lib/student-data.ts`                                                               | `getStudentProfile`, `getStudentDashboardData`    |
+| `schemas/onboarding.ts`                                                             | Zod validation for onboarding input               |
+| `actions/onboarding.ts`                                                             | `completeOnboarding` Server Action                |
+| `app/(student)/layout.tsx`                                                          | Base student gate (`requireUser` only)            |
+| `app/(student)/onboarding/page.tsx`                                                 | Onboarding page + already-onboarded redirect      |
+| `app/(student)/(app)/layout.tsx`                                                    | Profile gate + `StudentShell`                     |
+| `app/(student)/(app)/dashboard/page.tsx`                                            | Dashboard page                                    |
+| `components/student/onboarding-form.tsx`                                            | Onboarding form UI                                |
+| `components/student/subject-list.tsx`                                               | Subject → paper → chapter tree UI                 |
+| `components/student/student-shell.tsx`, `student-sidebar.tsx`, `student-topbar.tsx` | Student layout shell                              |
+| `components/shared/classes.ts`                                                      | Shared form/button style primitives               |
 
 ## Known Limitations / Follow-ups
 

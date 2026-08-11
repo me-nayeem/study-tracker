@@ -53,7 +53,9 @@ export function SubjectList({ data }: { data: StudentDashboardData }) {
                             key={chapter.id}
                             chapter={chapter}
                             percent={computeChapterProgress(chapter.topics, topicProgressByTopicId)}
-                            status={chapterMasteryByChapterId.get(chapter.id)?.status ?? "NOT_STARTED"}
+                            status={
+                              chapterMasteryByChapterId.get(chapter.id)?.status ?? "NOT_STARTED"
+                            }
                           />
                         ))}
                       </ul>

@@ -116,7 +116,6 @@ export async function getStudentDashboardData(
   };
 }
 
-
 async function getChapterWithOwnership(chapterId: string) {
   return prisma.chapter.findFirst({
     where: { id: chapterId, isArchived: false },

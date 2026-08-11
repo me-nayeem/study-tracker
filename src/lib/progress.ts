@@ -16,7 +16,6 @@ export type ProgressChapterInput = {
   topics: ProgressTopicInput[];
 };
 
-
 export function computeChapterProgress(
   topics: ProgressTopicInput[],
   progressByTopicId: ReadonlyMap<string, TopicProgressFlags>
@@ -35,7 +34,6 @@ export function computeChapterProgress(
   const total = topics.length * CHECKS_PER_TOPIC;
   return round1((checked / total) * 100);
 }
-
 
 export function computeSubjectProgress(
   chapters: ProgressChapterInput[],
@@ -56,8 +54,8 @@ export function computeSubjectProgress(
   return round1(weightedSum / totalWeight);
 }
 
-export function buildTopicProgressMap
-<  T extends { topicId: string; readDone: boolean; lectureDone: boolean; solvedDone: boolean },
+export function buildTopicProgressMap<
+  T extends { topicId: string; readDone: boolean; lectureDone: boolean; solvedDone: boolean },
 >(rows: T[]): Map<string, TopicProgressFlags> {
   const map = new Map<string, TopicProgressFlags>();
   for (const row of rows) {

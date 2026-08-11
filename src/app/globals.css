@@ -50,6 +50,10 @@ body {
   .animate-card-in {
     animation: card-in 0.5s ease-out;
   }
+
+  .hero-slide {
+    transition: opacity 1200ms ease-in-out;
+  }
 }
 
 @keyframes dot-pulse {
@@ -73,4 +77,21 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee-scroll 34s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
 }
