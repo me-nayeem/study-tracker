@@ -11,15 +11,15 @@ export default async function DashboardPage() {
     redirect("/onboarding");
   }
 
-  const track = await getStudentDashboardData(profile.trackId);
+  const data = await getStudentDashboardData(profile.trackId, profile.id);
 
   return (
     <div>
       <h1 className="font-display text-foreground text-2xl">Dashboard</h1>
-      <p className="text-text-secondary mt-1 text-sm">{track?.name}</p>
+      <p className="text-text-secondary mt-1 text-sm">{data.track?.name}</p>
 
       <div className="mt-6">
-        <SubjectList track={track} />
+        <SubjectList data={data} />
       </div>
     </div>
   );

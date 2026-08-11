@@ -34,6 +34,13 @@ export function fieldErrorState(error: ZodError): ActionState {
   };
 }
 
+export class ChapterAlreadySubmittedError extends Error {
+  constructor() {
+    super("This chapter was already marked complete.");
+    this.name = "ChapterAlreadySubmittedError";
+  }
+}
+
 export function handlePrismaError(err: unknown, entityLabel: string): ActionState {
   if (err instanceof TopicDeleteBlockedError || err instanceof LastAdminError) {
     return { success: false, error: err.message };
@@ -60,6 +67,14 @@ export function handlePrismaError(err: unknown, entityLabel: string): ActionStat
       };
     }
   }
+
+  if (
+  err instanceof TopicDeleteBlockedError ||
+  err instanceof LastAdminError ||
+  err instanceof ChapterAlreadySubmittedError
+) {
+  return { success: false, error: err.message };
+}
 
   console.error(`[curriculum] unexpected error on ${entityLabel}:`, err);
   return { success: false, error: "Something went wrong. Please try again." };
