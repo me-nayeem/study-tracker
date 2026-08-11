@@ -11,14 +11,18 @@ function isPublicRoute(path: string): boolean {
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  if (isPublicRoute(path)) {
-    return NextResponse.next();
-  }
-
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
+
+  if (path === "/login" && token) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (isPublicRoute(path)) {
+    return NextResponse.next();
+  }
 
   if (!token) {
     return NextResponse.redirect(new URL("/login", request.url));
