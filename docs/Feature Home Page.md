@@ -72,7 +72,7 @@ src/app/globals.css — .hero-slide opacity-transition rule (replaces the earlie
 - **Developer credit lives in the footer**, not primary nav — kept out of the
   way of signup/CTA attention per standard practice for a student-facing product.
 - **Mobile hero text** is centered (both axes) via `items-center justify-center
-  text-center`; desktop keeps the original bottom-left-anchored layout via
+text-center`; desktop keeps the original bottom-left-anchored layout via
   `md:items-start md:justify-end md:text-left`.
 
 ## Known follow-ups (not blocking)

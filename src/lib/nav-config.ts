@@ -28,11 +28,6 @@ export const STAFF_NAV: StaffNavEntry[] = [
       items: [
         { label: "Playlists", href: "/manager/playlists", roles: ["ADMIN", "MANAGER"] },
         { label: "Special videos", href: "/manager/special-videos", roles: ["ADMIN", "MANAGER"] },
-        {
-          label: "Notes moderation",
-          href: "/manager/notes-moderation",
-          roles: ["ADMIN", "MANAGER"],
-        },
         { label: "Official notes", href: "/manager/official-notes", roles: ["ADMIN", "MANAGER"] },
       ],
     },
