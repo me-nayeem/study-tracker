@@ -93,4 +93,13 @@ export async function searchChaptersForPicker(query: string) {
   });
 }
 
+
+export async function getTopicsForChapter(chapterId: string) {
+  return prisma.topic.findMany({
+    where: { chapterId, isArchived: false },
+    orderBy: { order: "asc" },
+    select: { id: true, name: true },
+  });
+}
+
 export type ChapterPickerResult = Awaited<ReturnType<typeof searchChaptersForPicker>>[number];

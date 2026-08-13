@@ -140,10 +140,15 @@ export default async function ChapterDetailPage({
       <div className="border-bg-elevated border-t pt-4">
         {canMarkComplete ? (
           <MarkCompleteButton chapterId={chapter.id} />
+        ) : status === "AWAITING_QUIZ" || status === "NEEDS_REVIEW" ? (
+          <Link
+            href={`/chapter/${chapter.id}/quiz`}
+            className="bg-accent-primary text-foreground inline-block w-full rounded-lg py-2.5 text-center font-medium transition-transform active:scale-[0.98] sm:w-auto sm:px-6"
+          >
+            {status === "NEEDS_REVIEW" ? "Retake quiz" : "Take quiz"}
+          </Link>
         ) : (
-          <p className="text-text-secondary text-sm">
-            This chapter has already been submitted for review.
-          </p>
+          <p className="text-state-success text-sm font-medium">Chapter mastered.</p>
         )}
       </div>
     </div>

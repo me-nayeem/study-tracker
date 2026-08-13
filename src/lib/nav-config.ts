@@ -29,6 +29,7 @@ export const STAFF_NAV: StaffNavEntry[] = [
         { label: "Playlists", href: "/manager/playlists", roles: ["ADMIN", "MANAGER"] },
         { label: "Special videos", href: "/manager/special-videos", roles: ["ADMIN", "MANAGER"] },
         { label: "Official notes", href: "/manager/official-notes", roles: ["ADMIN", "MANAGER"] },
+        { label: "Quizzes", href: "/manager/quizzes", roles: ["ADMIN", "MANAGER"] },
       ],
     },
   },
@@ -68,4 +69,4 @@ export type StudentNavItem = {
   href: string;
 };
 
-export const STUDENT_NAV: StudentNavItem[] = [{ label: "Dashboard", href: "/dashboard" }];
+export const STUDENT_NAV: StudentNavItem[] = [{ label: "Dashboard", href: "/dashboard" }, { label: "Quiz results", href: "/quiz-results" },];

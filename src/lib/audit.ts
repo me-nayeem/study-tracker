@@ -23,6 +23,8 @@ export const AUDIT_ENTITY_TYPES = [
   "ChapterPlaylist",
   "ChapterSpecialVideo",
   "OfficialNote",
+  "Quiz",
+  "QuizQuestion",
   "ExamResult",
   "PointRule",
   "Plan",

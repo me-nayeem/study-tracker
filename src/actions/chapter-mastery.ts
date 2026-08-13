@@ -42,6 +42,18 @@ export async function markChapterComplete(
     return { success: false, error: "Chapter not found." };
   }
 
+  const activeQuiz = await prisma.quiz.findFirst({
+    where: { chapterId, isActive: true },
+    select: { _count: { select: { questions: true } } },
+  });
+
+  if (!activeQuiz || activeQuiz._count.questions === 0) {
+    return {
+      success: false,
+      error: "This chapter doesn't have an active quiz with questions yet. Contact an admin.",
+    };
+  }
+
   try {
     await prisma.$transaction(async (tx) => {
       const existing = await tx.chapterMastery.findUnique({

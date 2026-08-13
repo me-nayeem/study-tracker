@@ -144,6 +144,7 @@ enum NotificationType {
   RECOMMENDATION
   PACE_ALERT
   SYSTEM
+  CHAPTER_NEEDS_REVIEW
 }
 
 enum SubscriptionStatus {
@@ -343,6 +344,7 @@ model Topic {
   topicProgress TopicProgress[]
   resources     Resource[]
   externalExams ExternalExam[] 
+  quizQuestions QuizQuestion[] 
 
   @@unique([chapterId, name])
 }
@@ -404,6 +406,9 @@ model QuizQuestion {
   correctIndex Int
   explanation  String?
   order        Int     @default(0)
+
+  topicId String?
+  topic   Topic?  @relation(fields: [topicId], references: [id], onDelete: SetNull)
 }
 
 model QuizAttempt {
