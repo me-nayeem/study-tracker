@@ -69,4 +69,8 @@ export type StudentNavItem = {
   href: string;
 };
 
-export const STUDENT_NAV: StudentNavItem[] = [{ label: "Dashboard", href: "/dashboard" }, { label: "Quiz results", href: "/quiz-results" },];
+export const STUDENT_NAV: StudentNavItem[] = [
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Leaderboard", href: "/leaderboard" },
+  { label: "Quiz results", href: "/quiz-results" },
+];

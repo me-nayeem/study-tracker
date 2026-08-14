@@ -93,7 +93,6 @@ export async function searchChaptersForPicker(query: string) {
   });
 }
 
-
 export async function getTopicsForChapter(chapterId: string) {
   return prisma.topic.findMany({
     where: { chapterId, isArchived: false },

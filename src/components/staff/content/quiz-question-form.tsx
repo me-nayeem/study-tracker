@@ -116,7 +116,9 @@ export function QuizQuestionForm({
             + Add option
           </button>
         )}
-        {state.fieldErrors?.options && <p className={errorTextClass}>{state.fieldErrors.options[0]}</p>}
+        {state.fieldErrors?.options && (
+          <p className={errorTextClass}>{state.fieldErrors.options[0]}</p>
+        )}
         {state.fieldErrors?.correctIndex && (
           <p className={errorTextClass}>{state.fieldErrors.correctIndex[0]}</p>
         )}
@@ -147,7 +149,12 @@ export function QuizQuestionForm({
         </div>
         <div>
           <label className={labelClass}>Order</label>
-          <input name="order" type="number" defaultValue={question?.order ?? 0} className={inputClass} />
+          <input
+            name="order"
+            type="number"
+            defaultValue={question?.order ?? 0}
+            className={inputClass}
+          />
         </div>
       </div>
 
@@ -158,7 +165,12 @@ export function QuizQuestionForm({
           {isPending ? "Saving…" : question ? "Save changes" : "Add question"}
         </button>
         {onCancel && (
-          <button type="button" onClick={onCancel} disabled={isPending} className={buttonSecondaryClass}>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isPending}
+            className={buttonSecondaryClass}
+          >
             Cancel
           </button>
         )}

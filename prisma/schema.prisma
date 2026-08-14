@@ -673,20 +673,6 @@ model StudyRoutine {
   @@index([studentId, isActive])
 }
 
-model StudyRoutineItem {
-  id          String       @id @default(cuid())
-  routineId   String
-  routine     StudyRoutine @relation(fields: [routineId], references: [id], onDelete: Cascade)
-  dayOfWeek   Int 
-  startMinute Int 
-  endMinute   Int
-  subjectId   String?
-  subject     Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
-  label       String?      @db.VarChar(160)
-
-  @@index([routineId, dayOfWeek])
-}
-
 model TodoItem {
   id              String         @id @default(cuid())
   studentId       String
@@ -699,10 +685,30 @@ model TodoItem {
   linkedChapter   Chapter?       @relation(fields: [linkedChapterId], references: [id], onDelete: SetNull)
   linkedExamId    String?
   linkedExam      ExternalExam?  @relation(fields: [linkedExamId], references: [id], onDelete: SetNull)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  sourceRoutineItemId String?
+  sourceRoutineItem   StudyRoutineItem? @relation(fields: [sourceRoutineItemId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([studentId, completed])
+  @@unique([sourceRoutineItemId, dueDate]) 
+}
+
+model StudyRoutineItem {
+  id          String       @id @default(cuid())
+  routineId   String
+  routine     StudyRoutine @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int
+  startMinute Int
+  endMinute   Int
+  subjectId   String?
+  subject     Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  label       String?      @db.VarChar(160)
+
+  todoItems TodoItem[] // new — reverse relation
+
+  @@index([routineId, dayOfWeek])
 }
 
 
@@ -728,7 +734,8 @@ model PointRule {
   id          String      @id @default(cuid())
   reason      PointReason @unique
   scoringMode ScoringMode @default(FLAT)
-  value       Float // meaning depends on scoringMode — see enum comment
+  value       Float 
+  secondaryValue Float?
   isActive    Boolean     @default(true)
   updatedAt   DateTime    @updatedAt
 }

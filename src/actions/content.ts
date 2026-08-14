@@ -17,6 +17,7 @@ import { getStudentProfile } from "@/lib/student-data";
 import { PlaylistReviewSchema } from "@/schemas/content";
 import { ChapterSpecialVideoSchema, ChapterSpecialVideoUpdateSchema } from "@/schemas/content";
 import { OfficialNoteSchema, OfficialNoteUpdateSchema } from "@/schemas/content";
+import { awardPoints } from "@/lib/points";
 
 function playlistPath(chapterId: string) {
   return `/manager/playlists/${chapterId}`;
@@ -167,10 +168,26 @@ export async function submitPlaylistReview(
   }
 
   try {
-    await prisma.playlistReview.upsert({
-      where: { playlistId_studentId: { playlistId, studentId: profile.id } },
-      create: { playlistId, studentId: profile.id, rating, comment: comment ?? null },
-      update: { rating, comment: comment ?? null },
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.playlistReview.findUnique({
+        where: { playlistId_studentId: { playlistId, studentId: profile.id } },
+      });
+
+      await tx.playlistReview.upsert({
+        where: { playlistId_studentId: { playlistId, studentId: profile.id } },
+        create: { playlistId, studentId: profile.id, rating, comment: comment ?? null },
+        update: { rating, comment: comment ?? null },
+      });
+
+      // Points only on the first review of this playlist by this student —
+      // upsert's update path means an edited review shouldn't re-award.
+      if (!existing) {
+        await awardPoints(tx, {
+          studentId: profile.id,
+          reason: "PLAYLIST_REVIEWED",
+          referenceId: playlistId,
+        });
+      }
     });
   } catch (err) {
     return handlePrismaError(err, "review");

@@ -80,7 +80,9 @@ export function QuizTakingForm({
       <button type="submit" disabled={isPending || !allAnswered} className={buttonPrimaryClass}>
         {isPending ? "Submitting…" : "Submit quiz"}
       </button>
-      {!allAnswered && <p className="text-text-secondary text-xs">Answer every question to submit.</p>}
+      {!allAnswered && (
+        <p className="text-text-secondary text-xs">Answer every question to submit.</p>
+      )}
     </form>
   );
 }
@@ -98,15 +100,23 @@ function QuizResultView({
     <div className="space-y-5">
       <div
         className={`rounded-xl border p-6 text-center ${
-          passed ? "border-state-success bg-state-success/10" : "border-state-warning bg-state-warning/10"
+          passed
+            ? "border-state-success bg-state-success/10"
+            : "border-state-warning bg-state-warning/10"
         }`}
       >
-        <p className={`font-mono text-3xl font-medium ${passed ? "text-state-success" : "text-state-warning"}`}>
+        <p
+          className={`font-mono text-3xl font-medium ${passed ? "text-state-success" : "text-state-warning"}`}
+        >
           {percent}%
         </p>
-        <p className="text-foreground mt-2 font-medium">{passed ? "Chapter mastered" : "Needs review"}</p>
+        <p className="text-foreground mt-2 font-medium">
+          {passed ? "Chapter mastered" : "Needs review"}
+        </p>
         {!passed && (
-          <p className="text-text-secondary mt-1 text-sm">You can retake this quiz in 60 minutes.</p>
+          <p className="text-text-secondary mt-1 text-sm">
+            You can retake this quiz in 60 minutes.
+          </p>
         )}
       </div>
 
@@ -116,14 +126,19 @@ function QuizResultView({
           {questionResults
             .filter((q) => !q.isCorrect)
             .map((q) => (
-              <div key={q.questionId} className="border-state-warning/40 bg-bg-surface rounded-xl border p-4">
+              <div
+                key={q.questionId}
+                className="border-state-warning/40 bg-bg-surface rounded-xl border p-4"
+              >
                 <p className="text-foreground text-sm font-medium">{q.questionText}</p>
                 {q.topicName && (
                   <span className="bg-accent-gamify/10 text-accent-gamify mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium">
                     {q.topicName}
                   </span>
                 )}
-                {q.explanation && <p className="text-text-secondary mt-2 text-sm">{q.explanation}</p>}
+                {q.explanation && (
+                  <p className="text-text-secondary mt-2 text-sm">{q.explanation}</p>
+                )}
               </div>
             ))}
         </div>

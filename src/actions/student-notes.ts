@@ -12,6 +12,7 @@ import {
   UpdateStudentNoteSchema,
   SetStudentNoteVisibilitySchema,
 } from "@/schemas/student-notes";
+import { awardPoints } from "@/lib/points";
 
 function chapterPath(chapterId: string) {
   return `/chapter/${chapterId}`;
@@ -62,8 +63,21 @@ export async function createStudentNote(
   }
 
   try {
-    await prisma.studentNote.create({
-      data: { studentId: profile.id, chapterId, title, fileUrl, isPublic, moderationStatus },
+    await prisma.$transaction(async (tx) => {
+      const existingCount = await tx.studentNote.count({
+        where: { studentId: profile.id, chapterId },
+      });
+
+      const note = await tx.studentNote.create({
+        data: { studentId: profile.id, chapterId, title, fileUrl, isPublic, moderationStatus },
+      });
+
+      await awardPoints(tx, {
+        studentId: profile.id,
+        reason: "NOTE_UPLOADED",
+        referenceId: note.id,
+        useSecondaryValue: existingCount > 0,
+      });
     });
   } catch (err) {
     return handlePrismaError(err, "note");

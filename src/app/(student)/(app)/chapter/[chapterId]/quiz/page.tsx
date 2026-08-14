@@ -41,7 +41,10 @@ export default async function ChapterQuizPage({
     if (onCooldown && availableAt) {
       return (
         <div className="space-y-4">
-          <Link href={`/chapter/${chapterId}`} className="text-text-secondary text-xs hover:underline">
+          <Link
+            href={`/chapter/${chapterId}`}
+            className="text-text-secondary text-xs hover:underline"
+          >
             ← {chapter.name}
           </Link>
           <div className="border-bg-elevated bg-bg-surface rounded-xl border p-6 text-center">

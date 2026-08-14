@@ -145,7 +145,8 @@ export async function deleteQuiz(_prev: ActionState, formData: FormData): Promis
     ) {
       return {
         success: false,
-        error: "This quiz has student attempts recorded and can't be deleted. Deactivate it instead.",
+        error:
+          "This quiz has student attempts recorded and can't be deleted. Deactivate it instead.",
       };
     }
     return handlePrismaError(err, "quiz");

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/dal";
 import { getStudentProfile } from "@/lib/student-data";
 import { getQuizCooldown } from "@/lib/quiz-data";
+import { awardPoints } from "@/lib/points";
 import { fieldErrorState } from "@/lib/prisma-errors";
 import { formValue } from "@/lib/form-data";
 import { SubmitQuizAttemptSchema } from "@/schemas/quiz-attempt";
@@ -55,6 +56,7 @@ export async function submitQuizAttempt(
       id: true,
       name: true,
       masteryPassPercent: true,
+      examWeight: true,
       paper: { select: { subject: { select: { trackId: true } } } },
     },
   });
@@ -114,7 +116,7 @@ export async function submitQuizAttempt(
   const now = new Date();
 
   await prisma.$transaction(async (tx) => {
-    await tx.quizAttempt.create({
+    const attempt = await tx.quizAttempt.create({
       data: {
         studentId: profile.id,
         quizId,
@@ -134,6 +136,22 @@ export async function submitQuizAttempt(
         masteredAt: passed ? now : chapterMastery.masteredAt,
       },
     });
+
+    await awardPoints(tx, {
+      studentId: profile.id,
+      reason: "QUIZ_ATTEMPT",
+      referenceId: attempt.id,
+      quantity: correctCount,
+    });
+
+    if (passed) {
+      await awardPoints(tx, {
+        studentId: profile.id,
+        reason: "CHAPTER_MASTERED",
+        referenceId: chapterId,
+        quantity: chapter.examWeight,
+      });
+    }
 
     if (!passed) {
       await tx.notification.create({

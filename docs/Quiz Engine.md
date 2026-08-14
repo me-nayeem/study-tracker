@@ -1,19 +1,23 @@
 # Feature — Quiz / Auto-Validation Engine
 
 ## Overview
+
 Automated quiz gating on chapter completion. A chapter marked complete
 (`AWAITING_QUIZ`) fires its active `Quiz`; the score against
 `Chapter.masteryPassPercent` determines `MASTERED` vs `NEEDS_REVIEW`.
 Failed students face a 1-hour cooldown before retaking.
 
 ## Schema additions
+
 - `QuizQuestion.topicId` (optional, `onDelete: SetNull`) — links a question
   back to the specific `Topic` it tests, so a wrong answer can be traced to
   a weak spot below chapter granularity.
 - `Topic.quizQuestions` — reverse relation for the above.
 - `NotificationType.CHAPTER_NEEDS_REVIEW` — new enum value for the
-  needs-review notification trigger 
+  needs-review notification trigger
+
 ## Admin/Manager (Content ops)
+
 - `(staff)/manager/quizzes` — list of chapters with quiz status
 - `(staff)/manager/quizzes/[chapterId]` — CRUD for `Quiz` + `QuizQuestion`
   (question text, 4 options as `Json`, `correctIndex`, optional
@@ -22,6 +26,7 @@ Failed students face a 1-hour cooldown before retaking.
   `quiz-question-form.tsx`
 
 ## Student flow
+
 1. `mark-complete-button.tsx` flips `ChapterMastery.status` →
    `AWAITING_QUIZ` (`actions/chapter-mastery.ts`)
 2. `/chapter/[chapterId]/quiz` (`app/(student)/(app)/chapter/[chapterId]/quiz/page.tsx`)
@@ -46,13 +51,14 @@ Failed students face a 1-hour cooldown before retaking.
    the in-app quiz.
 5. `mastery-badge.tsx` reflects current `MasteryStatus` on chapter/dashboard views.
 
-
 ## Bugs fixed
+
 - `Cannot call impure function during render` — `Date.now()` was called
   inline in `quiz/page.tsx`'s render body. Moved the calculation into
   `getQuizCooldown()` (an async server data function), which now returns
   `minutesLeft` pre-computed rather than the page deriving it during render.
 
 ## Definition of done (workflow.md, met)
+
 Check topics → mark complete → quiz → MASTERED/NEEDS_REVIEW, full loop,
 plus topic-level breakdown on failure and a working 1-hour retake gate.

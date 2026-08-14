@@ -37,12 +37,20 @@ function ResultRow({ result }: { result: StudentQuizResultWithReview }) {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
-          {percent !== null && <span className="text-text-secondary font-mono text-xs">{percent}%</span>}
-          <span className={`text-xs font-medium ${passed ? "text-state-success" : "text-state-warning"}`}>
+          {percent !== null && (
+            <span className="text-text-secondary font-mono text-xs">{percent}%</span>
+          )}
+          <span
+            className={`text-xs font-medium ${passed ? "text-state-success" : "text-state-warning"}`}
+          >
             {passed ? "Mastered" : "Needs review"}
           </span>
           {!passed && review && review.length > 0 && (
-            <button type="button" onClick={() => setExpanded((v) => !v)} className={buttonGhostClass}>
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              className={buttonGhostClass}
+            >
               {expanded ? "Hide" : "View details"}
             </button>
           )}

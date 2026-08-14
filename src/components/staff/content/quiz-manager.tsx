@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createQuiz, updateQuiz, setQuizActive, deleteQuiz, deleteQuizQuestion } from "@/actions/quiz";
+import {
+  createQuiz,
+  updateQuiz,
+  setQuizActive,
+  deleteQuiz,
+  deleteQuizQuestion,
+} from "@/actions/quiz";
 import { EntityForm } from "@/components/staff/curriculum/entity-form";
 import {
   buttonGhostClass,
@@ -34,7 +40,11 @@ export function QuizManager({
             onCancel={() => setAddingQuiz(false)}
           />
         ) : (
-          <button type="button" onClick={() => setAddingQuiz(true)} className={buttonSecondaryClass}>
+          <button
+            type="button"
+            onClick={() => setAddingQuiz(true)}
+            className={buttonSecondaryClass}
+          >
             + Add quiz
           </button>
         )}
@@ -75,8 +85,14 @@ function QuizForm({
       {(state) => (
         <div>
           <label className={labelClass}>Title</label>
-          <input name="title" defaultValue={quiz?.title ?? "Validation quiz"} className={inputClass} />
-          {state.fieldErrors?.title && <p className={errorTextClass}>{state.fieldErrors.title[0]}</p>}
+          <input
+            name="title"
+            defaultValue={quiz?.title ?? "Validation quiz"}
+            className={inputClass}
+          />
+          {state.fieldErrors?.title && (
+            <p className={errorTextClass}>{state.fieldErrors.title[0]}</p>
+          )}
         </div>
       )}
     </EntityForm>
@@ -141,11 +157,21 @@ function QuizCard({
             Edit
           </button>
           {!quiz.isActive && (
-            <button type="button" onClick={handleSetActive} disabled={isPending} className={buttonGhostClass}>
+            <button
+              type="button"
+              onClick={handleSetActive}
+              disabled={isPending}
+              className={buttonGhostClass}
+            >
               {isPending ? "…" : "Set active"}
             </button>
           )}
-          <button type="button" onClick={handleDelete} disabled={isPending} className={buttonGhostClass}>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isPending}
+            className={buttonGhostClass}
+          >
             {isPending ? "…" : "Delete"}
           </button>
         </div>
@@ -173,7 +199,11 @@ function QuizCard({
               onCancel={() => setAddingQuestion(false)}
             />
           ) : (
-            <button type="button" onClick={() => setAddingQuestion(true)} className={buttonSecondaryClass}>
+            <button
+              type="button"
+              onClick={() => setAddingQuestion(true)}
+              className={buttonSecondaryClass}
+            >
               + Add question
             </button>
           )}
@@ -223,13 +253,20 @@ function QuestionRow({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-foreground text-sm font-medium">{question.questionText}</p>
-          <p className="text-text-secondary mt-1 text-xs">Correct: {options[question.correctIndex]}</p>
+          <p className="text-text-secondary mt-1 text-xs">
+            Correct: {options[question.correctIndex]}
+          </p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <button type="button" onClick={() => setEditing((v) => !v)} className={buttonGhostClass}>
             Edit
           </button>
-          <button type="button" onClick={handleDelete} disabled={isPending} className={buttonGhostClass}>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isPending}
+            className={buttonGhostClass}
+          >
             {isPending ? "…" : "Delete"}
           </button>
         </div>

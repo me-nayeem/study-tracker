@@ -43,7 +43,12 @@ export function FailedQuizNoticeBoard({ notices }: { notices: ChapterReviewNotic
             className="text-text-secondary hover:text-foreground absolute top-3 right-3"
           >
             <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none">
-              <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path
+                d="M4 4l8 8M12 4l-8 8"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
           <p className="text-foreground text-sm font-medium">{notice.title}</p>

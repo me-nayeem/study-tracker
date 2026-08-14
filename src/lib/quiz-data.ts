@@ -28,7 +28,6 @@ export async function getQuizCooldown(chapterMasteryId: string) {
       ? Math.max(0, Math.ceil((availableAt.getTime() - Date.now()) / 60000))
       : null;
 
-
   return { onCooldown, availableAt: onCooldown ? availableAt : null, minutesLeft };
 }
 
