@@ -170,3 +170,184 @@ export async function setStudentNoteVisibility(
   revalidatePath(chapterPath(existing.chapterId));
   return { success: true };
 }
+
+import { NoteInteractionSchema, RateNoteSchema } from "@/schemas/student-notes";
+
+function notesFeedPath() {
+  return "/notes";
+}
+
+export async function toggleStudentNoteLike(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = NoteInteractionSchema.safeParse({ id: formValue(formData, "id") });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const { id } = parsed.data;
+
+  const profile = await getStudentProfile(user.id);
+  if (!profile) return { success: false, error: "No student profile found." };
+
+  const note = await prisma.studentNote.findFirst({
+    where: { id, isPublic: true, moderationStatus: "APPROVED" },
+    select: { id: true, studentId: true, chapterId: true },
+  });
+  if (!note) return { success: false, error: "Note not found." };
+  if (note.studentId === profile.id) {
+    return { success: false, error: "You can't like your own note." };
+  }
+
+  try {
+    const existing = await prisma.studentNoteLike.findUnique({
+      where: { noteId_studentId: { noteId: id, studentId: profile.id } },
+    });
+    if (existing) {
+      await prisma.studentNoteLike.delete({ where: { id: existing.id } });
+    } else {
+      await prisma.studentNoteLike.create({ data: { noteId: id, studentId: profile.id } });
+    }
+  } catch (err) {
+    return handlePrismaError(err, "like");
+  }
+
+  revalidatePath(notesFeedPath());
+  revalidatePath(`/chapter/${note.chapterId}`);
+  return { success: true };
+}
+
+export async function rateStudentNote(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = RateNoteSchema.safeParse({
+    id: formValue(formData, "id"),
+    rating: formValue(formData, "rating"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const { id, rating } = parsed.data;
+
+  const profile = await getStudentProfile(user.id);
+  if (!profile) return { success: false, error: "No student profile found." };
+
+  const note = await prisma.studentNote.findFirst({
+    where: { id, isPublic: true, moderationStatus: "APPROVED" },
+    select: { id: true, studentId: true, chapterId: true },
+  });
+  if (!note) return { success: false, error: "Note not found." };
+  if (note.studentId === profile.id) {
+    return { success: false, error: "You can't rate your own note." };
+  }
+
+  try {
+    await prisma.studentNoteRating.upsert({
+      where: { noteId_studentId: { noteId: id, studentId: profile.id } },
+      create: { noteId: id, studentId: profile.id, rating },
+      update: { rating },
+    });
+  } catch (err) {
+    return handlePrismaError(err, "rating");
+  }
+
+  revalidatePath(notesFeedPath());
+  revalidatePath(`/chapter/${note.chapterId}`);
+  return { success: true };
+}
+
+import {
+  CommentOnNoteSchema,
+  UpdateNoteCommentSchema,
+  DeleteNoteCommentSchema,
+} from "@/schemas/student-notes";
+
+export async function commentOnStudentNote(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = CommentOnNoteSchema.safeParse({
+    noteId: formValue(formData, "noteId"),
+    body: formValue(formData, "body"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const { noteId, body } = parsed.data;
+
+  const profile = await getStudentProfile(user.id);
+  if (!profile) return { success: false, error: "No student profile found." };
+
+  const note = await prisma.studentNote.findFirst({
+    where: { id: noteId, isPublic: true, moderationStatus: "APPROVED" },
+    select: { id: true, chapterId: true },
+  });
+  if (!note) return { success: false, error: "Note not found." };
+
+  try {
+    await prisma.studentNoteComment.create({
+      data: { noteId, studentId: profile.id, body },
+    });
+  } catch (err) {
+    return handlePrismaError(err, "comment");
+  }
+
+  revalidatePath(notesFeedPath());
+  revalidatePath(`/chapter/${note.chapterId}`);
+  return { success: true };
+}
+
+export async function updateStudentNoteComment(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = UpdateNoteCommentSchema.safeParse({
+    id: formValue(formData, "id"),
+    body: formValue(formData, "body"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const { id, body } = parsed.data;
+
+  const profile = await getStudentProfile(user.id);
+  if (!profile) return { success: false, error: "No student profile found." };
+
+  const existing = await prisma.studentNoteComment.findUnique({ where: { id } });
+  if (!existing || existing.studentId !== profile.id) {
+    return { success: false, error: "Comment not found." };
+  }
+
+  try {
+    await prisma.studentNoteComment.update({ where: { id }, data: { body } });
+  } catch (err) {
+    return handlePrismaError(err, "comment");
+  }
+
+  revalidatePath(notesFeedPath());
+  return { success: true };
+}
+
+export async function deleteStudentNoteComment(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = DeleteNoteCommentSchema.safeParse({ id: formValue(formData, "id") });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const { id } = parsed.data;
+
+  const profile = await getStudentProfile(user.id);
+  if (!profile) return { success: false, error: "No student profile found." };
+
+  const existing = await prisma.studentNoteComment.findUnique({ where: { id } });
+  if (!existing || existing.studentId !== profile.id) {
+    return { success: false, error: "Comment not found." };
+  }
+
+  try {
+    await prisma.studentNoteComment.delete({ where: { id } });
+  } catch (err) {
+    return handlePrismaError(err, "comment");
+  }
+
+  revalidatePath(notesFeedPath());
+  return { success: true };
+}

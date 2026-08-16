@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/dal";
 import { getStudentProfile } from "@/lib/student-data";
 import { StudentShell } from "@/components/student/student-shell";
+import { FloatingCalculator } from "@/components/student/floating-calculator";
 
 export default async function StudentAppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
@@ -12,8 +13,9 @@ export default async function StudentAppLayout({ children }: { children: React.R
   }
 
   return (
-    <StudentShell name={user.name} email={user.email}>
+    <StudentShell name={user.name} email={user.email} image={user.image}>
       {children}
+      <FloatingCalculator />
     </StudentShell>
   );
 }

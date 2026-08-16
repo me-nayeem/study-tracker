@@ -1,5 +1,6 @@
 import "./globals.css";
 import { IBM_Plex_Mono, Work_Sans, Fraunces } from "next/font/google";
+import { AuthSessionProvider } from "@/components/auth/session-provider";
 
 const ibm_plex_mono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${ibm_plex_mono.variable} ${work_sans.variable} ${fraunces.variable}`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <AuthSessionProvider>{children}</AuthSessionProvider>
+      </body>
     </html>
   );
 }

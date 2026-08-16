@@ -51,6 +51,20 @@ export function PlaylistForm({
             )}
           </div>
           <div>
+            <label className={labelClass}>
+              Channel URL <span className="font-normal">(optional)</span>
+            </label>
+            <input
+              name="channelUrl"
+              defaultValue={playlist?.channelUrl ?? ""}
+              placeholder="https://youtube.com/@channelname"
+              className={inputClass}
+            />
+            {state.fieldErrors?.channelUrl && (
+              <p className={errorTextClass}>{state.fieldErrors.channelUrl[0]}</p>
+            )}
+          </div>
+          <div>
             <label className={labelClass}>Order</label>
             <input
               name="order"

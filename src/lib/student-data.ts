@@ -178,3 +178,77 @@ export async function getChapterDetail(
     chapterMastery: mastery,
   };
 }
+
+async function getPaperWithOwnership(paperId: string) {
+  return prisma.paper.findFirst({
+    where: { id: paperId, isArchived: false },
+    include: {
+      subject: { select: { id: true, name: true, trackId: true } },
+      chapters: {
+        where: { isArchived: false },
+        orderBy: { order: "asc" },
+        include: {
+          topics: {
+            where: { isArchived: false },
+            orderBy: { order: "asc" },
+            select: { id: true },
+          },
+        },
+      },
+    },
+  });
+}
+
+export type StudentPaperDetail = NonNullable<Awaited<ReturnType<typeof getPaperWithOwnership>>>;
+export type StudentPaperChapter = StudentPaperDetail["chapters"][number];
+
+export type PaperDetailData = {
+  paper: StudentPaperDetail;
+  topicProgressByTopicId: Map<string, TopicProgressFlags>;
+  chapterMasteryByChapterId: Map<string, ChapterMasteryLite>;
+};
+
+export async function getPaperDetail(
+  paperId: string,
+  studentId: string,
+  trackId: string
+): Promise<PaperDetailData | null> {
+  const paper = await getPaperWithOwnership(paperId);
+
+  if (!paper || paper.subject.trackId !== trackId) {
+    return null;
+  }
+
+  const chapterIds = paper.chapters.map((c) => c.id);
+  const topicIds = paper.chapters.flatMap((c) => c.topics.map((t) => t.id));
+
+  const [topicProgressRows, chapterMasteryRows] = await Promise.all([
+    topicIds.length > 0
+      ? prisma.topicProgress.findMany({
+          where: { studentId, topicId: { in: topicIds } },
+          select: { topicId: true, readDone: true, lectureDone: true, solvedDone: true },
+        })
+      : Promise.resolve([]),
+    chapterIds.length > 0
+      ? prisma.chapterMastery.findMany({
+          where: { studentId, chapterId: { in: chapterIds } },
+          select: { chapterId: true, status: true, markedCompleteAt: true, masteredAt: true },
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const chapterMasteryByChapterId = new Map<string, ChapterMasteryLite>();
+  for (const row of chapterMasteryRows) {
+    chapterMasteryByChapterId.set(row.chapterId, {
+      status: row.status,
+      markedCompleteAt: row.markedCompleteAt,
+      masteredAt: row.masteredAt,
+    });
+  }
+
+  return {
+    paper,
+    topicProgressByTopicId: buildTopicProgressMap(topicProgressRows),
+    chapterMasteryByChapterId,
+  };
+}

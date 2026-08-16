@@ -32,3 +32,30 @@ export const UpdateStudentNoteSchema = z.object({
 });
 
 export const SetStudentNoteVisibilitySchema = z.object({ id });
+
+export const NoteInteractionSchema = z.object({ id });
+
+export const RateNoteSchema = z.object({
+  id,
+  rating: z.coerce.number().int().min(1, "Rating is required.").max(5),
+});
+
+export const CommentOnNoteSchema = z.object({
+  noteId: id,
+  body: z
+    .string()
+    .trim()
+    .min(1, "Comment can't be empty.")
+    .max(500, "Keep it under 500 characters."),
+});
+
+export const UpdateNoteCommentSchema = z.object({
+  id,
+  body: z
+    .string()
+    .trim()
+    .min(1, "Comment can't be empty.")
+    .max(500, "Keep it under 500 characters."),
+});
+
+export const DeleteNoteCommentSchema = z.object({ id });

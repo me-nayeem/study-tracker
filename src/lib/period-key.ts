@@ -34,3 +34,30 @@ export function getMonthlyKey(date: Date): string {
 }
 
 export const ALL_TIME_KEY = "ALL";
+
+export function getDhakaTomorrowParts(now: Date): {
+  year: number;
+  month: number;
+  day: number;
+  weekday: number;
+} {
+  const { year, month, day } = getDhakaDateParts(now);
+  const anchor = new Date(Date.UTC(year, month - 1, day));
+  anchor.setUTCDate(anchor.getUTCDate() + 1);
+  return {
+    year: anchor.getUTCFullYear(),
+    month: anchor.getUTCMonth() + 1,
+    day: anchor.getUTCDate(),
+    weekday: anchor.getUTCDay(),
+  };
+}
+
+export function dhakaWallClockToUtc(
+  year: number,
+  month: number,
+  day: number,
+  minuteOfDay: number
+): Date {
+  const dhakaMs = Date.UTC(year, month - 1, day, 0, minuteOfDay, 0);
+  return new Date(dhakaMs - 6 * 60 * 60 * 1000);
+}

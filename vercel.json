@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/cron/abandon-sessions", "schedule": "0 20 * * *" },
+    { "path": "/api/cron/generate-routine-todos", "schedule": "0 18 * * *" }
+  ]
+}

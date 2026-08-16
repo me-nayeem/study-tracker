@@ -10,6 +10,10 @@
 
   --accent-primary: #d9714b;
   --accent-gamify: #e3a857;
+  --accent-blue: #5b8def;
+  --accent-purple: #8b7fd9;
+  --accent-red: #d9605b;
+  --accent-teal: #4fa8a0;
 
   --state-success: #7ca982;
   --state-warning: #c75c4a;
@@ -26,6 +30,10 @@
 
   --color-accent-primary: var(--accent-primary);
   --color-accent-gamify: var(--accent-gamify);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-purple: var(--accent-purple);
+  --color-accent-red: var(--accent-red);
+  --color-accent-teal: var(--accent-teal);
 
   --color-state-success: var(--state-success);
   --color-state-warning: var(--state-warning);

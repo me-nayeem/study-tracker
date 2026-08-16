@@ -1,18 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import type { ChapterPlaylist } from "@/generated/prisma/client";
-import { setChapterPlaylistArchived } from "@/actions/content";
+import type { ChapterPlaylist, ChapterPlaylistVideo } from "@/generated/prisma/client";
+import { setChapterPlaylistArchived, setPlaylistVideoArchived } from "@/actions/content";
 import { ArchiveToggleButton } from "@/components/staff/curriculum/toggle-buttons";
 import { buttonGhostClass, buttonSecondaryClass } from "@/components/shared/classes";
 import { PlaylistForm } from "./playlist-forms";
+import { PlaylistVideoForm } from "./playlist-video-forms";
+
+type PlaylistWithVideos = ChapterPlaylist & { videos: ChapterPlaylistVideo[] };
 
 export function PlaylistManager({
   chapterId,
   playlists,
 }: {
   chapterId: string;
-  playlists: ChapterPlaylist[];
+  playlists: PlaylistWithVideos[];
 }) {
   const [adding, setAdding] = useState(false);
 
@@ -45,8 +48,9 @@ export function PlaylistManager({
   );
 }
 
-function PlaylistRow({ chapterId, playlist }: { chapterId: string; playlist: ChapterPlaylist }) {
+function PlaylistRow({ chapterId, playlist }: { chapterId: string; playlist: PlaylistWithVideos }) {
   const [editing, setEditing] = useState(false);
+  const [addingVideo, setAddingVideo] = useState(false);
 
   return (
     <div className="border-bg-elevated bg-bg-surface rounded-xl border p-4">
@@ -82,6 +86,69 @@ function PlaylistRow({ chapterId, playlist }: { chapterId: string; playlist: Cha
           <PlaylistForm
             chapterId={chapterId}
             playlist={playlist}
+            onSuccess={() => setEditing(false)}
+            onCancel={() => setEditing(false)}
+          />
+        </div>
+      )}
+
+      <div className="border-bg-elevated mt-4 border-t pt-4">
+        <h4 className="text-text-secondary mb-3 text-xs font-medium tracking-wide uppercase">
+          Videos in this playlist ({playlist.videos.length})
+        </h4>
+
+        <div className="space-y-2">
+          {playlist.videos.map((video) => (
+            <VideoRow key={video.id} playlistId={playlist.id} video={video} />
+          ))}
+        </div>
+
+        <div className="mt-3">
+          {addingVideo ? (
+            <PlaylistVideoForm
+              playlistId={playlist.id}
+              onSuccess={() => setAddingVideo(false)}
+              onCancel={() => setAddingVideo(false)}
+            />
+          ) : (
+            <button type="button" onClick={() => setAddingVideo(true)} className={buttonGhostClass}>
+              + Add video
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VideoRow({ playlistId, video }: { playlistId: string; video: ChapterPlaylistVideo }) {
+  const [editing, setEditing] = useState(false);
+
+  return (
+    <div className="bg-bg-elevated rounded-lg p-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-foreground truncate text-sm">
+            {video.title}
+            {video.isArchived && <ArchivedBadge />}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2 text-xs">
+          <button type="button" onClick={() => setEditing((v) => !v)} className={buttonGhostClass}>
+            Edit
+          </button>
+          <ArchiveToggleButton
+            id={video.id}
+            isArchived={video.isArchived}
+            action={setPlaylistVideoArchived}
+          />
+        </div>
+      </div>
+      {editing && (
+        <div className="mt-3">
+          <PlaylistVideoForm
+            playlistId={playlistId}
+            video={video}
             onSuccess={() => setEditing(false)}
             onCancel={() => setEditing(false)}
           />

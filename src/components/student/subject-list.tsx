@@ -1,12 +1,22 @@
 import Link from "next/link";
-import type { MasteryStatus } from "@/generated/prisma/enums";
-import type { StudentDashboardData, StudentDashboardChapter } from "@/lib/student-data";
-import { computeChapterProgress, computeSubjectProgress } from "@/lib/progress";
+import { BookOpen, Atom, Calculator, FlaskConical, Globe, Landmark } from "lucide-react";
+import type { StudentDashboardData } from "@/lib/student-data";
+import { computeSubjectProgress } from "@/lib/progress";
 import { ProgressBar } from "./progress-bar";
-import { MasteryBadge } from "./mastery-badge";
+
+const ICONS = [BookOpen, Atom, Calculator, FlaskConical, Globe, Landmark];
+
+const COLOR_SETS = [
+  { bg: "bg-accent-blue/15", text: "text-accent-blue", bar: "bg-accent-blue" },
+  { bg: "bg-accent-purple/15", text: "text-accent-purple", bar: "bg-accent-purple" },
+  { bg: "bg-accent-red/15", text: "text-accent-red", bar: "bg-accent-red" },
+  { bg: "bg-accent-teal/15", text: "text-accent-teal", bar: "bg-accent-teal" },
+  { bg: "bg-accent-gamify/15", text: "text-accent-gamify", bar: "bg-accent-gamify" },
+  { bg: "bg-accent-primary/15", text: "text-accent-primary", bar: "bg-accent-primary" },
+];
 
 export function SubjectList({ data }: { data: StudentDashboardData }) {
-  const { track, topicProgressByTopicId, chapterMasteryByChapterId } = data;
+  const { track, topicProgressByTopicId } = data;
 
   if (!track || track.subjects.length === 0) {
     return (
@@ -19,48 +29,49 @@ export function SubjectList({ data }: { data: StudentDashboardData }) {
   }
 
   return (
-    <div className="space-y-6">
-      {track.subjects.map((subject) => {
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      {track.subjects.map((subject, i) => {
         const allChapters = subject.papers.flatMap((paper) => paper.chapters);
         const subjectPercent = computeSubjectProgress(allChapters, topicProgressByTopicId);
+        const Icon = ICONS[i % ICONS.length];
+        const colors = COLOR_SETS[i % COLOR_SETS.length];
 
         return (
-          <div key={subject.id} className="bg-bg-surface border-bg-elevated rounded-xl border p-5">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="font-display text-foreground text-lg">{subject.name}</h2>
-              <span className="text-text-secondary font-mono text-xs">{subjectPercent}%</span>
-            </div>
-            <div className="mt-2">
-              <ProgressBar percent={subjectPercent} />
+          <div
+            key={subject.id}
+            className="bg-bg-surface border-bg-elevated animate-card-in rounded-xl border p-5"
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${colors.bg} ${colors.text}`}
+              >
+                <Icon className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="font-display text-foreground truncate text-lg">{subject.name}</h2>
+                  <span className="text-text-secondary shrink-0 font-mono text-xs">
+                    {subjectPercent}%
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <ProgressBar percent={subjectPercent} />
+                </div>
+              </div>
             </div>
 
             {subject.papers.length === 0 ? (
               <p className="text-text-secondary mt-4 text-sm">No papers added yet.</p>
             ) : (
-              <div className="mt-4 space-y-4">
+              <div className="mt-4 flex gap-2">
                 {subject.papers.map((paper) => (
-                  <div key={paper.id}>
-                    <h3 className="text-text-secondary text-xs font-medium tracking-wide uppercase">
-                      {paper.name}
-                    </h3>
-
-                    {paper.chapters.length === 0 ? (
-                      <p className="text-text-secondary mt-1.5 text-sm">No chapters added yet.</p>
-                    ) : (
-                      <ul className="mt-1.5 space-y-1.5">
-                        {paper.chapters.map((chapter) => (
-                          <ChapterRow
-                            key={chapter.id}
-                            chapter={chapter}
-                            percent={computeChapterProgress(chapter.topics, topicProgressByTopicId)}
-                            status={
-                              chapterMasteryByChapterId.get(chapter.id)?.status ?? "NOT_STARTED"
-                            }
-                          />
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+                  <Link
+                    key={paper.id}
+                    href={`/paper/${paper.id}`}
+                    className="bg-accent-primary text-background flex-1 rounded-lg px-4 py-2 text-center text-sm font-medium transition-opacity hover:opacity-90"
+                  >
+                    {paper.name}
+                  </Link>
                 ))}
               </div>
             )}
@@ -68,30 +79,5 @@ export function SubjectList({ data }: { data: StudentDashboardData }) {
         );
       })}
     </div>
-  );
-}
-
-function ChapterRow({
-  chapter,
-  percent,
-  status,
-}: {
-  chapter: StudentDashboardChapter;
-  percent: number;
-  status: MasteryStatus;
-}) {
-  return (
-    <li>
-      <Link
-        href={`/chapter/${chapter.id}`}
-        className="bg-bg-elevated hover:bg-bg-elevated/70 flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors"
-      >
-        <span className="text-foreground min-w-0 truncate">{chapter.name}</span>
-        <span className="flex shrink-0 items-center gap-3">
-          <MasteryBadge status={status} />
-          <span className="text-text-secondary w-10 text-right font-mono text-xs">{percent}%</span>
-        </span>
-      </Link>
-    </li>
   );
 }

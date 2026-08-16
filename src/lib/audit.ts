@@ -29,6 +29,8 @@ export const AUDIT_ENTITY_TYPES = [
   "PointRule",
   "Plan",
   "PaidBatch",
+  "ChapterTip",
+  "ChapterPlaylistVideo",
 ] as const;
 export type AuditEntityType = (typeof AUDIT_ENTITY_TYPES)[number];
 

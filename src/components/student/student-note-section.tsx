@@ -4,74 +4,40 @@ import { useState, useTransition } from "react";
 import { setStudentNoteVisibility } from "@/actions/student-notes";
 import { buttonGhostClass, buttonSecondaryClass } from "@/components/shared/classes";
 import { StudentNoteForm } from "./student-note-form";
-import type { StudentNoteOwnerRow, PublicStudentNoteRow } from "@/lib/content-data";
+import type { StudentNoteOwnerRow } from "@/lib/content-data";
 
 export function StudentNoteSection({
   chapterId,
   ownNotes,
-  publicNotes,
 }: {
   chapterId: string;
   ownNotes: StudentNoteOwnerRow[];
-  publicNotes: PublicStudentNoteRow[];
 }) {
   const [adding, setAdding] = useState(false);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-text-secondary mb-2 text-xs font-medium tracking-wide uppercase">
-          My notes
-        </h3>
-
-        <div className="border-bg-elevated bg-bg-surface rounded-xl border p-4">
-          {adding ? (
-            <StudentNoteForm
-              chapterId={chapterId}
-              onSuccess={() => setAdding(false)}
-              onCancel={() => setAdding(false)}
-            />
-          ) : (
-            <button type="button" onClick={() => setAdding(true)} className={buttonSecondaryClass}>
-              + Add note
-            </button>
-          )}
-        </div>
-
-        {ownNotes.length > 0 && (
-          <div className="mt-3 space-y-3">
-            {ownNotes.map((note) => (
-              <OwnNoteRow key={note.id} chapterId={chapterId} note={note} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div>
-        <h3 className="text-text-secondary mb-2 text-xs font-medium tracking-wide uppercase">
-          Community notes
-        </h3>
-        {publicNotes.length === 0 ? (
-          <p className="text-text-secondary text-sm">No shared notes for this chapter yet.</p>
+    <div>
+      <div className="border-bg-elevated bg-bg-surface rounded-xl border p-4">
+        {adding ? (
+          <StudentNoteForm
+            chapterId={chapterId}
+            onSuccess={() => setAdding(false)}
+            onCancel={() => setAdding(false)}
+          />
         ) : (
-          <div className="space-y-2">
-            {publicNotes.map((note) => (
-              <a
-                key={note.id}
-                href={note.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-bg-elevated hover:bg-bg-elevated/70 flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors"
-              >
-                <span className="text-foreground min-w-0 truncate">{note.title}</span>
-                <span className="text-text-secondary shrink-0 text-xs">
-                  {note.student.user.name ?? "Anonymous"}
-                </span>
-              </a>
-            ))}
-          </div>
+          <button type="button" onClick={() => setAdding(true)} className={buttonSecondaryClass}>
+            + Add note
+          </button>
         )}
       </div>
+
+      {ownNotes.length > 0 && (
+        <div className="mt-3 space-y-3">
+          {ownNotes.map((note) => (
+            <OwnNoteRow key={note.id} chapterId={chapterId} note={note} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

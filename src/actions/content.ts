@@ -9,6 +9,8 @@ import { formValue } from "@/lib/form-data";
 import {
   ChapterPlaylistSchema,
   ChapterPlaylistUpdateSchema,
+  ChapterPlaylistVideoSchema,
+  ChapterPlaylistVideoUpdateSchema,
   ArchiveContentSchema,
 } from "@/schemas/content";
 
@@ -18,6 +20,7 @@ import { PlaylistReviewSchema } from "@/schemas/content";
 import { ChapterSpecialVideoSchema, ChapterSpecialVideoUpdateSchema } from "@/schemas/content";
 import { OfficialNoteSchema, OfficialNoteUpdateSchema } from "@/schemas/content";
 import { awardPoints } from "@/lib/points";
+import { ChapterTipSchema } from "@/schemas/content";
 
 function playlistPath(chapterId: string) {
   return `/manager/playlists/${chapterId}`;
@@ -33,15 +36,23 @@ export async function createChapterPlaylist(
     chapterId: formValue(formData, "chapterId"),
     title: formValue(formData, "title"),
     youtubeUrl: formValue(formData, "youtubeUrl"),
+    channelUrl: formValue(formData, "channelUrl"),
     order: formValue(formData, "order"),
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const { chapterId, title, youtubeUrl, order } = parsed.data;
+  const { chapterId, title, youtubeUrl, channelUrl, order } = parsed.data;
 
   try {
     await prisma.$transaction(async (tx) => {
       const playlist = await tx.chapterPlaylist.create({
-        data: { chapterId, title, youtubeUrl, order, addedByUserId: actor.id },
+        data: {
+          chapterId,
+          title,
+          youtubeUrl,
+          channelUrl: channelUrl || null,
+          order,
+          addedByUserId: actor.id,
+        },
       });
       await logAudit(tx, {
         actorId: actor.id,
@@ -70,17 +81,18 @@ export async function updateChapterPlaylist(
     chapterId: formValue(formData, "chapterId"),
     title: formValue(formData, "title"),
     youtubeUrl: formValue(formData, "youtubeUrl"),
+    channelUrl: formValue(formData, "channelUrl"),
     order: formValue(formData, "order"),
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const { id, chapterId, title, youtubeUrl, order } = parsed.data;
+  const { id, chapterId, title, youtubeUrl, channelUrl, order } = parsed.data;
 
   try {
     await prisma.$transaction(async (tx) => {
       const before = await tx.chapterPlaylist.findUniqueOrThrow({ where: { id } });
       const playlist = await tx.chapterPlaylist.update({
         where: { id },
-        data: { title, youtubeUrl, order },
+        data: { title, youtubeUrl, channelUrl: channelUrl || null, order },
       });
       await logAudit(tx, {
         actorId: actor.id,
@@ -194,6 +206,127 @@ export async function submitPlaylistReview(
   }
 
   revalidatePath(`/chapter/${playlist.chapterId}`);
+  return { success: true };
+}
+
+function playlistVideoPath(chapterId: string) {
+  return `/manager/playlists/${chapterId}`;
+}
+
+export async function createPlaylistVideo(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const actor = await requireRole(["ADMIN", "MANAGER"]);
+
+  const parsed = ChapterPlaylistVideoSchema.safeParse({
+    playlistId: formValue(formData, "playlistId"),
+    title: formValue(formData, "title"),
+    youtubeUrl: formValue(formData, "youtubeUrl"),
+    order: formValue(formData, "order"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const { playlistId, title, youtubeUrl, order } = parsed.data;
+
+  let chapterId = "";
+  try {
+    await prisma.$transaction(async (tx) => {
+      const playlist = await tx.chapterPlaylist.findUniqueOrThrow({ where: { id: playlistId } });
+      chapterId = playlist.chapterId;
+      const video = await tx.chapterPlaylistVideo.create({
+        data: { playlistId, title, youtubeUrl, order, addedByUserId: actor.id },
+      });
+      await logAudit(tx, {
+        actorId: actor.id,
+        action: "CREATE",
+        entityType: "ChapterPlaylistVideo",
+        entityId: video.id,
+        metadata: { playlistId, title },
+      });
+    });
+  } catch (err) {
+    return handlePrismaError(err, "video");
+  }
+
+  revalidatePath(playlistVideoPath(chapterId));
+  return { success: true };
+}
+
+export async function updatePlaylistVideo(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const actor = await requireRole(["ADMIN", "MANAGER"]);
+
+  const parsed = ChapterPlaylistVideoUpdateSchema.safeParse({
+    id: formValue(formData, "id"),
+    playlistId: formValue(formData, "playlistId"),
+    title: formValue(formData, "title"),
+    youtubeUrl: formValue(formData, "youtubeUrl"),
+    order: formValue(formData, "order"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const { id, playlistId, title, youtubeUrl, order } = parsed.data;
+
+  let chapterId = "";
+  try {
+    await prisma.$transaction(async (tx) => {
+      const before = await tx.chapterPlaylistVideo.findUniqueOrThrow({ where: { id } });
+      const playlist = await tx.chapterPlaylist.findUniqueOrThrow({ where: { id: playlistId } });
+      chapterId = playlist.chapterId;
+      const video = await tx.chapterPlaylistVideo.update({
+        where: { id },
+        data: { title, youtubeUrl, order },
+      });
+      await logAudit(tx, {
+        actorId: actor.id,
+        action: "UPDATE",
+        entityType: "ChapterPlaylistVideo",
+        entityId: video.id,
+        metadata: { before, after: video },
+      });
+    });
+  } catch (err) {
+    return handlePrismaError(err, "video");
+  }
+
+  revalidatePath(playlistVideoPath(chapterId));
+  return { success: true };
+}
+
+export async function setPlaylistVideoArchived(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const actor = await requireRole(["ADMIN", "MANAGER"]);
+  const parsed = ArchiveContentSchema.safeParse({ id: formValue(formData, "id") });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const isArchived = formValue(formData, "isArchived") === "true";
+
+  let chapterId = "";
+  try {
+    await prisma.$transaction(async (tx) => {
+      const video = await tx.chapterPlaylistVideo.update({
+        where: { id: parsed.data.id },
+        data: { isArchived },
+      });
+      const playlist = await tx.chapterPlaylist.findUniqueOrThrow({
+        where: { id: video.playlistId },
+      });
+      chapterId = playlist.chapterId;
+      await logAudit(tx, {
+        actorId: actor.id,
+        action: "ARCHIVE",
+        entityType: "ChapterPlaylistVideo",
+        entityId: video.id,
+        metadata: { isArchived },
+      });
+    });
+  } catch (err) {
+    return handlePrismaError(err, "video");
+  }
+
+  revalidatePath(playlistVideoPath(chapterId));
   return { success: true };
 }
 
@@ -422,5 +555,138 @@ export async function setOfficialNoteArchived(
   }
 
   revalidatePath(officialNotePath(chapterId));
+  return { success: true };
+}
+
+function chapterTipPath(chapterId: string) {
+  return `/manager/tips/${chapterId}`;
+}
+
+export async function createChapterTip(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const actor = await requireRole(["ADMIN", "MANAGER"]);
+
+  const parsed = ChapterTipSchema.safeParse({
+    chapterId: formValue(formData, "chapterId"),
+    category: formValue(formData, "category"),
+    title: formValue(formData, "title"),
+    youtubeUrl: formValue(formData, "youtubeUrl"),
+    driveLink: formValue(formData, "driveLink"),
+    order: formValue(formData, "order"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const { chapterId, category, title, youtubeUrl, driveLink, order } = parsed.data;
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const tip = await tx.chapterTip.create({
+        data: {
+          chapterId,
+          category,
+          title,
+          youtubeUrl: youtubeUrl || null,
+          driveLink: driveLink || null,
+          order,
+          addedByUserId: actor.id,
+        },
+      });
+      await logAudit(tx, {
+        actorId: actor.id,
+        action: "CREATE",
+        entityType: "ChapterTip",
+        entityId: tip.id,
+        metadata: { chapterId, category, title },
+      });
+    });
+  } catch (err) {
+    return handlePrismaError(err, "tip");
+  }
+
+  revalidatePath(chapterTipPath(chapterId));
+  return { success: true };
+}
+
+export async function setChapterTipArchived(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const actor = await requireRole(["ADMIN", "MANAGER"]);
+  const parsed = ArchiveContentSchema.safeParse({ id: formValue(formData, "id") });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+  const isArchived = formValue(formData, "isArchived") === "true";
+
+  let chapterId = "";
+  try {
+    await prisma.$transaction(async (tx) => {
+      const tip = await tx.chapterTip.update({
+        where: { id: parsed.data.id },
+        data: { isArchived },
+      });
+      chapterId = tip.chapterId;
+      await logAudit(tx, {
+        actorId: actor.id,
+        action: "ARCHIVE",
+        entityType: "ChapterTip",
+        entityId: tip.id,
+        metadata: { isArchived },
+      });
+    });
+  } catch (err) {
+    return handlePrismaError(err, "tip");
+  }
+
+  revalidatePath(chapterTipPath(chapterId));
+  return { success: true };
+}
+
+export async function updateChapterTip(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const actor = await requireRole(["ADMIN", "MANAGER"]);
+
+  const parsed = ChapterTipSchema.safeParse({
+    chapterId: formValue(formData, "chapterId"),
+    category: formValue(formData, "category"),
+    title: formValue(formData, "title"),
+    youtubeUrl: formValue(formData, "youtubeUrl"),
+    driveLink: formValue(formData, "driveLink"),
+    order: formValue(formData, "order"),
+  });
+  if (!parsed.success) return fieldErrorState(parsed.error);
+
+  const id = formValue(formData, "id");
+  if (!id) return { success: false, error: "Missing tip id." };
+
+  const { chapterId, category, title, youtubeUrl, driveLink, order } = parsed.data;
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const before = await tx.chapterTip.findUniqueOrThrow({ where: { id } });
+      const tip = await tx.chapterTip.update({
+        where: { id },
+        data: {
+          category,
+          title,
+          youtubeUrl: youtubeUrl || null,
+          driveLink: driveLink || null,
+          order,
+        },
+      });
+      await logAudit(tx, {
+        actorId: actor.id,
+        action: "UPDATE",
+        entityType: "ChapterTip",
+        entityId: tip.id,
+        metadata: { before, after: tip },
+      });
+    });
+  } catch (err) {
+    return handlePrismaError(err, "tip");
+  }
+
+  revalidatePath(chapterTipPath(chapterId));
   return { success: true };
 }

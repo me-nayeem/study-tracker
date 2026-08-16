@@ -1,4 +1,12 @@
 import type { Role } from "@/generated/prisma/client";
+import {
+  LayoutDashboard,
+  CalendarClock,
+  Trophy,
+  ListChecks,
+  PlayCircle,
+  type LucideIcon,
+} from "lucide-react";
 
 export type StaffNavItem = {
   label: string;
@@ -30,6 +38,7 @@ export const STAFF_NAV: StaffNavEntry[] = [
         { label: "Special videos", href: "/manager/special-videos", roles: ["ADMIN", "MANAGER"] },
         { label: "Official notes", href: "/manager/official-notes", roles: ["ADMIN", "MANAGER"] },
         { label: "Quizzes", href: "/manager/quizzes", roles: ["ADMIN", "MANAGER"] },
+        { label: "Tips & tricks", href: "/manager/tips", roles: ["ADMIN", "MANAGER"] },
       ],
     },
   },
@@ -41,6 +50,7 @@ export const STAFF_NAV: StaffNavEntry[] = [
       items: [
         { label: "Exam results", href: "/manager/exam-results", roles: ["ADMIN", "MANAGER"] },
         { label: "Disputes", href: "/admin/exam-disputes", roles: ["ADMIN"] },
+        { label: "Tips & tricks", href: "/manager/tips", roles: ["ADMIN", "MANAGER"] },
       ],
     },
   },
@@ -67,10 +77,13 @@ export const STAFF_NAV: StaffNavEntry[] = [
 export type StudentNavItem = {
   label: string;
   href: string;
+  icon: LucideIcon;
 };
 
 export const STUDENT_NAV: StudentNavItem[] = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Leaderboard", href: "/leaderboard" },
-  { label: "Quiz results", href: "/quiz-results" },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Lectures", href: "/lectures", icon: PlayCircle },
+  { label: "Routine", href: "/routine", icon: CalendarClock },
+  { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
+  { label: "Quiz results", href: "/quiz-results", icon: ListChecks },
 ];

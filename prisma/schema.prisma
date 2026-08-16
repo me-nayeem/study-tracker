@@ -159,6 +159,11 @@ enum OtpPurpose {
   PASSWORD_RESET
 }
 
+enum TipCategory {
+  LAW
+  SHORTCUT
+  CALCULATOR_HACK
+}
 
 model User {
   id            String    @id @default(cuid())
@@ -262,6 +267,10 @@ model StudentProfile {
   examResults          ExamResult[]
   todoItems            TodoItem[]
   leaderboardSnapshots LeaderboardSnapshot[]
+  noteLikes   StudentNoteLike[]
+  noteRatings StudentNoteRating[]
+  noteComments StudentNoteComment[]
+  
 
   @@index([trackId, totalPoints])
 }
@@ -329,6 +338,7 @@ model Chapter {
   officialNotes    OfficialNote[]
   externalExams    ExternalExam[]
   todoItems        TodoItem[]
+  chapterTips      ChapterTip[]
 
   @@unique([paperId, name])
 }
@@ -384,6 +394,21 @@ model ChapterMastery {
   @@index([chapterId, status])
 }
 
+model ChapterTip {
+  id            String      @id @default(cuid())
+  chapterId     String
+  chapter       Chapter     @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  category      TipCategory
+  title         String      @db.VarChar(160)
+  youtubeUrl    String?     @db.VarChar(255)  // SHORTCUT, CALCULATOR_HACK
+  driveLink     String?     @db.VarChar(255)  // LAW, SHORTCUT
+  order         Int         @default(0)
+  isArchived    Boolean     @default(false)
+  addedByUserId String?
+  createdAt     DateTime    @default(now())
+
+  @@index([chapterId, category])
+}
 
 model Quiz {
   id        String   @id @default(cuid())
@@ -439,14 +464,30 @@ model ChapterPlaylist {
   chapter       Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   title         String   @db.VarChar(160)
   youtubeUrl    String   @db.VarChar(255)
+  channelUrl    String?  @db.VarChar(255)   
   addedByUserId String?
   order         Int      @default(0)
   isArchived    Boolean  @default(false)
   createdAt     DateTime @default(now())
 
   reviews PlaylistReview[]
+  videos  ChapterPlaylistVideo[]            
 
   @@index([chapterId])
+}
+
+model ChapterPlaylistVideo {
+  id            String          @id @default(cuid())
+  playlistId    String
+  playlist      ChapterPlaylist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  title         String          @db.VarChar(160)
+  youtubeUrl    String          @db.VarChar(255)
+  order         Int             @default(0)
+  isArchived    Boolean         @default(false)
+  addedByUserId String?
+  createdAt     DateTime        @default(now())
+
+  @@index([playlistId])
 }
 
 
@@ -497,8 +538,52 @@ model StudentNote {
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
+  likes   StudentNoteLike[]
+  ratings StudentNoteRating[]
+  comments StudentNoteComment[]
+
   @@index([chapterId, isPublic, moderationStatus])
   @@index([studentId])
+}
+
+
+model StudentNoteLike {
+  id        String         @id @default(cuid())
+  noteId    String
+  note      StudentNote    @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+
+  @@unique([noteId, studentId])
+  @@index([noteId])
+}
+
+model StudentNoteRating {
+  id        String         @id @default(cuid())
+  noteId    String
+  note      StudentNote    @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  rating    Int
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([noteId, studentId])
+  @@index([noteId])
+}
+
+model StudentNoteComment {
+  id        String         @id @default(cuid())
+  noteId    String
+  note      StudentNote    @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  body      String         @db.VarChar(500)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([noteId, createdAt])
 }
 
 
