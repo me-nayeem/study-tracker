@@ -11,6 +11,7 @@ import {
   buttonSecondaryClass,
 } from "@/components/shared/classes";
 import type { StudentNoteOwnerRow } from "@/lib/content-data";
+import { LevelUpModal } from "./level-up-modal";
 
 const initialState: ActionState = { success: false };
 
@@ -37,70 +38,85 @@ export function StudentNoteForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
+  const levelUpData = state.success ? state.data : undefined;
+  const leveledUp = levelUpData?.leveledUp === true;
+  const newLevel = leveledUp ? (levelUpData?.newLevel as number | undefined) : undefined;
+  const newLevelTitle = leveledUp
+    ? (levelUpData?.newLevelTitle as string | null | undefined)
+    : undefined;
+
   return (
-    <form ref={formRef} action={formAction} className="space-y-3">
-      {note ? (
-        <input type="hidden" name="id" value={note.id} />
-      ) : (
-        <input type="hidden" name="chapterId" value={chapterId} />
+    <>
+      {leveledUp && typeof newLevel === "number" && (
+        <LevelUpModal level={newLevel} title={newLevelTitle ?? null} />
       )}
 
-      <div>
-        <label className={labelClass}>Title</label>
-        <input
-          name="title"
-          defaultValue={note?.title}
-          placeholder="My chapter summary"
-          className={inputClass}
-        />
-        {state.fieldErrors?.title && <p className={errorTextClass}>{state.fieldErrors.title[0]}</p>}
-      </div>
-
-      <div>
-        <label className={labelClass}>Google Drive link</label>
-        <input
-          name="fileUrl"
-          defaultValue={note?.fileUrl}
-          placeholder="https://drive.google.com/..."
-          className={inputClass}
-        />
-        {state.fieldErrors?.fileUrl && (
-          <p className={errorTextClass}>{state.fieldErrors.fileUrl[0]}</p>
+      <form ref={formRef} action={formAction} className="space-y-3">
+        {note ? (
+          <input type="hidden" name="id" value={note.id} />
+        ) : (
+          <input type="hidden" name="chapterId" value={chapterId} />
         )}
-        <p className="text-text-secondary mt-1 text-xs">
-          Sharing must be set to "Anyone with the link", or others won't be able to open it.
-        </p>
-      </div>
 
-      {!note && (
-        <label className="text-text-secondary flex items-center gap-2 text-xs">
+        <div>
+          <label className={labelClass}>Title</label>
           <input
-            type="checkbox"
-            name="isPublic"
-            value="true"
-            className="accent-accent-primary h-4 w-4 rounded"
+            name="title"
+            defaultValue={note?.title}
+            placeholder="My chapter summary"
+            className={inputClass}
           />
-          Make public once approved
-        </label>
-      )}
+          {state.fieldErrors?.title && (
+            <p className={errorTextClass}>{state.fieldErrors.title[0]}</p>
+          )}
+        </div>
 
-      {state.error && !state.fieldErrors && <p className={errorTextClass}>{state.error}</p>}
+        <div>
+          <label className={labelClass}>Google Drive link</label>
+          <input
+            name="fileUrl"
+            defaultValue={note?.fileUrl}
+            placeholder="https://drive.google.com/..."
+            className={inputClass}
+          />
+          {state.fieldErrors?.fileUrl && (
+            <p className={errorTextClass}>{state.fieldErrors.fileUrl[0]}</p>
+          )}
+          <p className="text-text-secondary mt-1 text-xs">
+            Sharing must be set to "Anyone with the link", or others won't be able to open it.
+          </p>
+        </div>
 
-      <div className="flex gap-2 pt-1">
-        <button type="submit" disabled={isPending} className={buttonPrimaryClass}>
-          {isPending ? "Saving…" : note ? "Save changes" : "Add note"}
-        </button>
-        {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isPending}
-            className={buttonSecondaryClass}
-          >
-            Cancel
-          </button>
+        {!note && (
+          <label className="text-text-secondary flex items-center gap-2 text-xs">
+            <input
+              type="checkbox"
+              name="isPublic"
+              value="true"
+              className="accent-accent-primary h-4 w-4 rounded"
+            />
+            Make public once approved
+          </label>
         )}
-      </div>
-    </form>
+
+        {state.error && !state.fieldErrors && <p className={errorTextClass}>{state.error}</p>}
+
+        <div className="flex gap-2 pt-1">
+          <button type="submit" disabled={isPending} className={buttonPrimaryClass}>
+            {isPending ? "Saving…" : note ? "Save changes" : "Add note"}
+          </button>
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={isPending}
+              className={buttonSecondaryClass}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+      </form>
+    </>
   );
 }

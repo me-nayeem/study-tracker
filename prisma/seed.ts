@@ -1,71 +1,36 @@
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PointReason, ScoringMode } from "../src/generated/prisma/enums";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-const POINT_RULES: {
-  reason: PointReason;
-  scoringMode: ScoringMode;
-  value: number;
-  secondaryValue: number | null;
-}[] = [
-  {
-    reason: PointReason.CHAPTER_MASTERED,
-    scoringMode: ScoringMode.PER_WEIGHT,
-    value: 10,
-    secondaryValue: null,
-  },
-  {
-    reason: PointReason.QUIZ_ATTEMPT,
-    scoringMode: ScoringMode.PER_MARK,
-    value: 1,
-    secondaryValue: null,
-  },
-  {
-    reason: PointReason.EXTERNAL_EXAM_RESULT,
-    scoringMode: ScoringMode.PER_MARK,
-    value: 1,
-    secondaryValue: null,
-  },
-  {
-    reason: PointReason.NOTE_UPLOADED,
-    scoringMode: ScoringMode.FLAT,
-    value: 10,
-    secondaryValue: 3,
-  },
-  {
-    reason: PointReason.STREAK_BONUS,
-    scoringMode: ScoringMode.FLAT,
-    value: 1,
-    secondaryValue: null,
-  },
-  {
-    reason: PointReason.PLAYLIST_REVIEWED,
-    scoringMode: ScoringMode.FLAT,
-    value: 5,
-    secondaryValue: null,
-  },
+const TIERS = ["Bronze", "Silver", "Gold", "Platinum", "Diamond"];
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+
+const RAW_POINTS = [
+  0, 75, 227, 435, 689, 985, 1319, 1687, 2089, 2523, 2986, 3478, 3997, 4543, 5115, 5712, 6334, 6979,
+  7647, 8338, 9051, 9786, 10542, 11319, 12117, 12935, 13773, 14630, 15507, 16402, 17316, 18249,
+  19200, 20169, 21156, 22160, 23182, 24221, 25276, 26349, 27438, 28544, 29666, 30804, 31958, 33128,
+  34314, 35515, 36732, 37964,
 ];
 
+const LEVELS = RAW_POINTS.map((minPoints, i) => {
+  const level = i + 1;
+  const tier = TIERS[Math.floor(i / 10)];
+  const sub = ROMAN[i % 10];
+  return { level, minPoints, title: `${tier} Scholar ${sub}` };
+});
+
 async function main() {
-  for (const rule of POINT_RULES) {
-    await prisma.pointRule.upsert({
-      where: { reason: rule.reason },
-      update: {},
-      create: rule,
+  for (const l of LEVELS) {
+    await prisma.levelThreshold.upsert({
+      where: { level: l.level },
+      create: l,
+      update: { minPoints: l.minPoints, title: l.title },
     });
   }
-  console.log(`Seeded ${POINT_RULES.length} PointRule rows.`);
+  console.log(`Seeded ${LEVELS.length} level thresholds with titles.`);
 }
 
-main()
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().finally(() => prisma.$disconnect());

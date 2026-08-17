@@ -15,6 +15,13 @@ type AwardPointsParams = {
   useSecondaryValue?: boolean;
 };
 
+export type AwardPointsResult = {
+  points: number;
+  leveledUp: boolean;
+  newLevel: number | null;
+  newLevelTitle: string | null;
+};
+
 async function upsertMasterScoreSnapshots(
   tx: Prisma.TransactionClient,
   studentId: string,
@@ -59,12 +66,12 @@ async function upsertMasterScoreSnapshots(
 export async function awardPoints(
   tx: Prisma.TransactionClient,
   params: AwardPointsParams
-): Promise<number> {
+): Promise<AwardPointsResult> {
   const { studentId, reason, referenceId, quantity, useSecondaryValue } = params;
 
   const rule = await tx.pointRule.findUnique({ where: { reason } });
   if (!rule || !rule.isActive) {
-    return 0;
+    return { points: 0, leveledUp: false, newLevel: null, newLevelTitle: null };
   }
 
   const baseValue = useSecondaryValue ? (rule.secondaryValue ?? rule.value) : rule.value;
@@ -93,21 +100,58 @@ export async function awardPoints(
     data: { studentId, points, reason, referenceId },
   });
 
+  const before = await tx.studentProfile.findUniqueOrThrow({
+    where: { id: studentId },
+    select: { level: true, totalPoints: true },
+  });
+
   const updated = await tx.studentProfile.update({
     where: { id: studentId },
     data: { totalPoints: { increment: points } },
-    select: { trackId: true },
+    select: { trackId: true, userId: true },
   });
 
   await upsertMasterScoreSnapshots(tx, studentId, updated.trackId, points, new Date());
 
-  return points;
+  const newTotalPoints = before.totalPoints + points;
+
+  const eligibleLevel = await tx.levelThreshold.findFirst({
+    where: { minPoints: { lte: newTotalPoints } },
+    orderBy: { level: "desc" },
+    select: { level: true, title: true },
+  });
+
+  let leveledUp = false;
+  let newLevel: number | null = null;
+  let newLevelTitle: string | null = null;
+
+  if (eligibleLevel && eligibleLevel.level > before.level) {
+    await tx.studentProfile.update({
+      where: { id: studentId },
+      data: { level: eligibleLevel.level },
+    });
+
+    await tx.notification.create({
+      data: {
+        userId: updated.userId,
+        type: "LEVEL_UP",
+        title: `Level ${eligibleLevel.level} reached!`,
+        body: `You've earned enough points to reach Level ${eligibleLevel.level}. Keep going!`,
+      },
+    });
+
+    leveledUp = true;
+    newLevel = eligibleLevel.level;
+    newLevelTitle = eligibleLevel.title;
+  }
+
+  return { points, leveledUp, newLevel, newLevelTitle };
 }
 
 export async function manualAdjustPoints(
   tx: Prisma.TransactionClient,
   params: { studentId: string; points: number; referenceId?: string }
-): Promise<void> {
+): Promise<AwardPointsResult> {
   const { studentId, points, referenceId } = params;
 
   await tx.pointTransaction.create({
@@ -119,11 +163,50 @@ export async function manualAdjustPoints(
     },
   });
 
+  const before = await tx.studentProfile.findUniqueOrThrow({
+    where: { id: studentId },
+    select: { level: true, totalPoints: true },
+  });
+
   const updated = await tx.studentProfile.update({
     where: { id: studentId },
     data: { totalPoints: { increment: points } },
-    select: { trackId: true },
+    select: { trackId: true, userId: true },
   });
 
   await upsertMasterScoreSnapshots(tx, studentId, updated.trackId, points, new Date());
+
+  const newTotalPoints = before.totalPoints + points;
+
+  const eligibleLevel = await tx.levelThreshold.findFirst({
+    where: { minPoints: { lte: newTotalPoints } },
+    orderBy: { level: "desc" },
+    select: { level: true, title: true },
+  });
+
+  let leveledUp = false;
+  let newLevel: number | null = null;
+  let newLevelTitle: string | null = null;
+
+  if (eligibleLevel && eligibleLevel.level > before.level) {
+    await tx.studentProfile.update({
+      where: { id: studentId },
+      data: { level: eligibleLevel.level },
+    });
+
+    await tx.notification.create({
+      data: {
+        userId: updated.userId,
+        type: "LEVEL_UP",
+        title: `Level ${eligibleLevel.level} reached!`,
+        body: `You've earned enough points to reach Level ${eligibleLevel.level}. Keep going!`,
+      },
+    });
+
+    leveledUp = true;
+    newLevel = eligibleLevel.level;
+    newLevelTitle = eligibleLevel.title;
+  }
+
+  return { points, leveledUp, newLevel, newLevelTitle };
 }

@@ -30,6 +30,9 @@ export type SubmitQuizAttemptState = {
     percent: number;
     passed: boolean;
     questionResults: QuestionResult[];
+    leveledUp?: boolean;
+    newLevel?: number | null;
+    newLevelTitle?: string | null;
   };
 };
 
@@ -115,6 +118,10 @@ export async function submitQuizAttempt(
   const newStatus = passed ? "MASTERED" : "NEEDS_REVIEW";
   const now = new Date();
 
+  let leveledUp = false;
+  let newLevel: number | null = null;
+  let newLevelTitle: string | null = null;
+
   await prisma.$transaction(async (tx) => {
     const attempt = await tx.quizAttempt.create({
       data: {
@@ -137,20 +144,30 @@ export async function submitQuizAttempt(
       },
     });
 
-    await awardPoints(tx, {
+    const quizResult = await awardPoints(tx, {
       studentId: profile.id,
       reason: "QUIZ_ATTEMPT",
       referenceId: attempt.id,
       quantity: correctCount,
     });
+    if (quizResult.leveledUp) {
+      leveledUp = true;
+      newLevel = quizResult.newLevel;
+      newLevelTitle = quizResult.newLevelTitle;
+    }
 
     if (passed) {
-      await awardPoints(tx, {
+      const masteryResult = await awardPoints(tx, {
         studentId: profile.id,
         reason: "CHAPTER_MASTERED",
         referenceId: chapterId,
         quantity: chapter.examWeight,
       });
+      if (masteryResult.leveledUp) {
+        leveledUp = true;
+        newLevel = masteryResult.newLevel;
+        newLevelTitle = masteryResult.newLevelTitle;
+      }
     }
 
     if (!passed) {
@@ -167,9 +184,11 @@ export async function submitQuizAttempt(
   });
 
   revalidatePath(`/chapter/${chapterId}`);
-  revalidatePath(`/chapter/${chapterId}/quiz`);
   revalidatePath("/dashboard");
   revalidatePath("/quiz-results");
 
-  return { success: true, result: { percent, passed, questionResults } };
+  return {
+    success: true,
+    result: { percent, passed, questionResults, leveledUp, newLevel, newLevelTitle },
+  };
 }

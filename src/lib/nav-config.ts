@@ -5,6 +5,8 @@ import {
   Trophy,
   ListChecks,
   PlayCircle,
+  MessageSquare,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 
@@ -29,6 +31,14 @@ export const STAFF_NAV: StaffNavEntry[] = [
     item: { label: "Dashboard", href: "/manager", roles: ["ADMIN", "MANAGER"] },
   },
   {
+    type: "link",
+    item: { label: "Students", href: "/manager/students", roles: ["ADMIN", "MANAGER"] },
+  },
+  {
+    type: "link",
+    item: { label: "Feedback", href: "/manager/feedback", roles: ["ADMIN", "MANAGER"] },
+  },
+  {
     type: "group",
     group: {
       label: "Content",
@@ -50,13 +60,8 @@ export const STAFF_NAV: StaffNavEntry[] = [
       items: [
         { label: "Exam results", href: "/manager/exam-results", roles: ["ADMIN", "MANAGER"] },
         { label: "Disputes", href: "/admin/exam-disputes", roles: ["ADMIN"] },
-        { label: "Tips & tricks", href: "/manager/tips", roles: ["ADMIN", "MANAGER"] },
       ],
     },
-  },
-  {
-    type: "link",
-    item: { label: "Students", href: "/manager/students", roles: ["ADMIN", "MANAGER"] },
   },
   {
     type: "group",
@@ -86,4 +91,6 @@ export const STUDENT_NAV: StudentNavItem[] = [
   { label: "Routine", href: "/routine", icon: CalendarClock },
   { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
   { label: "Quiz results", href: "/quiz-results", icon: ListChecks },
+  { label: "Feedback", href: "/feedback", icon: MessageSquare },
+  { label: "Contact", href: "/contact", icon: Mail },
 ];

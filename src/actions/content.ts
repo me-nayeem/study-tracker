@@ -180,6 +180,10 @@ export async function submitPlaylistReview(
   }
 
   try {
+    let leveledUp = false;
+    let newLevel: number | null = null;
+    let newLevelTitle: string | null = null;
+
     await prisma.$transaction(async (tx) => {
       const existing = await tx.playlistReview.findUnique({
         where: { playlistId_studentId: { playlistId, studentId: profile.id } },
@@ -191,22 +195,23 @@ export async function submitPlaylistReview(
         update: { rating, comment: comment ?? null },
       });
 
-      // Points only on the first review of this playlist by this student —
-      // upsert's update path means an edited review shouldn't re-award.
       if (!existing) {
-        await awardPoints(tx, {
+        const result = await awardPoints(tx, {
           studentId: profile.id,
           reason: "PLAYLIST_REVIEWED",
           referenceId: playlistId,
         });
+        leveledUp = result.leveledUp;
+        newLevel = result.newLevel;
+        newLevelTitle = result.newLevelTitle;
       }
     });
+
+    revalidatePath(`/chapter/${playlist.chapterId}`);
+    return { success: true, data: leveledUp ? { leveledUp, newLevel, newLevelTitle } : undefined };
   } catch (err) {
     return handlePrismaError(err, "review");
   }
-
-  revalidatePath(`/chapter/${playlist.chapterId}`);
-  return { success: true };
 }
 
 function playlistVideoPath(chapterId: string) {

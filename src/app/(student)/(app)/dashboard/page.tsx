@@ -4,10 +4,13 @@ import { getStudentProfile, getStudentDashboardData } from "@/lib/student-data";
 import { getUnreadChapterReviewNotices } from "@/lib/notifications-data";
 import { prisma } from "@/lib/prisma";
 import { evaluateStreak } from "@/lib/streaks";
+import { isInstallPromptEligible } from "@/lib/pwa-eligibility";
 import { SubjectList } from "@/components/student/subject-list";
 import { FailedQuizNoticeBoard } from "@/components/student/failed-quiz-notice-board";
 import { StatsHeader } from "@/components/student/stats-header";
 import { StreakCelebrationModal } from "@/components/student/streak-celebration-modal";
+import { PwaInstallController } from "@/components/student/pwa-install-controller";
+import { LevelUpModal } from "@/components/student/level-up-modal";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -24,6 +27,9 @@ export default async function DashboardPage() {
   ]);
 
   const displayTotalPoints = profile.totalPoints + streakResult.pointsAwarded;
+  const pwaEligible = isInstallPromptEligible(profile, new Date());
+  const showLevelUp = streakResult.leveledUp;
+  const showStreak = streakResult.awarded && !showLevelUp;
 
   return (
     <div>
@@ -46,12 +52,21 @@ export default async function DashboardPage() {
         <SubjectList data={data} />
       </div>
 
-      {streakResult.awarded && (
+      {showLevelUp && (
+        <LevelUpModal level={streakResult.newLevel!} title={streakResult.newLevelTitle} />
+      )}
+
+      {showStreak && (
         <StreakCelebrationModal
           streakCount={streakResult.streakCount}
           pointsAwarded={streakResult.pointsAwarded}
         />
       )}
+
+      <PwaInstallController
+        eligible={pwaEligible}
+        suppressForStreak={streakResult.awarded || showLevelUp}
+      />
     </div>
   );
 }

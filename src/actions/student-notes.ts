@@ -63,6 +63,10 @@ export async function createStudentNote(
   }
 
   try {
+    let leveledUp = false;
+    let newLevel: number | null = null;
+    let newLevelTitle: string | null = null;
+
     await prisma.$transaction(async (tx) => {
       const existingCount = await tx.studentNote.count({
         where: { studentId: profile.id, chapterId },
@@ -72,19 +76,26 @@ export async function createStudentNote(
         data: { studentId: profile.id, chapterId, title, fileUrl, isPublic, moderationStatus },
       });
 
-      await awardPoints(tx, {
+      const result = await awardPoints(tx, {
         studentId: profile.id,
         reason: "NOTE_UPLOADED",
         referenceId: note.id,
         useSecondaryValue: existingCount > 0,
       });
+
+      leveledUp = result.leveledUp;
+      newLevel = result.newLevel;
+      newLevelTitle = result.newLevelTitle;
     });
+
+    revalidatePath(chapterPath(chapterId));
+    return {
+      success: true,
+      data: leveledUp ? { leveledUp, newLevel, newLevelTitle } : undefined,
+    };
   } catch (err) {
     return handlePrismaError(err, "note");
   }
-
-  revalidatePath(chapterPath(chapterId));
-  return { success: true };
 }
 
 export async function updateStudentNote(

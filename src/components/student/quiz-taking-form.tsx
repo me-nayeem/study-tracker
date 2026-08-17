@@ -4,6 +4,7 @@ import { useActionState, useMemo, useState } from "react";
 import Link from "next/link";
 import { submitQuizAttempt, type SubmitQuizAttemptState } from "@/actions/quiz-attempt";
 import { buttonPrimaryClass } from "@/components/shared/classes";
+import { LevelUpModal } from "./level-up-modal";
 
 type ClientOption = { index: number; text: string };
 type ClientQuestion = { id: string; questionText: string; options: ClientOption[] };
@@ -30,7 +31,6 @@ export function QuizTakingForm({
 }) {
   const shuffledQuestions = useMemo(
     () => shuffle(questions).map((q) => ({ ...q, options: shuffle(q.options) })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -94,10 +94,13 @@ function QuizResultView({
   chapterId: string;
   result: NonNullable<SubmitQuizAttemptState["result"]>;
 }) {
-  const { percent, passed, questionResults } = result;
+  const { percent, passed, questionResults, leveledUp, newLevel, newLevelTitle } = result;
 
   return (
     <div className="space-y-5">
+      {leveledUp === true && typeof newLevel === "number" && (
+        <LevelUpModal level={newLevel} title={newLevelTitle ?? null} />
+      )}
       <div
         className={`rounded-xl border p-6 text-center ${
           passed

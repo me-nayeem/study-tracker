@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Star } from "lucide-react";
 import { submitPlaylistReview } from "@/actions/content";
+import { LevelUpModal } from "./level-up-modal";
 
 export function PlaylistReviewPopover({
   playlistId,
@@ -17,6 +18,9 @@ export function PlaylistReviewPopover({
   const [rating, setRating] = useState(ownRating ?? 0);
   const [comment, setComment] = useState(ownComment ?? "");
   const [isPending, startTransition] = useTransition();
+  const [levelUpInfo, setLevelUpInfo] = useState<{ level: number; title: string | null } | null>(
+    null
+  );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,14 +29,22 @@ export function PlaylistReviewPopover({
     formData.set("playlistId", playlistId);
     formData.set("rating", String(rating));
     formData.set("comment", comment);
-    startTransition(() => {
-      submitPlaylistReview({ success: false }, formData);
+    startTransition(async () => {
+      const result = await submitPlaylistReview({ success: false }, formData);
+      if (result.success && result.data?.leveledUp) {
+        setLevelUpInfo({
+          level: result.data.newLevel as number,
+          title: (result.data.newLevelTitle as string | null) ?? null,
+        });
+      }
     });
     setOpen(false);
   }
 
   return (
     <div className="flex-1">
+      {levelUpInfo && <LevelUpModal level={levelUpInfo.level} title={levelUpInfo.title} />}
+
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

@@ -145,6 +145,7 @@ enum NotificationType {
   PACE_ALERT
   SYSTEM
   CHAPTER_NEEDS_REVIEW
+  LEVEL_UP
 }
 
 enum SubscriptionStatus {
@@ -163,6 +164,12 @@ enum TipCategory {
   LAW
   SHORTCUT
   CALCULATOR_HACK
+}
+
+enum FeedbackCategory {
+  BUG
+  SUGGESTION
+  GENERAL
 }
 
 model User {
@@ -254,6 +261,9 @@ model StudentProfile {
   totalPoints Int @default(0)
   level       Int @default(1)
 
+  pwaInstalled          Boolean   @default(false)
+  pwaInstallDismissedAt DateTime?
+  
   createdAt DateTime @default(now())
 
   topicProgress        TopicProgress[]
@@ -270,6 +280,7 @@ model StudentProfile {
   noteLikes   StudentNoteLike[]
   noteRatings StudentNoteRating[]
   noteComments StudentNoteComment[]
+  feedback Feedback[]
   
 
   @@index([trackId, totalPoints])
@@ -867,4 +878,19 @@ model AuditLog {
   createdAt  DateTime @default(now())
 
   @@index([entityType, entityId])
+}
+
+
+
+model Feedback {
+  id           String           @id @default(cuid())
+  studentId    String
+  student      StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  category     FeedbackCategory
+  message      String
+  isReviewed   Boolean          @default(false)
+  reviewedByUserId String?
+  createdAt    DateTime         @default(now())
+
+  @@index([isReviewed, createdAt])
 }

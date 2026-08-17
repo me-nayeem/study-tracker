@@ -3,20 +3,14 @@ import { awardPoints } from "@/lib/points";
 import { getDailyKey } from "@/lib/period-key";
 
 export type StreakResult = {
-  awarded: boolean; // true on the first qualifying visit of the day
+  awarded: boolean;
   streakCount: number;
   pointsAwarded: number;
+  leveledUp: boolean;
+  newLevel: number | null;
+  newLevelTitle: string | null;
 };
 
-/**
- * Evaluates streak continuity on visit — called once per Dhaka-calendar
- * day, from the dashboard page. Idempotent per day via
- * StudentProfile.lastActiveAt: a 2nd/3rd visit the same day is a silent
- * no-op (awarded: false).
- *
- * "Visiting" is now the entire streak mechanism — not tied to StudySession
- * completion, since the study timer feature is currently unlaunched.
- */
 export async function evaluateStreak(
   tx: Prisma.TransactionClient,
   studentId: string,
@@ -28,7 +22,14 @@ export async function evaluateStreak(
   const lastActiveKey = profile.lastActiveAt ? getDailyKey(profile.lastActiveAt) : null;
 
   if (lastActiveKey === todayKey) {
-    return { awarded: false, streakCount: profile.streakCount, pointsAwarded: 0 };
+    return {
+      awarded: false,
+      streakCount: profile.streakCount,
+      pointsAwarded: 0,
+      leveledUp: false,
+      newLevel: null,
+      newLevelTitle: null,
+    };
   }
 
   const yesterdayKey = getDailyKey(new Date(now.getTime() - 24 * 60 * 60 * 1000));
@@ -40,11 +41,18 @@ export async function evaluateStreak(
     data: { streakCount: newStreakCount, lastActiveAt: now },
   });
 
-  const pointsAwarded = await awardPoints(tx, {
+  const result = await awardPoints(tx, {
     studentId,
     reason: "STREAK_BONUS",
     referenceId: todayKey,
   });
 
-  return { awarded: true, streakCount: newStreakCount, pointsAwarded };
+  return {
+    awarded: true,
+    streakCount: newStreakCount,
+    pointsAwarded: result.points,
+    leveledUp: result.leveledUp,
+    newLevel: result.newLevel,
+    newLevelTitle: result.newLevelTitle,
+  };
 }

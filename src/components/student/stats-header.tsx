@@ -11,7 +11,7 @@ export function StatsHeader({
     <div className="mt-4 grid grid-cols-3 gap-3">
       <StatCard label="Level" value={level} accentClass="text-accent-gamify" />
       <StatCard label="Points" value={totalPoints} accentClass="text-accent-gamify" />
-      <StatCard label="Streak" value={`${streakCount}d`} accentClass="text-state-success" />
+      <StatCard label="Streak" value={`${streakCount}d`} accentClass="text-state-success"/>
     </div>
   );
 }
