@@ -166,10 +166,5 @@ export async function submitQuizAttempt(
     }
   });
 
-  revalidatePath(`/chapter/${chapterId}`);
-  revalidatePath(`/chapter/${chapterId}/quiz`);
-  revalidatePath("/dashboard");
-  revalidatePath("/quiz-results");
-
   return { success: true, result: { percent, passed, questionResults } };
 }
