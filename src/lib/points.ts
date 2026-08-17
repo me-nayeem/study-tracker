@@ -56,6 +56,26 @@ async function upsertMasterScoreSnapshots(
   }
 }
 
+async function syncLevel(tx: Prisma.TransactionClient, studentId: string): Promise<void> {
+  const profile = await tx.studentProfile.findUniqueOrThrow({
+    where: { id: studentId },
+    select: { level: true, totalPoints: true },
+  });
+
+  const eligibleLevel = await tx.levelThreshold.findFirst({
+    where: { minPoints: { lte: profile.totalPoints } },
+    orderBy: { level: "desc" },
+    select: { level: true },
+  });
+
+  if (eligibleLevel && eligibleLevel.level !== profile.level) {
+    await tx.studentProfile.update({
+      where: { id: studentId },
+      data: { level: eligibleLevel.level },
+    });
+  }
+}
+
 export async function awardPoints(
   tx: Prisma.TransactionClient,
   params: AwardPointsParams
@@ -100,6 +120,7 @@ export async function awardPoints(
   });
 
   await upsertMasterScoreSnapshots(tx, studentId, updated.trackId, points, new Date());
+  await syncLevel(tx, studentId);
 
   return points;
 }
@@ -126,4 +147,5 @@ export async function manualAdjustPoints(
   });
 
   await upsertMasterScoreSnapshots(tx, studentId, updated.trackId, points, new Date());
+  await syncLevel(tx, studentId);
 }

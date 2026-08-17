@@ -5,6 +5,8 @@ import {
   Trophy,
   ListChecks,
   PlayCircle,
+  MessageSquare,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 
@@ -59,6 +61,10 @@ export const STAFF_NAV: StaffNavEntry[] = [
     item: { label: "Students", href: "/manager/students", roles: ["ADMIN", "MANAGER"] },
   },
   {
+    type: "link",
+    item: { label: "Feedback", href: "/manager/feedback", roles: ["ADMIN", "MANAGER"] },
+  },
+  {
     type: "group",
     group: {
       label: "Admin",
@@ -86,4 +92,6 @@ export const STUDENT_NAV: StudentNavItem[] = [
   { label: "Routine", href: "/routine", icon: CalendarClock },
   { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
   { label: "Quiz results", href: "/quiz-results", icon: ListChecks },
+  { label: "Feedback", href: "/feedback", icon: MessageSquare },
+  { label: "Contact", href: "/contact", icon: Mail },
 ];

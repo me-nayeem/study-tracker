@@ -39,10 +39,9 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+/prisma/migrations
 
 .agents
 .claude
 .windsurf
 skills-lock.json
-
-prisma/migrations
