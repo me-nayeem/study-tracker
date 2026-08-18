@@ -11,7 +11,7 @@ const TABS = [
     bg: "bg-accent-blue/15",
     text: "text-accent-blue",
   },
-  { id: "exam", label: "Exam", icon: FileCheck, bg: "bg-accent-red/15", text: "text-accent-red" },
+  { id: "exam", label: "Topic", icon: FileCheck, bg: "bg-accent-red/15", text: "text-accent-red" },
   {
     id: "checklist",
     label: "Checklist",
