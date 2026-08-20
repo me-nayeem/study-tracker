@@ -30,19 +30,22 @@ export async function createQuiz(_prev: ActionState, formData: FormData): Promis
   const parsed = QuizSchema.safeParse({
     chapterId: formValue(formData, "chapterId"),
     title: formValue(formData, "title"),
+    timeLimitMinutes: formValue(formData, "timeLimitMinutes"),
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const { chapterId, title } = parsed.data;
+  const { chapterId, title, timeLimitMinutes } = parsed.data;
 
   try {
     await prisma.$transaction(async (tx) => {
-      const quiz = await tx.quiz.create({ data: { chapterId, title, isActive: false } });
+      const quiz = await tx.quiz.create({
+        data: { chapterId, title, isActive: false, timeLimitMinutes: timeLimitMinutes ?? null },
+      });
       await logAudit(tx, {
         actorId: actor.id,
         action: "CREATE",
         entityType: "Quiz",
         entityId: quiz.id,
-        metadata: { chapterId, title },
+        metadata: { chapterId, title, timeLimitMinutes: timeLimitMinutes ?? null },
       });
     });
   } catch (err) {
@@ -60,14 +63,18 @@ export async function updateQuiz(_prev: ActionState, formData: FormData): Promis
     id: formValue(formData, "id"),
     chapterId: formValue(formData, "chapterId"),
     title: formValue(formData, "title"),
+    timeLimitMinutes: formValue(formData, "timeLimitMinutes"),
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const { id, chapterId, title } = parsed.data;
+  const { id, chapterId, title, timeLimitMinutes } = parsed.data;
 
   try {
     await prisma.$transaction(async (tx) => {
       const before = await tx.quiz.findUniqueOrThrow({ where: { id } });
-      const quiz = await tx.quiz.update({ where: { id }, data: { title } });
+      const quiz = await tx.quiz.update({
+        where: { id },
+        data: { title, timeLimitMinutes: timeLimitMinutes ?? null },
+      });
       await logAudit(tx, {
         actorId: actor.id,
         action: "UPDATE",

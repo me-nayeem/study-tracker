@@ -76,7 +76,12 @@ export default async function ChapterQuizPage({
         <h1 className="font-display text-foreground text-2xl">{quiz.title}</h1>
         <p className="text-text-secondary mt-1 text-sm">{chapter.name}</p>
       </div>
-      <QuizTakingForm chapterId={chapterId} quizId={quiz.id} questions={questionsForClient} />
+      <QuizTakingForm
+  chapterId={chapterId}
+  quizId={quiz.id}
+  questions={questionsForClient}
+  timeLimitMinutes={quiz.timeLimitMinutes}
+/>
     </div>
   );
 }

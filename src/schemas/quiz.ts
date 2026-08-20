@@ -5,6 +5,12 @@ const id = z.string().min(1, "Missing id.");
 export const QuizSchema = z.object({
   chapterId: id,
   title: z.string().trim().min(1, "Title is required.").max(160),
+  timeLimitMinutes: z.coerce
+    .number()
+    .int()
+    .min(1, "Must be at least 1 minute.")
+    .max(180, "Max 180 minutes.")
+    .optional(),
 });
 export const QuizUpdateSchema = QuizSchema.extend({ id });
 

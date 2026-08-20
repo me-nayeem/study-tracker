@@ -83,17 +83,36 @@ function QuizForm({
       hidden={quiz ? { id: quiz.id, chapterId } : { chapterId }}
     >
       {(state) => (
-        <div>
-          <label className={labelClass}>Title</label>
-          <input
-            name="title"
-            defaultValue={quiz?.title ?? "Validation quiz"}
-            className={inputClass}
-          />
-          {state.fieldErrors?.title && (
-            <p className={errorTextClass}>{state.fieldErrors.title[0]}</p>
-          )}
-        </div>
+        <>
+          <div>
+            <label className={labelClass}>Title</label>
+            <input
+              name="title"
+              defaultValue={quiz?.title ?? "Validation quiz"}
+              className={inputClass}
+            />
+            {state.fieldErrors?.title && (
+              <p className={errorTextClass}>{state.fieldErrors.title[0]}</p>
+            )}
+          </div>
+          <div>
+            <label className={labelClass}>
+              Time limit (minutes) <span className="font-normal">(optional)</span>
+            </label>
+            <input
+              name="timeLimitMinutes"
+              type="number"
+              min={1}
+              max={180}
+              defaultValue={quiz?.timeLimitMinutes ?? ""}
+              placeholder="No limit"
+              className={inputClass}
+            />
+            {state.fieldErrors?.timeLimitMinutes && (
+              <p className={errorTextClass}>{state.fieldErrors.timeLimitMinutes[0]}</p>
+            )}
+          </div>
+        </>
       )}
     </EntityForm>
   );

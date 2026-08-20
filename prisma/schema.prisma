@@ -242,6 +242,7 @@ model Quiz {
   chapterId String
   title     String         @default("Validation quiz") @db.VarChar(160)
   isActive  Boolean        @default(true)
+  timeLimitMinutes Int?
   createdAt DateTime       @default(now())
   chapter   Chapter        @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   attempts  QuizAttempt[]

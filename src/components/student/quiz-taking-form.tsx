@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState, useTransition  } from "react";
 import Link from "next/link";
 import { submitQuizAttempt, type SubmitQuizAttemptState } from "@/actions/quiz-attempt";
 import { buttonPrimaryClass } from "@/components/shared/classes";
@@ -23,19 +23,61 @@ export function QuizTakingForm({
   chapterId,
   quizId,
   questions,
+  timeLimitMinutes,
 }: {
   chapterId: string;
   quizId: string;
   questions: ClientQuestion[];
+  timeLimitMinutes: number | null;
 }) {
   const shuffledQuestions = useMemo(
     () => shuffle(questions).map((q) => ({ ...q, options: shuffle(q.options) })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const answersRef = useRef(answers);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
   const [state, formAction, isPending] = useActionState(submitQuizAttempt, initialState);
+  const [, startTransition] = useTransition();
+
+  const deadlineRef = useRef<number | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState<number | null>(
+    timeLimitMinutes ? timeLimitMinutes * 60 : null
+  );
+  const autoSubmittedRef = useRef(false);
+
+  useEffect(() => {
+    if (!timeLimitMinutes || state.success) return;
+
+    if (deadlineRef.current === null) {
+      deadlineRef.current = Date.now() + timeLimitMinutes * 60_000;
+    }
+
+    const interval = setInterval(() => {
+      const remainingMs = deadlineRef.current! - Date.now();
+      setSecondsLeft(Math.max(0, Math.ceil(remainingMs / 1000)));
+
+      if (remainingMs <= 0 && !autoSubmittedRef.current) {
+        autoSubmittedRef.current = true;
+        clearInterval(interval);
+        const formData = new FormData();
+        formData.set("quizId", quizId);
+        formData.set("chapterId", chapterId);
+        formData.set("answers", JSON.stringify(answersRef.current));
+        startTransition(() => {
+          formAction(formData);
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.success]);
 
   if (state.success && state.result) {
     return <QuizResultView chapterId={chapterId} result={state.result} />;
@@ -53,6 +95,8 @@ export function QuizTakingForm({
       }}
       className="space-y-5"
     >
+      {secondsLeft !== null && <QuizTimer secondsLeft={secondsLeft} />}
+
       {shuffledQuestions.map((q, i) => (
         <div key={q.id} className="border-bg-elevated bg-bg-surface rounded-xl border p-4">
           <p className="text-foreground text-sm font-medium">
@@ -84,6 +128,24 @@ export function QuizTakingForm({
         <p className="text-text-secondary text-xs">Answer every question to submit.</p>
       )}
     </form>
+  );
+}
+
+function QuizTimer({ secondsLeft }: { secondsLeft: number }) {
+  const minutes = Math.floor(secondsLeft / 60);
+  const seconds = secondsLeft % 60;
+  const low = secondsLeft <= 60;
+
+  return (
+    <div
+      className={`sticky top-0 z-10 rounded-xl border px-4 py-2 text-center font-mono text-sm ${
+        low
+          ? "border-state-warning bg-state-warning/10 text-state-warning"
+          : "border-bg-elevated bg-bg-surface text-foreground"
+      }`}
+    >
+      Time left: {minutes}:{seconds.toString().padStart(2, "0")}
+    </div>
   );
 }
 
