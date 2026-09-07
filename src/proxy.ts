@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const PUBLIC_ROUTES = ["/", "/login", "/developer"];
+const PUBLIC_ROUTES = ["/", "/login", "/developer", "/privacy", "/terms"];
 
 function isPublicRoute(path: string): boolean {
   return PUBLIC_ROUTES.includes(path);

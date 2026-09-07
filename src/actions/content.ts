@@ -690,3 +690,53 @@ export async function updateChapterTip(
   revalidatePath(chapterTipPath(chapterId));
   return { success: true };
 }
+
+
+export async function toggleVideoProgress(
+  videoId: string,
+  completed: boolean
+): Promise<ActionState> {
+  const user = await requireUser();
+
+  const profile = await getStudentProfile(user.id);
+  if (!profile) {
+    return { success: false, error: "No student profile found." };
+  }
+
+  const video = await prisma.chapterPlaylistVideo.findFirst({
+    where: { id: videoId, isArchived: false },
+    select: {
+      id: true,
+      playlistId: true,
+      playlist: {
+        select: {
+          chapter: {
+            select: { paper: { select: { subject: { select: { trackId: true } } } } },
+          },
+        },
+      },
+    },
+  });
+
+  if (!video || video.playlist.chapter.paper.subject.trackId !== profile.trackId) {
+    return { success: false, error: "Video not found." };
+  }
+
+  try {
+    await prisma.playlistVideoProgress.upsert({
+      where: { studentId_videoId: { studentId: profile.id, videoId } },
+      create: {
+        studentId: profile.id,
+        videoId,
+        completed,
+        completedAt: completed ? new Date() : null,
+      },
+      update: { completed, completedAt: completed ? new Date() : null },
+    });
+  } catch (err) {
+    return handlePrismaError(err, "progress");
+  }
+
+  revalidatePath(`/playlist/${video.playlistId}`);
+  return { success: true };
+}

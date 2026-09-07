@@ -18,7 +18,8 @@ export default async function PlaylistWatchPage({
     redirect("/onboarding");
   }
 
-  const playlist = await getPlaylistWatchData(playlistId, profile.trackId);
+  const playlist = await getPlaylistWatchData(playlistId, profile.id, profile.trackId);
+
   if (!playlist) {
     notFound();
   }

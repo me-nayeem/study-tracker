@@ -74,7 +74,7 @@ export async function getPlaylistVideosForPlaylist(playlistId: string) {
   });
 }
 
-async function getPlaylistWithOwnership(playlistId: string) {
+async function getPlaylistWithOwnership(playlistId: string, studentId: string) {
   return prisma.chapterPlaylist.findFirst({
     where: { id: playlistId, isArchived: false },
     include: {
@@ -88,20 +88,38 @@ async function getPlaylistWithOwnership(playlistId: string) {
       videos: {
         where: { isArchived: false },
         orderBy: { order: "asc" },
+        include: {
+          progress: {
+            where: { studentId },
+            select: { completed: true },
+          },
+        },
       },
     },
   });
 }
 
-export async function getPlaylistWatchData(playlistId: string, trackId: string) {
-  const playlist = await getPlaylistWithOwnership(playlistId);
+export async function getPlaylistWatchData(
+  playlistId: string,
+  studentId: string,
+  trackId: string
+) {
+  const playlist = await getPlaylistWithOwnership(playlistId, studentId);
   if (!playlist || playlist.chapter.paper.subject.trackId !== trackId) {
     return null;
   }
-  return playlist;
+
+  return {
+    ...playlist,
+    videos: playlist.videos.map(({ progress, ...video }) => ({
+      ...video,
+      completed: progress[0]?.completed ?? false,
+    })),
+  };
 }
 
 export type PlaylistWatchData = NonNullable<Awaited<ReturnType<typeof getPlaylistWatchData>>>;
+export type PlaylistWatchVideo = PlaylistWatchData["videos"][number];
 
 export async function getSpecialVideosForChapter(chapterId: string) {
   return prisma.chapterSpecialVideo.findMany({
