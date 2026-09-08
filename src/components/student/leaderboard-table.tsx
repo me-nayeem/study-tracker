@@ -1,5 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Crown, Medal } from "lucide-react";
+import { Crown, Medal, User } from "lucide-react";
 import type { LeaderboardEntry } from "@/lib/leaderboard-data";
 
 const RANK_STYLES: Record<number, { bg: string; text: string; icon: typeof Crown }> = {
@@ -7,6 +8,39 @@ const RANK_STYLES: Record<number, { bg: string; text: string; icon: typeof Crown
   2: { bg: "bg-text-secondary/10 border-text-secondary/30", text: "text-foreground", icon: Medal },
   3: { bg: "bg-state-premium/15 border-state-premium/40", text: "text-state-premium", icon: Medal },
 };
+
+function subtitleFor(entry: LeaderboardEntry): string | null {
+  if (entry.institutionName && entry.boardLabel) {
+    return `${entry.institutionName} · ${entry.boardLabel}`;
+  }
+  return entry.institutionName ?? entry.boardLabel ?? null;
+}
+
+function Avatar({ image, size = "md" }: { image: string | null; size?: "sm" | "md" }) {
+  const dimension = size === "sm" ? 32 : 40;
+  const boxClass = size === "sm" ? "h-8 w-8" : "h-10 w-10";
+  const iconClass = size === "sm" ? "h-4 w-4" : "h-5 w-5";
+
+  if (image) {
+    return (
+      <Image
+        src={image}
+        alt=""
+        width={dimension}
+        height={dimension}
+        className={`shrink-0 rounded-full object-cover ${boxClass}`}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`bg-bg-elevated text-text-secondary flex shrink-0 items-center justify-center rounded-full ${boxClass}`}
+    >
+      <User className={iconClass} />
+    </div>
+  );
+}
 
 export function LeaderboardTable({
   entries,
@@ -43,6 +77,7 @@ export function LeaderboardTable({
             const style = RANK_STYLES[entry.rank];
             const Icon = style.icon;
             const isYou = entry.studentId === currentStudentId;
+            const subtitle = subtitleFor(entry);
             return (
               <div
                 key={entry.studentId}
@@ -50,17 +85,24 @@ export function LeaderboardTable({
                   isYou ? "ring-accent-primary ring-2" : ""
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <Icon className={`h-6 w-6 ${style.text}`} />
+                <div className="mb-3 flex items-center gap-1.5">
+                  <Icon className={`h-4 w-4 ${style.text}`} />
                   <span className={`font-mono text-xs font-bold ${style.text}`}>#{entry.rank}</span>
                 </div>
-                <p className="text-foreground mt-2 truncate text-sm font-semibold">
-                  {entry.name}
-                  {isYou ? " (You)" : ""}
-                </p>
-                <p className="text-accent-gamify mt-0.5 font-mono text-lg font-bold">
-                  {entry.points}
-                </p>
+
+                <div className="flex items-center gap-3">
+                  <Avatar image={entry.image} size="md" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-foreground truncate text-sm font-semibold">
+                      {entry.name}
+                      {isYou ? " (You)" : ""}
+                    </p>
+                    {subtitle && <p className="text-text-secondary truncate text-xs">{subtitle}</p>}
+                  </div>
+                  <p className="text-accent-gamify shrink-0 font-mono text-lg font-bold">
+                    {entry.points}
+                  </p>
+                </div>
               </div>
             );
           })}
@@ -75,29 +117,34 @@ export function LeaderboardTable({
         ) : rest.length === 0 ? null : (
           rest.map((entry) => {
             const isYou = entry.studentId === currentStudentId;
+            const subtitle = subtitleFor(entry);
             return (
               <div
                 key={entry.studentId}
-                className={`border-bg-elevated flex items-center justify-between border-b px-4 py-3 last:border-b-0 ${
+                className={`border-bg-elevated flex items-center justify-between gap-3 border-b px-4 py-3 last:border-b-0 ${
                   isYou ? "bg-accent-primary/10" : ""
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 items-center gap-3">
                   <span
-                    className={`w-8 font-mono text-sm ${
+                    className={`w-6 shrink-0 font-mono text-sm ${
                       isYou ? "text-accent-primary font-bold" : "text-text-secondary"
                     }`}
                   >
                     #{entry.rank}
                   </span>
-                  <span
-                    className={`text-sm ${isYou ? "text-foreground font-semibold" : "text-foreground"}`}
-                  >
-                    {entry.name}
-                    {isYou ? " (You)" : ""}
-                  </span>
+                  <Avatar image={entry.image} size="sm" />
+                  <div className="min-w-0">
+                    <p
+                      className={`truncate text-sm ${isYou ? "text-foreground font-semibold" : "text-foreground"}`}
+                    >
+                      {entry.name}
+                      {isYou ? " (You)" : ""}
+                    </p>
+                    {subtitle && <p className="text-text-secondary truncate text-xs">{subtitle}</p>}
+                  </div>
                 </div>
-                <span className="text-accent-gamify font-mono text-sm font-semibold">
+                <span className="text-accent-gamify shrink-0 font-mono text-sm font-semibold">
                   {entry.points}
                 </span>
               </div>

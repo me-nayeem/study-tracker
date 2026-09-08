@@ -1,6 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
-import type { LeaderboardPeriod } from "@/generated/prisma/enums";
+import type { LeaderboardPeriod, Board } from "@/generated/prisma/enums";
 
 const PAGE_SIZE = 25;
 const MAX_ENTRIES = 100;
@@ -10,7 +10,16 @@ export type LeaderboardEntry = {
   studentId: string;
   name: string;
   points: number;
+  image: string | null;
+  institutionName: string | null;
+  boardLabel: string | null;
 };
+
+export function formatBoardLabel(board: Board | null): string | null {
+  if (!board) return null;
+  const label = board.charAt(0) + board.slice(1).toLowerCase();
+  return `${label} Board`;
+}
 
 export async function getMasterLeaderboardPage({
   trackId,
@@ -56,7 +65,13 @@ export async function getMasterLeaderboardPage({
     select: {
       studentId: true,
       value: true,
-      student: { select: { user: { select: { name: true } } } },
+      student: {
+        select: {
+          institutionName: true,
+          board: true,
+          user: { select: { name: true, image: true } },
+        },
+      },
     },
   });
 
@@ -65,6 +80,9 @@ export async function getMasterLeaderboardPage({
     studentId: row.studentId,
     name: row.student.user.name ?? "Unnamed student",
     points: row.value,
+    image: row.student.user.image,
+    institutionName: row.student.institutionName,
+    boardLabel: formatBoardLabel(row.student.board),
   }));
 
   return { entries, page: safePage, pageSize: PAGE_SIZE, totalPages, trackStudentCount };
