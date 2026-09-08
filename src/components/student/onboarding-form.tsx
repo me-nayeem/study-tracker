@@ -19,8 +19,8 @@ const LEVEL_OPTIONS = [
 
 const GROUP_OPTIONS = [
   { value: "SCIENCE", label: "Science" },
-  { value: "ARTS", label: "Arts" },
-  { value: "COMMERCE", label: "Commerce" },
+  // { value: "ARTS", label: "Arts" },
+  // { value: "COMMERCE", label: "Commerce" },
 ];
 
 const BOARD_OPTIONS = [
