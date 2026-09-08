@@ -30,7 +30,7 @@ export class LastAdminError extends Error {
 export function fieldErrorState(error: ZodError): ActionState {
   return {
     success: false,
-    error: "Please fix the errors below.",
+    error: "Please fix the errors above.",
     fieldErrors: error.flatten().fieldErrors,
   };
 }
