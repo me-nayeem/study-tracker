@@ -60,9 +60,12 @@ export default async function ChapterDetailPage({
   return (
     <div className="space-y-8">
       <div>
-        {/* <Link href="/dashboard" className="text-text-secondary text-xs hover:underline">
-          ← Dashboard
-        </Link> */}
+        <Link
+          href={`/paper/${chapter.paperId}`}
+          className="text-text-secondary hover:text-foreground text-sm"
+        >
+          ← Back
+        </Link>
         <p className="text-text-secondary mt-2 text-xs">
           {chapter.paper.subject.name} · {chapter.paper.name}
         </p>

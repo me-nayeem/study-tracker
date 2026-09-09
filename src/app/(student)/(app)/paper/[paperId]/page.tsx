@@ -25,9 +25,9 @@ export default async function PaperPage({ params }: { params: Promise<{ paperId:
 
   return (
     <div>
-      {/* <Link href="/dashboard" className="text-text-secondary hover:text-foreground text-sm">
+      <Link href="/dashboard" className="text-text-secondary hover:text-foreground text-sm">
         ← Back to dashboard
-      </Link> */}
+      </Link>
 
       <div className="mt-3 flex items-center justify-between gap-3">
         <div>
