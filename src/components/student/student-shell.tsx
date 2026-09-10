@@ -4,6 +4,7 @@ import { useEffect, useState, useSyncExternalStore, useCallback } from "react";
 import { StudentSidebar } from "./student-sidebar";
 import { StudentTopbar } from "./student-topbar";
 import { BottomNav } from "./bottom-nav";
+import { BackForwardRefresh } from "./back-forward-refresh";
 
 const COLLAPSE_KEY = "student-sidebar-collapsed";
 const COLLAPSE_EVENT = "student-sidebar-collapsed-change";
@@ -53,6 +54,8 @@ export function StudentShell({
 
   return (
     <div className="bg-background min-h-screen">
+      <BackForwardRefresh />
+
       {mobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 md:hidden"
