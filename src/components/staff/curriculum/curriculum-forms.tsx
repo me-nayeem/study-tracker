@@ -338,6 +338,24 @@ export function TopicForm({
               className={inputClass}
             />
           </div>
+                    <div>
+           <label className={labelClass}>
+              Practice exam file <span className="font-normal">(optional)</span>
+            </label>
+            <input
+              name="examHtmlFileName"
+              type="text"
+              defaultValue={topic?.examHtmlFileName ?? ""}
+              placeholder="matrices-intro-exam.html"
+              className={inputClass}
+            />
+            <p className="text-text-secondary mt-1 text-xs">
+              Must exactly match a file placed in public/exams/
+            </p>
+            {state.fieldErrors?.examHtmlFileName && (
+              <p className={errorTextClass}>{state.fieldErrors.examHtmlFileName[0]}</p>
+            )}
+          </div>
         </>
       )}
     </EntityForm>

@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { PlayCircle, FileCheck } from "lucide-react";
+import { FileCheck } from "lucide-react";
+
+type TopicExamItem = {
+  id: string;
+  name: string;
+  examHtmlFileName: string | null;
+};
 
 const CARD_COLORS = [
   { bg: "bg-accent-blue/15", border: "border-accent-blue/30" },
@@ -9,7 +15,7 @@ const CARD_COLORS = [
   { bg: "bg-accent-gamify/15", border: "border-accent-gamify/30" },
 ];
 
-export function TopicExamSection({ topics }: { topics: { id: string; name: string }[] }) {
+export function TopicExamSection({ topics }: { topics: TopicExamItem[] }) {
   if (topics.length === 0) {
     return <p className="text-text-secondary text-sm">No topics added yet.</p>;
   }
@@ -24,21 +30,20 @@ export function TopicExamSection({ topics }: { topics: { id: string; name: strin
             className={`animate-card-in rounded-xl border p-4 ${colors.bg} ${colors.border}`}
           >
             <p className="text-foreground text-sm font-semibold">{topic.name}</p>
-            <div className="mt-3 flex gap-2">
-              {/* <Link
-                href={`/topic/${topic.id}/video`}
-                className="bg-bg-surface text-foreground hover:bg-bg-elevated flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
-              >
-                <PlayCircle className="h-3.5 w-3.5" />
-                Video
-              </Link> */}
-              <Link
-                href={`https://claude.ai/public/artifacts/1071191a-18e7-4651-8ea0-ce7ea6582811`}
-                className="bg-bg-surface text-foreground hover:bg-bg-elevated flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
-              >
-                <FileCheck className="h-3.5 w-3.5" />
-                Exam
-              </Link>
+            <div className="mt-3">
+              {topic.examHtmlFileName ? (
+                <Link
+                  href={`/exams/${topic.examHtmlFileName}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-bg-surface text-foreground hover:bg-bg-elevated flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
+                >
+                  <FileCheck className="h-3.5 w-3.5" />
+                  Exam
+                </Link>
+              ) : (
+                <p className="text-text-secondary text-xs">Practice exam coming soon</p>
+              )}
             </div>
           </div>
         );

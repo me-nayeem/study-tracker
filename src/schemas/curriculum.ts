@@ -43,6 +43,12 @@ export const TopicSchema = z.object({
   chapterId: id,
   name: z.string().trim().min(1, "Name is required.").max(160),
   order: z.coerce.number().int().min(0).default(0),
+  examHtmlFileName: z
+    .string()
+    .trim()
+    .regex(/^[a-zA-Z0-9_-]+\.html$/, "Must be a plain filename like my-exam.html")
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
 });
 export const TopicUpdateSchema = TopicSchema.extend({ id });
 

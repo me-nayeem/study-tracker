@@ -183,6 +183,7 @@ model Topic {
   name          String          @db.VarChar(160)
   order         Int             @default(0)
   isArchived    Boolean         @default(false)
+  examHtmlFileName String?      @db.VarChar(255)
   externalExams ExternalExam[]
   quizQuestions QuizQuestion[]
   resources     Resource[]
@@ -262,6 +263,7 @@ model QuizQuestion {
   topicId      String?
   quiz         Quiz    @relation(fields: [quizId], references: [id], onDelete: Cascade)
   topic        Topic?  @relation(fields: [topicId], references: [id])
+  @@unique([quizId, order], map: "quizquestion_quizid_order_key")
 }
 
 model QuizAttempt {

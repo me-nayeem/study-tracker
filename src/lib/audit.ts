@@ -10,6 +10,7 @@ export const AUDIT_ACTIONS = [
   "DEACTIVATED",
   "RECONCILED",
   "DISPUTE_RESOLVED",
+  "MANUAL_ADJUSTMENT",
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 

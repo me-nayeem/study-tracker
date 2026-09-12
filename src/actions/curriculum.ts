@@ -432,19 +432,22 @@ export async function createTopic(_prev: ActionState, formData: FormData): Promi
     chapterId: formValue(formData, "chapterId"),
     name: formValue(formData, "name"),
     order: formValue(formData, "order"),
+    examHtmlFileName: formValue(formData, "examHtmlFileName"),
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const { chapterId, name, order } = parsed.data;
+  const { chapterId, name, order, examHtmlFileName } = parsed.data;
 
   try {
     await prisma.$transaction(async (tx) => {
-      const topic = await tx.topic.create({ data: { chapterId, name, order } });
+      const topic = await tx.topic.create({
+        data: { chapterId, name, order, examHtmlFileName: examHtmlFileName ?? null },
+      });
       await logAudit(tx, {
         actorId: actor.id,
         action: "CREATE",
         entityType: "Topic",
         entityId: topic.id,
-        metadata: { chapterId, name, order },
+        metadata: { chapterId, name, order, examHtmlFileName: examHtmlFileName ?? null },
       });
     });
   } catch (err) {
@@ -463,14 +466,18 @@ export async function updateTopic(_prev: ActionState, formData: FormData): Promi
     chapterId: formValue(formData, "chapterId"),
     name: formValue(formData, "name"),
     order: formValue(formData, "order"),
+    examHtmlFileName: formValue(formData, "examHtmlFileName"),
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const { id, name, order } = parsed.data;
+  const { id, name, order, examHtmlFileName } = parsed.data;
 
   try {
     await prisma.$transaction(async (tx) => {
       const before = await tx.topic.findUniqueOrThrow({ where: { id } });
-      const topic = await tx.topic.update({ where: { id }, data: { name, order } });
+      const topic = await tx.topic.update({
+        where: { id },
+        data: { name, order, examHtmlFileName: examHtmlFileName ?? null },
+      });
       await logAudit(tx, {
         actorId: actor.id,
         action: "UPDATE",
