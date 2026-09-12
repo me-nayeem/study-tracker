@@ -35,6 +35,7 @@ export const ChapterSchema = z.object({
   order: z.coerce.number().int().min(0).default(0),
   examWeight: z.coerce.number().min(0.1, "Weight must be at least 0.1.").max(100),
   masteryPassPercent: z.coerce.number().int().min(0).max(100),
+  isFreePreview: z.coerce.boolean().default(false),
 });
 export const ChapterUpdateSchema = ChapterSchema.extend({ id });
 

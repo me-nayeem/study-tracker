@@ -25,15 +25,15 @@ export function TopicExamSection({ topics }: { topics: { id: string; name: strin
           >
             <p className="text-foreground text-sm font-semibold">{topic.name}</p>
             <div className="mt-3 flex gap-2">
-              <Link
+              {/* <Link
                 href={`/topic/${topic.id}/video`}
                 className="bg-bg-surface text-foreground hover:bg-bg-elevated flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
               >
                 <PlayCircle className="h-3.5 w-3.5" />
                 Video
-              </Link>
+              </Link> */}
               <Link
-                href={`/topic/${topic.id}/exam`}
+                href={`https://claude.ai/public/artifacts/1071191a-18e7-4651-8ea0-ce7ea6582811`}
                 className="bg-bg-surface text-foreground hover:bg-bg-elevated flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
               >
                 <FileCheck className="h-3.5 w-3.5" />

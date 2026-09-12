@@ -279,6 +279,7 @@ function ChapterNode({ chapter }: { chapter: ChapterWithChildren }) {
             <p className="text-foreground truncate text-sm font-medium">
               {chapter.name}
               {chapter.isArchived && <ArchivedBadge />}
+              {!chapter.isFreePreview && <ProLockedBadge />}
             </p>
             <p className="text-text-secondary font-mono text-xs">
               weight {chapter.examWeight.toFixed(1)} · pass {chapter.masteryPassPercent}%
@@ -362,6 +363,7 @@ function TopicRowItem({ topic, chapterId }: { topic: TopicRow; chapterId: string
   );
 }
 
+
 function Chevron({ open }: { open: boolean }) {
   return (
     <svg
@@ -377,6 +379,14 @@ function Chevron({ open }: { open: boolean }) {
         strokeLinejoin="round"
       />
     </svg>
+  );
+}
+
+function ProLockedBadge() {
+  return (
+    <span className="bg-state-premium/10 text-state-premium ml-2 rounded-full px-2 py-0.5 align-middle text-[10px] font-medium">
+      Pro-locked
+    </span>
   );
 }
 

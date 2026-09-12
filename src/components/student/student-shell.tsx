@@ -31,11 +31,13 @@ export function StudentShell({
   name,
   email,
   image,
+  isProActive,
   children,
 }: {
   name?: string | null;
   email?: string | null;
   image?: string | null;
+  isProActive: boolean;
   children: React.ReactNode;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -79,6 +81,7 @@ export function StudentShell({
           name={name}
           email={email}
           image={image}
+          isProActive={isProActive}
           onMenuClick={() => setMobileOpen((v) => !v)}
         />
         <main className="animate-card-in flex-1 px-4 py-6 pb-20 md:px-8 md:py-8 md:pb-8">

@@ -280,6 +280,16 @@ export function ChapterForm({
               )}
             </div>
           </div>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              name="isFreePreview"
+              type="checkbox"
+              defaultChecked={chapter?.isFreePreview ?? false}
+              value="true"
+              className="accent-accent-primary h-4 w-4"
+            />
+            <span className={labelClass}>Free preview (visible without Pro)</span>
+          </label>
         </>
       )}
     </EntityForm>

@@ -327,21 +327,22 @@ export async function createChapter(_prev: ActionState, formData: FormData): Pro
     order: formValue(formData, "order"),
     examWeight: formValue(formData, "examWeight"),
     masteryPassPercent: formValue(formData, "masteryPassPercent"),
+    isFreePreview: formValue(formData, "isFreePreview"),
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const { paperId, name, order, examWeight, masteryPassPercent } = parsed.data;
+  const { paperId, name, order, examWeight, masteryPassPercent, isFreePreview } = parsed.data;
 
   try {
     await prisma.$transaction(async (tx) => {
       const chapter = await tx.chapter.create({
-        data: { paperId, name, order, examWeight, masteryPassPercent },
+         data: { paperId, name, order, examWeight, masteryPassPercent, isFreePreview },
       });
       await logAudit(tx, {
         actorId: actor.id,
         action: "CREATE",
         entityType: "Chapter",
         entityId: chapter.id,
-        metadata: { paperId, name, examWeight, masteryPassPercent },
+        metadata: { paperId, name, examWeight, masteryPassPercent, isFreePreview },
       });
     });
   } catch (err) {
@@ -362,16 +363,18 @@ export async function updateChapter(_prev: ActionState, formData: FormData): Pro
     order: formValue(formData, "order"),
     examWeight: formValue(formData, "examWeight"),
     masteryPassPercent: formValue(formData, "masteryPassPercent"),
+    isFreePreview: formValue(formData, "isFreePreview"),
   });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const { id, name, order, examWeight, masteryPassPercent } = parsed.data;
+  const { id, name, order, examWeight, masteryPassPercent, isFreePreview } = parsed.data;
+
 
   try {
     await prisma.$transaction(async (tx) => {
       const before = await tx.chapter.findUniqueOrThrow({ where: { id } });
       const chapter = await tx.chapter.update({
         where: { id },
-        data: { name, order, examWeight, masteryPassPercent },
+        data: { name, order, examWeight, masteryPassPercent, isFreePreview },
       });
       await logAudit(tx, {
         actorId: actor.id,

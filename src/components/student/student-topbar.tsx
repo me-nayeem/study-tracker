@@ -6,11 +6,13 @@ export function StudentTopbar({
   name,
   email,
   image,
+  isProActive,
   onMenuClick,
 }: {
   name?: string | null;
   email?: string | null;
   image?: string | null;
+  isProActive: boolean;
   onMenuClick: () => void;
 }) {
   return (
@@ -32,8 +34,14 @@ export function StudentTopbar({
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
-        <span className="bg-bg-elevated text-text-secondary rounded-full px-2.5 py-1 text-xs font-medium">
-          Free
+        <span
+          className={
+            isProActive
+              ? "bg-state-premium/15 text-state-premium rounded-full px-2.5 py-1 text-xs font-medium"
+              : "bg-bg-elevated text-text-secondary rounded-full px-2.5 py-1 text-xs font-medium"
+          }
+        >
+          {isProActive ? "Pro" : "Free"}
         </span>
         <Link
           href="/account"

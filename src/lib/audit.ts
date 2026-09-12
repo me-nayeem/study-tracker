@@ -29,6 +29,7 @@ export const AUDIT_ENTITY_TYPES = [
   "PointRule",
   "Plan",
   "PaidBatch",
+  "Subscription",
   "ChapterTip",
   "ChapterPlaylistVideo",
   "Feedback",
