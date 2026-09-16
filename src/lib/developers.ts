@@ -20,7 +20,7 @@ export const DEVELOPERS: Developer[] = [
   },
   {
     name: "MD Sahariaj Hosen",
-    role: "Schema, database design & business model",
+    role: "Business model",
     linkedinUrl: "https://www.linkedin.com/in/sahariaj/",
     githubUrl: "https://github.com/sahariajf",
     email: "Mdsahariajhosen@gmail.com",

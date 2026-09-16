@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ম্যাট্রিক্সের পরিচিতি ও প্রকারভেদ - অনুশীলনী</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF2F6;
+    --card:#FFFFFF;
+    --ink:#1C2B39;
+    --muted:#5C6B7A;
+    --maroon:#7A2436;
+    --navy:#2C4A6E;
+    --gold:#B8902E;
+    --correct:#2F6F4E;
+    --incorrect:#B23A2E;
+    --line:#DCE1E7;
+    --answer-bg:#E9EFF3;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:32px 14px; background:var(--paper);
+    font-family:'Hind Siliguri', sans-serif; color:var(--ink);
+  }
+  .page{max-width:720px; margin:0 auto; background:var(--card); border:1px solid var(--line); box-shadow:0 1px 4px rgba(28,43,57,0.08);}
+  .letterhead{background:var(--maroon); color:#fff; padding:26px 30px 22px; position:relative;}
+  .seal{position:absolute; top:22px; right:26px; width:50px; height:50px; border-radius:50%; background:#fff; border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Tiro Bangla',serif; font-size:22px; color:var(--maroon);}
+  .subject-line{margin:0 0 10px; font-size:13.5px; opacity:0.92; max-width:520px;}
+  .letterhead h1{font-family:'Tiro Bangla',serif; font-size:24px; font-weight:600; margin:0 0 8px; max-width:540px; line-height:1.3;}
+  .letterhead .sub{margin:0; font-size:13.5px; opacity:0.9;}
+  .goldbar{height:4px; background:var(--gold);}
+  .meta-bar{display:flex; justify-content:space-between; align-items:center; padding:13px 30px; border-bottom:1px solid var(--line); background:#FAFBFC; font-size:14px; flex-wrap:wrap; gap:8px;}
+  .meta-bar .score{font-weight:600; color:var(--navy);}
+  .mcq-section{padding:6px 30px 4px;}
+  .question{padding:22px 0; border-bottom:1px solid var(--line);}
+  .question:last-child{border-bottom:none;}
+  .q-head{display:flex; gap:10px; margin-bottom:14px;}
+  .q-num{font-family:'Tiro Bangla',serif; color:var(--maroon); font-weight:600; flex-shrink:0; font-size:16px;}
+  .q-text{font-size:16px; line-height:1.65;}
+  .options{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-left:26px;}
+  @media (max-width:480px){.options{grid-template-columns:1fr;} .letterhead{padding:22px 20px;} .mcq-section,.cq-section{padding-left:20px; padding-right:20px;} .meta-bar{padding:12px 20px;}}
+  .option{border:1px solid var(--line); border-radius:5px; padding:10px 14px; cursor:pointer; font-size:15px; line-height:1.5; transition:border-color .15s, background .15s;}
+  .option:hover{border-color:var(--navy);}
+  .option:focus-visible{outline:2px solid var(--navy); outline-offset:1px;}
+  .option.correct{border-color:var(--correct); background:#EAF5EE; color:var(--correct); font-weight:600;}
+  .option.incorrect{border-color:var(--incorrect); background:#FBEAE8; color:var(--incorrect); font-weight:600;}
+  .option.disabled{pointer-events:none;}
+  .explanation{margin:14px 0 0 26px; padding:12px 16px; background:var(--answer-bg); border-left:3px solid var(--navy); font-size:14.5px; line-height:1.7; display:none; border-radius:2px;}
+  .explanation.show{display:block;}
+  .explanation b{color:var(--navy);}
+  .cq-section{padding:6px 30px 30px;}
+  .section-title{font-family:'Tiro Bangla',serif; font-size:19px; color:var(--maroon); margin:26px 0 16px; padding-top:22px; border-top:2px solid var(--maroon);}
+  .stimulus{border-left:3px solid var(--gold); background:#FBF8F0; padding:14px 18px; font-size:15px; line-height:1.8; margin-bottom:18px; border-radius:2px;}
+  .subq{margin-bottom:16px;}
+  .subq-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:15.5px; line-height:1.6;}
+  .subq-marks{font-size:13px; color:var(--muted); white-space:nowrap; flex-shrink:0;}
+  .reveal-btn{margin-top:9px; background:none; border:1px solid var(--navy); color:var(--navy); border-radius:4px; padding:6px 13px; font-size:13.5px; cursor:pointer; font-family:inherit;}
+  .reveal-btn:hover{background:var(--navy); color:#fff;}
+  .reveal-btn:focus-visible{outline:2px solid var(--navy); outline-offset:2px;}
+  .answer-box{display:none; margin-top:10px; padding:12px 16px; background:var(--answer-bg); border-left:3px solid var(--correct); font-size:14.5px; line-height:1.8; border-radius:2px;}
+  .answer-box.show{display:block;}
+  .answer-box b{color:var(--maroon);}
+  .foot-note{padding:16px 30px 26px; font-size:12.5px; color:var(--muted); text-align:center; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="letterhead">
+    <div class="seal">১</div>
+    <p class="subject-line">বিষয়: উচ্চতর গণিত (১ম পত্র), অধ্যায় ১ (ম্যাট্রিক্স ও নির্ণায়ক)</p>
+    <h1>ম্যাট্রিক্সের পরিচিতি ও প্রকারভেদ</h1>
+    <p class="sub">অনুশীলনী: ১০টি বহুনির্বাচনি প্রশ্ন এবং ১টি সৃজনশীল প্রশ্ন</p>
+  </div>
+  <div class="goldbar"></div>
+
+  <div class="meta-bar">
+    <span>মোট প্রশ্ন: ১১টি (MCQ ১০ + CQ ১)</span>
+    <span class="score">স্কোর: <span id="score">০</span>/১০</span>
+  </div>
+
+  <div class="mcq-section" id="mcqSection"></div>
+
+  <div class="cq-section">
+    <div class="section-title">সৃজনশীল প্রশ্ন</div>
+
+    <div class="stimulus">
+      মনে করি, দুটি ম্যাট্রিক্স,
+      A = [[2, 0, 0], [0, 2, 0], [0, 0, 2]] (৩×৩ ক্রমের) এবং
+      B = [[3, -1], [4, 5]] (২×২ ক্রমের)।
+    </div>
+
+    <div class="subq">
+      <div class="subq-head"><span>ক) স্কেলার ম্যাট্রিক্স কাকে বলে?</span><span class="subq-marks">জ্ঞানমূলক, মান-১</span></div>
+      <button class="reveal-btn" onclick="toggleAnswer('ans-ka')">উত্তর দেখুন</button>
+      <div class="answer-box" id="ans-ka">
+        <b>Bekkha:</b> যদি কোনো কর্ণ ম্যাট্রিক্সের প্রধান কর্ণের সকল উপাদান পরস্পর সমান এবং একটি অশূন্য সংখ্যা (ধরা যাক k) হয়, আর কর্ণের বাইরের সকল উপাদান শূন্য হয়, তবে তাকে স্কেলার ম্যাট্রিক্স বলে।
+      </div>
+    </div>
+
+    <div class="subq">
+      <div class="subq-head"><span>খ) দেখাও যে, B − Bᵀ একটি স্কিউ-সিমেট্রিক ম্যাট্রিক্স।</span><span class="subq-marks">অনুধাবনমূলক, মান-২</span></div>
+      <button class="reveal-btn" onclick="toggleAnswer('ans-kha')">উত্তর দেখুন</button>
+      <div class="answer-box" id="ans-kha">
+        <b>Bekkha:</b> Bᵀ = [[3, 4], [-1, 5]]।<br>
+        B − Bᵀ = [[3−3, −1−4], [4−(−1), 5−5]] = [[0, −5], [5, 0]]।<br>
+        এখন (B−Bᵀ)ᵀ = [[0, 5], [−5, 0]] = −[[0, −5], [5, 0]] = −(B−Bᵀ)।<br>
+        যেহেতু (B−Bᵀ)ᵀ = −(B−Bᵀ), সুতরাং B−Bᵀ একটি স্কিউ-সিমেট্রিক ম্যাট্রিক্স। (প্রমাণিত)
+      </div>
+    </div>
+
+    <div class="subq">
+      <div class="subq-head"><span>গ) A ম্যাট্রিক্সটি কোন ধরনের ম্যাট্রিক্স তা ব্যাখ্যাসহ নির্ণয় কর।</span><span class="subq-marks">প্রয়োগ, মান-৩</span></div>
+      <button class="reveal-btn" onclick="toggleAnswer('ans-ga')">উত্তর দেখুন</button>
+      <div class="answer-box" id="ans-ga">
+        <b>Bekkha:</b> A = [[2,0,0],[0,2,0],[0,0,2]] একটি ৩×৩ বর্গ ম্যাট্রিক্স, কারণ এর সারি সংখ্যা ও কলাম সংখ্যা সমান (৩টি করে)।<br>
+        A এর প্রধান কর্ণের সকল উপাদান সমান (প্রতিটি 2) এবং কর্ণের বাইরের সকল উপাদান শূন্য।<br>
+        যেহেতু প্রধান কর্ণের সকল উপাদান একই অশূন্য সংখ্যা এবং বাকি সব শূন্য, তাই A একটি <b>স্কেলার ম্যাট্রিক্স</b> (একই সাথে এটি কর্ণ ম্যাট্রিক্সও বটে, তবে সুনির্দিষ্টভাবে এটি স্কেলার ম্যাট্রিক্স)।
+      </div>
+    </div>
+
+    <div class="subq">
+      <div class="subq-head"><span>ঘ) B ম্যাট্রিক্সকে একটি সিমেট্রিক ও একটি স্কিউ-সিমেট্রিক ম্যাট্রিক্সের সমষ্টিরূপে প্রকাশ কর।</span><span class="subq-marks">উচ্চতর দক্ষতা, মান-৪</span></div>
+      <button class="reveal-btn" onclick="toggleAnswer('ans-gha')">উত্তর দেখুন</button>
+      <div class="answer-box" id="ans-gha">
+        <b>Bekkha:</b> যেকোনো বর্গ ম্যাট্রিক্স B কে নিম্নরূপে প্রকাশ করা যায়:<br>
+        B = ½(B + Bᵀ) + ½(B − Bᵀ)<br><br>
+        Bᵀ = [[3,4],[-1,5]]<br>
+        B + Bᵀ = [[6, 3], [3, 10]]  ⟹  ½(B+Bᵀ) = [[3, 1.5], [1.5, 5]] — এটি সিমেট্রিক অংশ (যাচাই: এর ট্রান্সপোজ নিজের সমান)।<br>
+        B − Bᵀ = [[0, −5], [5, 0]]  ⟹  ½(B−Bᵀ) = [[0, −2.5], [2.5, 0]] — এটি স্কিউ-সিমেট্রিক অংশ।<br><br>
+        সুতরাং, B = [[3, 1.5], [1.5, 5]] + [[0, −2.5], [2.5, 0]]।<br>
+        যাচাই: দুটি যোগ করলে = [[3, −1], [4, 5]] = B। (প্রমাণিত)
+      </div>
+    </div>
+  </div>
+
+  <div class="foot-note">অধ্যায় ১: ম্যাট্রিক্স ও নির্ণায়ক — টপিক ১ (মোট ৯টি টপিকের প্রথমটি)</div>
+</div>
+
+<script>
+  const mcqData = [
+    {
+      q: "একটি ম্যাট্রিক্সে সারি সংখ্যা m এবং কলাম সংখ্যা n হলে, ম্যাট্রিক্সের ক্রম (order) কীভাবে লেখা হয়?",
+      options: ["n×m", "m×n", "m+n", "mn"],
+      correctIndex: 1,
+      explain: "ম্যাট্রিক্সের ক্রম নির্ণয় করা হয় সারি সংখ্যা × কলাম সংখ্যা আকারে, অর্থাৎ m×n। প্রথমে সারি সংখ্যা, পরে কলাম সংখ্যা লেখা হয়।"
+    },
+    {
+      q: "যে ম্যাট্রিক্সে সারি সংখ্যা ও কলাম সংখ্যা পরস্পর সমান, তাকে কী বলে?",
+      options: ["আয়তাকার ম্যাট্রিক্স", "বর্গ ম্যাট্রিক্স", "সারি ম্যাট্রিক্স", "কলাম ম্যাট্রিক্স"],
+      correctIndex: 1,
+      explain: "যখন m = n, অর্থাৎ সারি ও কলামের সংখ্যা সমান হয়, তখন তাকে বর্গ ম্যাট্রিক্স (square matrix) বলা হয়। যেমন: ২×২, ৩×৩ ক্রমের ম্যাট্রিক্স।"
+    },
+    {
+      q: "একটি বর্গ ম্যাট্রিক্সের প্রধান কর্ণের বাইরের সকল উপাদান শূন্য হলে তাকে কী বলে?",
+      options: ["স্কেলার ম্যাট্রিক্স", "একক ম্যাট্রিক্স", "কর্ণ ম্যাট্রিক্স", "শূন্য ম্যাট্রিক্স"],
+      correctIndex: 2,
+      explain: "কর্ণ ম্যাট্রিক্সে (diagonal matrix) কেবল শর্ত থাকে যে প্রধান কর্ণের বাইরের সব উপাদান শূন্য হবে। প্রধান কর্ণের উপাদানগুলো ভিন্ন ভিন্ন যেকোনো মান (শূন্যসহ) হতে পারে।"
+    },
+    {
+      q: "কর্ণ ম্যাট্রিক্সের প্রধান কর্ণের সকল উপাদান পরস্পর সমান ও অশূন্য হলে তাকে কী বলে?",
+      options: ["একক ম্যাট্রিক্স", "স্কেলার ম্যাট্রিক্স", "শূন্য ম্যাট্রিক্স", "সারি ম্যাট্রিক্স"],
+      correctIndex: 1,
+      explain: "স্কেলার ম্যাট্রিক্স (scalar matrix) হলো এমন কর্ণ ম্যাট্রিক্স যার প্রধান কর্ণের সব উপাদান একই অশূন্য সংখ্যা (k)। k = 1 হলে সেটি একক ম্যাট্রিক্সে পরিণত হয়।"
+    },
+    {
+      q: "স্কেলার ম্যাট্রিক্সে k = 1 হলে তাকে কী বলা হয়?",
+      options: ["নাল ম্যাট্রিক্স", "একক ম্যাট্রিক্স (Identity Matrix)", "সারি ম্যাট্রিক্স", "ত্রিকোণ ম্যাট্রিক্স"],
+      correctIndex: 1,
+      explain: "একক ম্যাট্রিক্স (I) হলো এমন স্কেলার ম্যাট্রিক্স যার প্রধান কর্ণের সব উপাদান 1 এবং বাকি সব উপাদান 0। ম্যাট্রিক্স গুণনে এটি identity element হিসেবে কাজ করে (A·I = A)।"
+    },
+    {
+      q: "যে ম্যাট্রিক্সের সকল উপাদান শূন্য, তাকে কী বলে?",
+      options: ["একক ম্যাট্রিক্স", "নাল বা শূন্য ম্যাট্রিক্স", "স্কেলার ম্যাট্রিক্স", "কর্ণ ম্যাট্রিক্স"],
+      correctIndex: 1,
+      explain: "নাল ম্যাট্রিক্স (Null/Zero Matrix) কে সাধারণত O দ্বারা প্রকাশ করা হয়, যার প্রতিটি উপাদান শূন্য। এটি যেকোনো ক্রমের হতে পারে।"
+    },
+    {
+      q: "একটি ম্যাট্রিক্সের সারি সংখ্যা মাত্র ১টি হলে তাকে কী বলে?",
+      options: ["কলাম ম্যাট্রিক্স", "সারি ম্যাট্রিক্স", "বর্গ ম্যাট্রিক্স", "শূন্য ম্যাট্রিক্স"],
+      correctIndex: 1,
+      explain: "শুধুমাত্র একটি সারি বিশিষ্ট ম্যাট্রিক্সকে সারি ম্যাট্রিক্স (row matrix) বলে। এর ক্রম হয় ১×n আকারে।"
+    },
+    {
+      q: "A ম্যাট্রিক্সের সারি ও কলাম পরস্পর অদলবদল করে যে নতুন ম্যাট্রিক্স পাওয়া যায়, তাকে কী বলে?",
+      options: ["বিপরীত ম্যাট্রিক্স", "ট্রান্সপোজ ম্যাট্রিক্স (Aᵀ)", "অনুবন্ধী ম্যাট্রিক্স", "সহগুণক ম্যাট্রিক্স"],
+      correctIndex: 1,
+      explain: "ম্যাট্রিক্স A এর সারিগুলোকে কলাম এবং কলামগুলোকে সারি করে যে নতুন ম্যাট্রিক্স গঠিত হয়, তাকে A এর ট্রান্সপোজ বলে এবং Aᵀ দ্বারা প্রকাশ করা হয়।"
+    },
+    {
+      q: "যদি Aᵀ = A হয়, তবে A কে কী বলে?",
+      options: ["স্কিউ-সিমেট্রিক ম্যাট্রিক্স", "সিমেট্রিক ম্যাট্রিক্স", "অর্থোগোনাল ম্যাট্রিক্স", "নাল ম্যাট্রিক্স"],
+      correctIndex: 1,
+      explain: "যে বর্গ ম্যাট্রিক্সের ট্রান্সপোজ তার নিজের সমান (Aᵀ = A), তাকে প্রতিসম বা সিমেট্রিক ম্যাট্রিক্স বলে।"
+    },
+    {
+      q: "যদি Aᵀ = −A হয়, তবে A এর প্রধান কর্ণের প্রতিটি উপাদানের মান কত হবে?",
+      options: ["সব 1", "সব −1", "সব শূন্য", "যেকোনো মান"],
+      correctIndex: 2,
+      explain: "Aᵀ = −A হলে A কে স্কিউ-সিমেট্রিক (প্রতি-প্রতিসম) ম্যাট্রিক্স বলে। এক্ষেত্রে প্রধান কর্ণের প্রতিটি উপাদান aᵢᵢ এর জন্য aᵢᵢ = −aᵢᵢ শর্ত পূরণ করতে হয়, যা কেবল aᵢᵢ = 0 হলেই সম্ভব।"
+    }
+  ];
+
+  const banglaDigits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+  function banglaNum(n){ return String(n).split('').map(c => banglaDigits[+c] ?? c).join(''); }
+
+  let score = 0;
+
+  function buildMCQ(){
+    const container = document.getElementById('mcqSection');
+    const labels = ['ক','খ','গ','ঘ'];
+    mcqData.forEach((item, qi) => {
+      const qDiv = document.createElement('div');
+      qDiv.className = 'question';
+      qDiv.innerHTML =
+        '<div class="q-head"><span class="q-num">' + banglaNum(qi+1) + '.</span><span class="q-text">' + item.q + '</span></div>' +
+        '<div class="options" id="opts-' + qi + '"></div>' +
+        '<div class="explanation" id="exp-' + qi + '"><b>Bekkha:</b> ' + item.explain + '</div>';
+      container.appendChild(qDiv);
+      const optWrap = qDiv.querySelector('#opts-' + qi);
+      item.options.forEach((opt, oi) => {
+        const b = document.createElement('div');
+        b.className = 'option';
+        b.tabIndex = 0;
+        b.textContent = labels[oi] + ') ' + opt;
+        b.onclick = () => selectOption(qi, oi);
+        b.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); selectOption(qi, oi); } };
+        optWrap.appendChild(b);
+      });
+    });
+  }
+
+  function selectOption(qi, oi){
+    const optWrap = document.getElementById('opts-' + qi);
+    if(optWrap.dataset.answered) return;
+    optWrap.dataset.answered = "1";
+    const opts = optWrap.children;
+    const correctIndex = mcqData[qi].correctIndex;
+    for(let i=0; i<opts.length; i++){ opts[i].classList.add('disabled'); }
+    if(oi === correctIndex){
+      opts[oi].classList.add('correct');
+      score++;
+    } else {
+      opts[oi].classList.add('incorrect');
+      opts[correctIndex].classList.add('correct');
+    }
+    document.getElementById('exp-' + qi).classList.add('show');
+    document.getElementById('score').textContent = banglaNum(score);
+  }
+
+  function toggleAnswer(id){
+    document.getElementById(id).classList.toggle('show');
+  }
+
+  buildMCQ();
+</script>
+</body>
+</html>

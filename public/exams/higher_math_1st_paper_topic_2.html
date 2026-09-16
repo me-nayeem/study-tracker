@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ম্যাট্রিক্সের সমতা, যোগ ও বিয়োগ - অনুশীলনী</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF2F6;
+    --card:#FFFFFF;
+    --ink:#1C2B39;
+    --muted:#5C6B7A;
+    --maroon:#7A2436;
+    --navy:#2C4A6E;
+    --gold:#B8902E;
+    --correct:#2F6F4E;
+    --incorrect:#B23A2E;
+    --line:#DCE1E7;
+    --answer-bg:#E9EFF3;
+  }
+  *{box-sizing:border-box;}
+  html{overflow-x:hidden;}
+  body{
+    margin:0; padding:28px 12px; background:var(--paper);
+    font-family:'Hind Siliguri', sans-serif; color:var(--ink);
+    overflow-x:hidden;
+  }
+  .page{max-width:720px; margin:0 auto; background:var(--card); border:1px solid var(--line); box-shadow:0 1px 4px rgba(28,43,57,0.08); overflow:hidden;}
+  .letterhead{background:var(--maroon); color:#fff; padding:22px 24px 20px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px;}
+  .letterhead-text{flex:1 1 auto; min-width:0;}
+  .seal{flex-shrink:0; width:46px; height:46px; border-radius:50%; background:#fff; border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Tiro Bangla',serif; font-size:20px; color:var(--maroon);}
+  .subject-line{margin:0 0 8px; font-size:13px; opacity:0.92; overflow-wrap:anywhere;}
+  .letterhead h1{font-family:'Tiro Bangla',serif; font-size:21px; font-weight:600; margin:0 0 6px; line-height:1.35; overflow-wrap:anywhere;}
+  .letterhead .sub{margin:0; font-size:13px; opacity:0.9; overflow-wrap:anywhere;}
+  .goldbar{height:4px; background:var(--gold);}
+  .meta-bar{display:flex; justify-content:space-between; align-items:center; padding:12px 24px; border-bottom:1px solid var(--line); background:#FAFBFC; font-size:14px; flex-wrap:wrap; gap:8px;}
+  .meta-bar .score{font-weight:600; color:var(--navy);}
+  .mcq-section{padding:6px 24px 4px;}
+  .question{padding:20px 0; border-bottom:1px solid var(--line);}
+  .question:last-child{border-bottom:none;}
+  .q-head{display:flex; gap:10px; margin-bottom:14px; align-items:flex-start;}
+  .q-num{font-family:'Tiro Bangla',serif; color:var(--maroon); font-weight:600; flex-shrink:0; font-size:16px;}
+  .q-text{font-size:16px; line-height:1.65; flex:1; min-width:0; overflow-wrap:anywhere;}
+  .options{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-left:0;}
+  @media (max-width:520px){.options{grid-template-columns:1fr;}}
+  .option{border:1px solid var(--line); border-radius:5px; padding:10px 14px; cursor:pointer; font-size:15px; line-height:1.5; transition:border-color .15s, background .15s; overflow-wrap:anywhere;}
+  .option:hover{border-color:var(--navy);}
+  .option:focus-visible{outline:2px solid var(--navy); outline-offset:1px;}
+  .option.correct{border-color:var(--correct); background:#EAF5EE; color:var(--correct); font-weight:600;}
+  .option.incorrect{border-color:var(--incorrect); background:#FBEAE8; color:var(--incorrect); font-weight:600;}
+  .option.disabled{pointer-events:none;}
+  .explanation{margin:14px 0 0 0; padding:12px 16px; background:var(--answer-bg); border-left:3px solid var(--navy); font-size:14.5px; line-height:1.7; display:none; border-radius:2px; overflow-wrap:anywhere;}
+  .explanation.show{display:block;}
+  .explanation b{color:var(--navy);}
+  .cq-section{padding:6px 24px 26px;}
+  .section-title{font-family:'Tiro Bangla',serif; font-size:19px; color:var(--maroon); margin:24px 0 16px; padding-top:20px; border-top:2px solid var(--maroon);}
+  .stimulus{border-left:3px solid var(--gold); background:#FBF8F0; padding:14px 16px; font-size:15px; line-height:1.8; margin-bottom:18px; border-radius:2px; overflow-wrap:anywhere;}
+  .subq{margin-bottom:16px;}
+  .subq-head{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:6px 10px; font-size:15.5px; line-height:1.6;}
+  .subq-head span:first-child{overflow-wrap:anywhere; flex:1 1 220px; min-width:0;}
+  .subq-marks{font-size:13px; color:var(--muted); white-space:nowrap; flex-shrink:0;}
+  .reveal-btn{margin-top:9px; background:none; border:1px solid var(--navy); color:var(--navy); border-radius:4px; padding:6px 13px; font-size:13.5px; cursor:pointer; font-family:inherit;}
+  .reveal-btn:hover{background:var(--navy); color:#fff;}
+  .reveal-btn:focus-visible{outline:2px solid var(--navy); outline-offset:2px;}
+  .answer-box{display:none; margin-top:10px; padding:12px 16px; background:var(--answer-bg); border-left:3px solid var(--correct); font-size:14.5px; line-height:1.8; border-radius:2px; overflow-wrap:anywhere;}
+  .answer-box.show{display:block;}
+  .answer-box b{color:var(--maroon);}
+  @media (max-width:380px){
+    body{padding:18px 6px;}
+    .seal{width:38px; height:38px; font-size:17px;}
+    .letterhead h1{font-size:18.5px;}
+    .letterhead{padding:18px 16px;}
+    .mcq-section,.cq-section{padding-left:16px; padding-right:16px;}
+    .meta-bar{padding:10px 16px;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="letterhead">
+    <div class="letterhead-text">
+      <p class="subject-line">বিষয়: উচ্চতর গণিত (১ম পত্র), অধ্যায় ১ (ম্যাট্রিক্স ও নির্ণায়ক)</p>
+      <h1>ম্যাট্রিক্সের সমতা, যোগ ও বিয়োগ</h1>
+      <p class="sub">অনুশীলনী: ১০টি বহুনির্বাচনি প্রশ্ন এবং ১টি সৃজনশীল প্রশ্ন</p>
+    </div>
+    <div class="seal">২</div>
+  </div>
+  <div class="goldbar"></div>
+
+  <div class="meta-bar">
+    <span>মোট প্রশ্ন: ১১টি (MCQ ১০ + CQ ১)</span>
+    <span class="score">স্কোর: <span id="score">০</span>/১০</span>
+  </div>
+
+  <div class="mcq-section" id="mcqSection"></div>
+
+  <div class="cq-section">
+    <div class="section-title">সৃজনশীল প্রশ্ন</div>
+
+    <div class="stimulus">মনে করি, A = [[4, -1], [2, 3]], B = [[1, 5], [-2, 0]] এবং C = [[0, 0], [0, 0]]।</div>
+
+    <div class="subq">
+      <div class="subq-head"><span>ক) দুটি ম্যাট্রিক্স সমান হওয়ার শর্ত লেখ।</span><span class="subq-marks">জ্ঞানমূলক, মান-১</span></div>
+      <button class="reveal-btn" onclick="toggleAnswer('ans-ka')">উত্তর দেখুন</button>
+      <div class="answer-box" id="ans-ka"><b>Bekkha:</b> দুটি ম্যাট্রিক্স সমান হতে হলে তাদের ক্রম একই হতে হবে এবং একই অবস্থানের প্রতিটি অনুরূপ উপাদান পরস্পর সমান হতে হবে।</div>
+    </div>
+    <div class="subq">
+      <div class="subq-head"><span>খ) A + C = A হবে কেন ব্যাখ্যা কর।</span><span class="subq-marks">অনুধাবনমূলক, মান-২</span></div>
+      <button class="reveal-btn" onclick="toggleAnswer('ans-kha')">উত্তর দেখুন</button>
+      <div class="answer-box" id="ans-kha"><b>Bekkha:</b> C = [[0,0],[0,0]] একটি শূন্য বা নাল ম্যাট্রিক্স, যা additive identity হিসেবে কাজ করে। A এর প্রতিটি উপাদানের সাথে C এর অনুরূপ উপাদান (0) যোগ করলে A এর উপাদানই অপরিবর্তিত থাকে, তাই A + C = A।</div>
+    </div>
+    <div class="subq">
+      <div class="subq-head"><span>গ) A + B এবং A − B নির্ণয় কর।</span><span class="subq-marks">প্রয়োগ, মান-৩</span></div>
+      <button class="reveal-btn" onclick="toggleAnswer('ans-ga')">উত্তর দেখুন</button>
+      <div class="answer-box" id="ans-ga"><b>Bekkha:</b> A+B = [[4+1, −1+5], [2+(−2), 3+0]] = [[5, 4], [0, 3]]<br>A−B = [[4−1, −1−5], [2−(−2), 3−0]] = [[3, −6], [4, 3]]</div>
+    </div>
+    <div class="subq">
+      <div class="subq-head"><span>ঘ) দেখাও যে, (A+B) − B = A।</span><span class="subq-marks">উচ্চতর দক্ষতা, মান-৪</span></div>
+      <button class="reveal-btn" onclick="toggleAnswer('ans-gha')">উত্তর দেখুন</button>
+      <div class="answer-box" id="ans-gha"><b>Bekkha:</b> (A+B) − B = [[5,4],[0,3]] − [[1,5],[-2,0]] = [[5−1, 4−5], [0−(−2), 3−0]] = [[4, −1], [2, 3]] = A। (প্রমাণিত)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const mcqData = [
+  {
+    "q": "দুটি ম্যাট্রিক্স A ও B পরস্পর সমান হওয়ার জন্য কোন শর্ত পূরণ করতে হয়?",
+    "options": [
+      "শুধু ক্রম সমান হতে হবে",
+      "ক্রম সমান হতে হবে এবং প্রতিটি অনুরূপ (corresponding) উপাদান সমান হতে হবে",
+      "শুধু উপাদানের সংখ্যা সমান হতে হবে",
+      "নির্ণায়কের মান সমান হতে হবে"
+    ],
+    "correctIndex": 1,
+    "explain": "দুটি ম্যাট্রিক্স সমান হতে হলে তাদের ক্রম (order) একই হতে হবে এবং একই অবস্থানে থাকা প্রতিটি অনুরূপ উপাদান পরস্পর সমান হতে হবে।"
+  },
+  {
+    "q": "A ও B ম্যাট্রিক্স দুটি যোগ করা যাবে কখন?",
+    "options": [
+      "A ও B বর্গ ম্যাট্রিক্স হলে",
+      "A ও B এর ক্রম একই হলে",
+      "A ও B এর নির্ণায়ক শূন্য হলে",
+      "যেকোনো ক্রমের ম্যাট্রিক্সই যোগ করা যায়"
+    ],
+    "correctIndex": 1,
+    "explain": "দুটি ম্যাট্রিক্স যোগ বা বিয়োগ করতে হলে তাদের ক্রম (order) অবশ্যই একই হতে হবে; ভিন্ন ক্রমের ম্যাট্রিক্স যোগ/বিয়োগ সংজ্ঞায়িত নয়।"
+  },
+  {
+    "q": "A = [[2,3],[1,4]] এবং B = [[1,0],[2,3]] হলে A+B এর দ্বিতীয় সারি, প্রথম কলামের উপাদানটি কত?",
+    "options": [
+      "3",
+      "7",
+      "1",
+      "4"
+    ],
+    "correctIndex": 0,
+    "explain": "A+B এর প্রতিটি উপাদান পাওয়া যায় A ও B এর অনুরূপ উপাদান যোগ করে। দ্বিতীয় সারি, প্রথম কলামের উপাদান = 1+2 = 3।"
+  },
+  {
+    "q": "ম্যাট্রিক্স যোগের ক্ষেত্রে A+B = B+A — এই ধর্মটিকে কী বলে?",
+    "options": [
+      "সংযোগ ধর্ম (Associative)",
+      "বিনিময় ধর্ম (Commutative)",
+      "বণ্টন ধর্ম (Distributive)",
+      "সমতা ধর্ম"
+    ],
+    "correctIndex": 1,
+    "explain": "A+B = B+A সম্পর্কটি ম্যাট্রিক্স যোগের বিনিময় ধর্ম (commutative property) নির্দেশ করে।"
+  },
+  {
+    "q": "(A+B)+C = A+(B+C) — এই ধর্মটির নাম কী?",
+    "options": [
+      "বিনিময় ধর্ম",
+      "সংযোগ ধর্ম (Associative)",
+      "নিরপেক্ষ উপাদান ধর্ম",
+      "বিপরীত ধর্ম"
+    ],
+    "correctIndex": 1,
+    "explain": "ম্যাট্রিক্স যোগে (A+B)+C = A+(B+C) সম্পর্কটি সংযোগ ধর্ম বা associative property নামে পরিচিত।"
+  },
+  {
+    "q": "যেকোনো ম্যাট্রিক্স A এর জন্য A + O = A হয়, এখানে O কী নির্দেশ করে?",
+    "options": [
+      "একক ম্যাট্রিক্স",
+      "নাল বা শূন্য ম্যাট্রিক্স (additive identity)",
+      "A এর বিপরীত ম্যাট্রিক্স",
+      "A এর ট্রান্সপোজ"
+    ],
+    "correctIndex": 1,
+    "explain": "শূন্য ম্যাট্রিক্স O কে additive identity বলা হয়, কারণ এটি যেকোনো ম্যাট্রিক্সের সাথে যোগ করলে সেই ম্যাট্রিক্সটিই অপরিবর্তিত থাকে (A+O=A)।"
+  },
+  {
+    "q": "A এর যোগাত্মক বিপরীত (additive inverse) কোনটি, যেন A + (তার বিপরীত) = O হয়?",
+    "options": [
+      "A",
+      "−A",
+      "Aᵀ",
+      "A⁻¹"
+    ],
+    "correctIndex": 1,
+    "explain": "A + (−A) = O শর্ত পূরণ করে, তাই A এর additive inverse হলো −A, যা A এর প্রতিটি উপাদানের বিপরীত চিহ্নযুক্ত সংখ্যা নিয়ে গঠিত।"
+  },
+  {
+    "q": "A = [[5,-2],[3,6]] হলে A − A এর ফলাফল কী হবে?",
+    "options": [
+      "A",
+      "2A",
+      "শূন্য ম্যাট্রিক্স",
+      "একক ম্যাট্রিক্স"
+    ],
+    "correctIndex": 2,
+    "explain": "যেকোনো ম্যাট্রিক্স থেকে নিজেকে বিয়োগ করলে প্রতিটি উপাদান শূন্য হয়ে যায়, ফলে A − A = O।"
+  },
+  {
+    "q": "যদি A + B = A + C হয় এবং A, B, C একই ক্রমের ম্যাট্রিক্স হয়, তবে কোন সিদ্ধান্তে আসা যায়?",
+    "options": [
+      "B = C",
+      "A = O",
+      "B = −C",
+      "কিছু বলা যায় না"
+    ],
+    "correctIndex": 0,
+    "explain": "ম্যাট্রিক্স যোগে বাতিলকরণ সূত্র (cancellation law) প্রযোজ্য: A+B = A+C হলে উভয় পাশ থেকে A বিয়োগ করে পাওয়া যায় B = C।"
+  },
+  {
+    "q": "A = [[1,2,3]] (1×3 সারি ম্যাট্রিক্স) এবং B = [[4],[5],[6]] (3×1 কলাম ম্যাট্রিক্স) হলে A + B করা সম্ভব কি?",
+    "options": [
+      "হ্যাঁ, ফলাফল 3×3 ম্যাট্রিক্স হবে",
+      "হ্যাঁ, ফলাফল 1×1 ম্যাট্রিক্স হবে",
+      "না, কারণ তাদের ক্রম ভিন্ন",
+      "হ্যাঁ, ফলাফল শূন্য ম্যাট্রিক্স হবে"
+    ],
+    "correctIndex": 2,
+    "explain": "A এর ক্রম 1×3 এবং B এর ক্রম 3×1 — দুটি ভিন্ন। যোগের জন্য উভয় ম্যাট্রিক্সের ক্রম অভিন্ন হতে হয়, তাই A+B সংজ্ঞায়িত নয়।"
+  }
+];
+
+  const banglaDigits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+  function banglaNum(n){ return String(n).split('').map(c => banglaDigits[+c] ?? c).join(''); }
+
+  let score = 0;
+
+  function buildMCQ(){
+    const container = document.getElementById('mcqSection');
+    const labels = ['ক','খ','গ','ঘ'];
+    mcqData.forEach((item, qi) => {
+      const qDiv = document.createElement('div');
+      qDiv.className = 'question';
+      qDiv.innerHTML =
+        '<div class="q-head"><span class="q-num">' + banglaNum(qi+1) + '.</span><span class="q-text">' + item.q + '</span></div>' +
+        '<div class="options" id="opts-' + qi + '"></div>' +
+        '<div class="explanation" id="exp-' + qi + '"><b>Bekkha:</b> ' + item.explain + '</div>';
+      container.appendChild(qDiv);
+      const optWrap = qDiv.querySelector('#opts-' + qi);
+      item.options.forEach((opt, oi) => {
+        const b = document.createElement('div');
+        b.className = 'option';
+        b.tabIndex = 0;
+        b.textContent = labels[oi] + ') ' + opt;
+        b.onclick = () => selectOption(qi, oi);
+        b.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); selectOption(qi, oi); } };
+        optWrap.appendChild(b);
+      });
+    });
+  }
+
+  function selectOption(qi, oi){
+    const optWrap = document.getElementById('opts-' + qi);
+    if(optWrap.dataset.answered) return;
+    optWrap.dataset.answered = "1";
+    const opts = optWrap.children;
+    const correctIndex = mcqData[qi].correctIndex;
+    for(let i=0; i<opts.length; i++){ opts[i].classList.add('disabled'); }
+    if(oi === correctIndex){
+      opts[oi].classList.add('correct');
+      score++;
+    } else {
+      opts[oi].classList.add('incorrect');
+      opts[correctIndex].classList.add('correct');
+    }
+    document.getElementById('exp-' + qi).classList.add('show');
+    document.getElementById('score').textContent = banglaNum(score);
+  }
+
+  function toggleAnswer(id){
+    document.getElementById(id).classList.toggle('show');
+  }
+
+  buildMCQ();
+</script>
+</body>
+</html>
