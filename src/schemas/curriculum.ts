@@ -35,15 +35,14 @@ export const ChapterSchema = z.object({
   order: z.coerce.number().int().min(0).default(0),
   examWeight: z.coerce.number().min(0.1, "Weight must be at least 0.1.").max(100),
   masteryPassPercent: z.coerce.number().int().min(0).max(100),
-  isFreePreview: z.coerce.boolean().default(false),
-});
+  isFreePreview: z.enum(["true", "false"]).default("false").transform(v => v === "true"),});
 export const ChapterUpdateSchema = ChapterSchema.extend({ id });
 
 export const TopicSchema = z.object({
   chapterId: id,
   name: z.string().trim().min(1, "Name is required.").max(160),
   order: z.coerce.number().int().min(0).default(0),
-   examHtmlFileName: z.preprocess(
+  examHtmlFileName: z.preprocess(
     (val) => (typeof val === "string" ? val.trim().replace(/^\/+/, "") : val),
     z
       .string()

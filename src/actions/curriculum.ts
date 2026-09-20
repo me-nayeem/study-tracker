@@ -108,7 +108,7 @@ export async function setTrackArchived(
   const actor = await requireRole(["ADMIN"]);
   const parsed = ArchiveSchema.safeParse({ id: formValue(formData, "id") });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const isArchived = formValue(formData, "isArchived") === "true";
+  const isArchived = formValue(formData, "isArchived")?.toLowerCase() === "true";
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -200,7 +200,7 @@ export async function setSubjectArchived(
   const actor = await requireRole(["ADMIN"]);
   const parsed = ArchiveSchema.safeParse({ id: formValue(formData, "id") });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const isArchived = formValue(formData, "isArchived") === "true";
+  const isArchived = formValue(formData, "isArchived")?.toLowerCase() === "true";
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -295,7 +295,7 @@ export async function setPaperArchived(
   const actor = await requireRole(["ADMIN"]);
   const parsed = ArchiveSchema.safeParse({ id: formValue(formData, "id") });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const isArchived = formValue(formData, "isArchived") === "true";
+  const isArchived = formValue(formData, "isArchived")?.toLowerCase() === "true";
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -399,7 +399,7 @@ export async function setChapterArchived(
   const actor = await requireRole(["ADMIN"]);
   const parsed = ArchiveSchema.safeParse({ id: formValue(formData, "id") });
   if (!parsed.success) return fieldErrorState(parsed.error);
-  const isArchived = formValue(formData, "isArchived") === "true";
+  const isArchived = formValue(formData, "isArchived")?.toLowerCase() === "true";
 
   try {
     await prisma.$transaction(async (tx) => {
