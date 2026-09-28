@@ -3,20 +3,11 @@ import { awardPoints } from "@/lib/points";
 import { getDailyKey } from "@/lib/period-key";
 
 export type StreakResult = {
-  awarded: boolean; // true on the first qualifying visit of the day
+  awarded: boolean; 
   streakCount: number;
   pointsAwarded: number;
 };
 
-/**
- * Evaluates streak continuity on visit — called once per Dhaka-calendar
- * day, from the dashboard page. Idempotent per day via
- * StudentProfile.lastActiveAt: a 2nd/3rd visit the same day is a silent
- * no-op (awarded: false).
- *
- * "Visiting" is now the entire streak mechanism — not tied to StudySession
- * completion, since the study timer feature is currently unlaunched.
- */
 export async function evaluateStreak(
   tx: Prisma.TransactionClient,
   studentId: string,

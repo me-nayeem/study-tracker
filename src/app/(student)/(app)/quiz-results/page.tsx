@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/dal";
 import { getStudentProfile } from "@/lib/student-data";
 import { getStudentQuizResultsWithReview } from "@/lib/quiz-data";
@@ -7,7 +7,9 @@ import { QuizResultsList } from "@/components/student/quiz-results-list";
 export default async function QuizResultsPage() {
   const user = await requireUser();
   const profile = await getStudentProfile(user.id);
-  if (!profile) notFound();
+  if (!profile) {
+    redirect("/onboarding");
+  }
 
   const results = await getStudentQuizResultsWithReview(profile.id);
 

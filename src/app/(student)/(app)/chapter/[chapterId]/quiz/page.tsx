@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/dal";
 import { getStudentProfile } from "@/lib/student-data";
@@ -14,7 +15,9 @@ export default async function ChapterQuizPage({
   const { chapterId } = await params;
   const user = await requireUser();
   const profile = await getStudentProfile(user.id);
-  if (!profile) notFound();
+  if (!profile) {
+    redirect("/onboarding");
+  }
 
   const chapter = await prisma.chapter.findFirst({
     where: { id: chapterId, isArchived: false },

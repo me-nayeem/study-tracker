@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/dal";
 import { getStudentProfile } from "@/lib/student-data";
 import { getMasterLeaderboardPage, getStudentMasterRank } from "@/lib/leaderboard-data";
@@ -40,7 +41,9 @@ export default async function LeaderboardPage({
   const params = await searchParams;
   const user = await requireUser();
   const profile = await getStudentProfile(user.id);
-  if (!profile) return null; // (app) layout already guarantees a profile exists
+  if (!profile) {
+    redirect("/onboarding");
+  } 
 
   const metric = params.metric === "STUDY_TIME" ? "STUDY_TIME" : "MASTER_SCORE";
   const period = isValidPeriod(params.period) ? params.period : "ALL_TIME";

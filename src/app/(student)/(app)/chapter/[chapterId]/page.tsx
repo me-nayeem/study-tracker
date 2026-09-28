@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Lock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/dal";
@@ -50,7 +51,7 @@ export default async function ChapterDetailPage({
   const chapterTips = await getChapterTipsForChapterStudentView(chapterId);
 
   if (!profile) {
-    notFound();
+    redirect("/onboarding");
   }
 
   const detail = await getChapterDetail(chapterId, profile.id, profile.trackId);
