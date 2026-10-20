@@ -81,6 +81,7 @@ export async function toggleTopicProgress(
   }
 
   revalidatePath(`/chapter/${chapterId}`);
+  revalidatePath(`/chapter/${chapterId}/checklist`);
   revalidatePath("/dashboard");
   return { success: true };
 }

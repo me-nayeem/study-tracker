@@ -103,7 +103,7 @@ export function LoginForm() {
       {step === "email" ? (
         <form action={requestAction} className="mt-8 space-y-4">
           <div>
-            <label htmlFor="email" className="text-text-text-secondary text-sm">
+            <label htmlFor="email" className="text-text-secondary text-sm">
               Email
             </label>
             <input

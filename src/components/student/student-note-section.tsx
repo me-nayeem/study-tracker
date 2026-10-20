@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { setStudentNoteVisibility } from "@/actions/student-notes";
 import { buttonGhostClass, buttonSecondaryClass } from "@/components/shared/classes";
 import { StudentNoteForm } from "./student-note-form";
+import { useToast } from "@/components/shared/dialog-provider";
 import type { StudentNoteOwnerRow } from "@/lib/content-data";
 
 export function StudentNoteSection({
@@ -45,6 +46,7 @@ export function StudentNoteSection({
 function OwnNoteRow({ chapterId, note }: { chapterId: string; note: StudentNoteOwnerRow }) {
   const [editing, setEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const toast = useToast();
 
   function toggleVisibility() {
     const next = !note.isPublic;
@@ -53,7 +55,7 @@ function OwnNoteRow({ chapterId, note }: { chapterId: string; note: StudentNoteO
     formData.set("isPublic", String(next));
     startTransition(async () => {
       const result = await setStudentNoteVisibility({ success: false }, formData);
-      if (!result.success) alert(result.error ?? "Failed to update.");
+      if (!result.success) toast(result.error ?? "Failed to update.");
     });
   }
 

@@ -6,8 +6,8 @@ const MESSAGES = [
   "Keep studying, keep growing.",
   "You are building something real.",
   "Consistency beats intensity. Nice work.",
-  "Be Consistance.",
-  "Keep Pushing Yourself.",
+  "Be consistent.",
+  "Keep pushing yourself.",
 ];
 
 export function StreakCelebrationModal({
@@ -49,7 +49,7 @@ export function StreakCelebrationModal({
           onClick={() => setOpen(false)}
           className="bg-accent-primary text-background mt-5 w-full rounded-lg px-4 py-2 text-sm font-medium transition-opacity hover:opacity-90"
         >
-          Let's go
+          Let&apos;s go
         </button>
       </div>
     </div>

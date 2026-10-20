@@ -206,6 +206,7 @@ export async function submitPlaylistReview(
   }
 
   revalidatePath(`/chapter/${playlist.chapterId}`);
+  revalidatePath(`/chapter/${playlist.chapterId}/lectures`);
   return { success: true };
 }
 

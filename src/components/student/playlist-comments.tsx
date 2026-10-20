@@ -22,7 +22,7 @@ export function PlaylistComments({ comments }: { comments: PlaylistComment[] }) 
   const hiddenCount = comments.length - visible.length;
 
   return (
-    <div className="border-bg-elevated mt-3 space-y-2 border-t pt-3">
+    <div className="space-y-2.5">
       {visible.map((c, i) => (
         <div key={i} className="flex items-start gap-2">
           <div className="bg-bg-elevated text-text-secondary flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold">

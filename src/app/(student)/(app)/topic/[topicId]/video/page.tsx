@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/dal";
 import { getStudentProfile } from "@/lib/student-data";
 import { prisma } from "@/lib/prisma";
 import { ComingSoon } from "@/components/student/coming-soon";
+import { getSubscribedFeatureKeys } from "@/lib/feature-subscriptions";
 
 export default async function TopicVideoPage({ params }: { params: Promise<{ topicId: string }> }) {
   const { topicId } = await params;
@@ -27,6 +28,8 @@ export default async function TopicVideoPage({ params }: { params: Promise<{ top
       title="Topic video"
       backHref={`/chapter/${topic.chapterId}`}
       backLabel="Back to chapter"
+      featureKey="topic:videos"
+      subscribed={(await getSubscribedFeatureKeys(user.id)).includes("topic:videos")}
     />
   );
 }

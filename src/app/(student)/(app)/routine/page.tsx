@@ -1,11 +1,21 @@
-export default function RoutinePage() {
+import { requireUser } from "@/lib/dal";
+import { getSubscribedFeatureKeys } from "@/lib/feature-subscriptions";
+import { ComingSoonPanel } from "@/components/student/coming-soon";
+
+export default async function RoutinePage() {
+  const user = await requireUser();
+  const subscribedKeys = await getSubscribedFeatureKeys(user.id);
+
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center space-y-3 text-center">
+    <div className="max-w-2xl space-y-5">
       <h1 className="font-display text-foreground text-2xl">Study routine</h1>
-      <p className="text-text-secondary max-w-sm text-sm">
-        The weekly routine builder is coming soon. You will be able to schedule study blocks and get
-        auto-generated to-dos for each day.
-      </p>
+      <ComingSoonPanel
+        emoji="🗓️"
+        title="Weekly routine builder"
+        message="Schedule study blocks for each day and get auto-generated to-dos. Coming soon."
+        featureKey="routine"
+        subscribed={subscribedKeys.includes("routine")}
+      />
     </div>
   );
 }

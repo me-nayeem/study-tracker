@@ -68,7 +68,7 @@ export function StudentNoteForm({
           <p className={errorTextClass}>{state.fieldErrors.fileUrl[0]}</p>
         )}
         <p className="text-text-secondary mt-1 text-xs">
-          Sharing must be set to "Anyone with the link", or others won't be able to open it.
+          Sharing must be set to &quot;Anyone with the link&quot;, or others won&apos;t be able to open it.
         </p>
       </div>
 

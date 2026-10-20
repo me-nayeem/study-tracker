@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { changeUserRole } from "@/actions/users";
 import { Role } from "@/generated/prisma/enums";
 import { inputClass } from "@/components/staff/curriculum/classes";
+import { useConfirm, useToast } from "@/components/shared/dialog-provider";
 
 export function RoleSelect({
   userId,
@@ -16,10 +17,17 @@ export function RoleSelect({
 }) {
   const [value, setValue] = useState<Role>(currentRole);
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
+  const toast = useToast();
 
-  function handleChange(newRole: Role) {
+  async function handleChange(newRole: Role) {
     if (newRole === value) return;
-    if (!confirm(`Change this user's role from ${value} to ${newRole}?`)) return;
+    const ok = await confirm({
+      title: "Change role?",
+      message: `This user's role will change from ${value} to ${newRole}.`,
+      confirmLabel: "Change role",
+    });
+    if (!ok) return;
 
     const formData = new FormData();
     formData.set("userId", userId);
@@ -28,7 +36,7 @@ export function RoleSelect({
     startTransition(async () => {
       const result = await changeUserRole({ success: false }, formData);
       if (!result.success) {
-        alert(result.error ?? "Failed to change role.");
+        toast(result.error ?? "Failed to change role.");
         return;
       }
       setValue(newRole);

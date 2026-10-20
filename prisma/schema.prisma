@@ -25,8 +25,21 @@ model User {
   sessions       Session[]
   studentProfile StudentProfile?
   subscription   Subscription?
+  featureSubscriptions FeatureSubscription[]
 
   @@index([role])
+}
+
+/// "Notify me" waitlist for coming-soon features (e.g. "subject:bangla", "routine").
+model FeatureSubscription {
+  id         String   @id @default(cuid())
+  userId     String
+  featureKey String   @db.VarChar(80)
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, featureKey])
+  @@index([featureKey])
 }
 
 model Account {

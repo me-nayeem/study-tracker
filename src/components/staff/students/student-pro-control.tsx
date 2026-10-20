@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { grantManualPro, revokeManualPro } from "@/actions/subscription";
 import type { ActionState } from "@/lib/prisma-errors";
 import {
@@ -10,6 +10,7 @@ import {
   buttonPrimaryClass,
   buttonGhostClass,
 } from "@/components/staff/curriculum/classes";
+import { useConfirm } from "@/components/shared/dialog-provider";
 
 const initialState: ActionState = { success: false };
 
@@ -23,21 +24,31 @@ export function StudentProControl({
   const [expanded, setExpanded] = useState(false);
   const [grantState, grantAction, grantPending] = useActionState(grantManualPro, initialState);
   const [, revokeAction, revokePending] = useActionState(revokeManualPro, initialState);
+  const revokeFormRef = useRef<HTMLFormElement>(null);
+  const confirm = useConfirm();
+
+  async function handleRevoke() {
+    const ok = await confirm({
+      title: "Revoke Pro access?",
+      message: "This student will lose Pro features immediately.",
+      confirmLabel: "Revoke",
+      destructive: true,
+    });
+    if (ok) revokeFormRef.current?.requestSubmit();
+  }
 
   if (!expanded) {
     return (
       <div className="flex justify-end gap-2">
         {isProActive && (
-          <form
-            action={revokeAction}
-            onSubmit={(e) => {
-              if (!window.confirm("Revoke this student's Pro access?")) {
-                e.preventDefault();
-              }
-            }}
-          >
+          <form ref={revokeFormRef} action={revokeAction}>
             <input type="hidden" name="userId" value={userId} />
-            <button type="submit" disabled={revokePending} className={buttonGhostClass}>
+            <button
+              type="button"
+              onClick={handleRevoke}
+              disabled={revokePending}
+              className={buttonGhostClass}
+            >
               {revokePending ? "Revoking…" : "Revoke Pro"}
             </button>
           </form>

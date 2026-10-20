@@ -26,10 +26,10 @@ export default async function SpecialVideoWatchPage({
   return (
     <div>
       <Link
-        href={`/chapter/${data.chapter.id}`}
+        href={`/chapter/${data.chapter.id}/lectures`}
         className="text-text-secondary hover:text-foreground text-sm"
       >
-        ← Back to chapter
+        ← Back to lectures
       </Link>
       <h1 className="font-display text-foreground mt-2 mb-4 text-xl">Special Videos</h1>
 

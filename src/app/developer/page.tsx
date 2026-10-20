@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { DEVELOPERS } from "@/lib/developers";
+import { SITE_NAME } from "@/lib/site-config";
 
 export const metadata: Metadata = {
-  title: "Developers — HSC Study Tracker",
+  title: "Developers",
 };
 
 export default function DeveloperPage() {
@@ -11,7 +12,7 @@ export default function DeveloperPage() {
       <div className="mx-auto max-w-3xl">
         <h1 className="font-display text-foreground text-3xl md:text-4xl">Built by</h1>
         <p className="text-text-secondary mt-2 text-sm md:text-base">
-          Two people, no team — here&apos;s who&apos;s behind HSC Study Tracker.
+          Two people, no team — here&apos;s who&apos;s behind {SITE_NAME}.
         </p>
 
         <div className="mt-10 space-y-6">

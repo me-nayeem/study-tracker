@@ -3,7 +3,6 @@
 import { useActionState, useEffect,useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Clock3 } from "lucide-react";
 import { updateAccount } from "@/actions/account";
 import type { ActionState } from "@/lib/prisma-errors";
 import { Board } from "@/generated/prisma/enums";

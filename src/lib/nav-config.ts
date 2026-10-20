@@ -45,18 +45,6 @@ export const STAFF_NAV: StaffNavEntry[] = [
     },
   },
   {
-    type: "group",
-    group: {
-      label: "Exams",
-      roles: ["ADMIN", "MANAGER"],
-      items: [
-        { label: "Exam results", href: "/manager/exam-results", roles: ["ADMIN", "MANAGER"] },
-        { label: "Disputes", href: "/admin/exam-disputes", roles: ["ADMIN"] },
-        { label: "Tips & tricks", href: "/manager/tips", roles: ["ADMIN", "MANAGER"] },
-      ],
-    },
-  },
-  {
     type: "link",
     item: { label: "Students", href: "/manager/students", roles: ["ADMIN", "MANAGER"] },
   },
@@ -72,7 +60,6 @@ export const STAFF_NAV: StaffNavEntry[] = [
       items: [
         { label: "Curriculum", href: "/admin/curriculum", roles: ["ADMIN"] },
         { label: "Staff & roles", href: "/admin/staff-roles", roles: ["ADMIN"] },
-        { label: "Pricing", href: "/admin/pricing", roles: ["ADMIN"] },
         { label: "Point rules", href: "/admin/point-rules", roles: ["ADMIN"] },
         { label: "Audit log", href: "/admin/audit-log", roles: ["ADMIN"] },
       ],

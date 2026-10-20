@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { User, Menu } from "lucide-react";
+import { BrandLogo } from "@/components/shared/brand-logo";
 
 export function StudentTopbar({
   name,
@@ -25,11 +26,8 @@ export function StudentTopbar({
         >
           <Menu className="h-5 w-5" />
         </button>
-        <Link
-          href="/dashboard"
-          className="font-display text-foreground truncate text-base leading-none"
-        >
-          HSC Study Tracker
+        <Link href="/dashboard" aria-label="Dashboard" className="min-w-0">
+          <BrandLogo size="sm" />
         </Link>
       </div>
 

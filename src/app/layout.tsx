@@ -1,6 +1,20 @@
 import "./globals.css";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Work_Sans, Fraunces } from "next/font/google";
 import { AuthSessionProvider } from "@/components/auth/session-provider";
+import { DialogProvider } from "@/components/shared/dialog-provider";
+import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/site-config";
+
+export const metadata: Metadata = {
+  title: { default: SITE_NAME, template: `%s — ${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+};
+
+export const viewport: Viewport = {
+  themeColor: "#17140F",
+  colorScheme: "dark",
+};
 
 const ibm_plex_mono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -30,7 +44,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${ibm_plex_mono.variable} ${work_sans.variable} ${fraunces.variable}`}
     >
       <body className="flex min-h-full flex-col">
-        <AuthSessionProvider>{children}</AuthSessionProvider>
+        <AuthSessionProvider>
+          <DialogProvider>{children}</DialogProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );

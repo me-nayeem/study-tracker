@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SITE_NAME, SUPPORT_EMAIL, LEGAL_LAST_UPDATED } from "@/lib/site-config";
 
 export const metadata = {
-  title: `Privacy Policy — ${SITE_NAME}`,
+  title: "Privacy Policy",
 };
 
 export default function PrivacyPolicyPage() {
@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="font-display mb-2 text-lg">1. Who we are</h2>
             <p>
-              {SITE_NAME} ("we", "us", "our") is a study platform for HSC/SSC students in
+              {SITE_NAME} (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is a study platform for HSC/SSC students in
               Bangladesh, offering chapter-wise progress tracking, curated content, quizzes,
               note sharing, and exam result analysis. This policy explains what information we
               collect, why, and how you can control it.
@@ -93,7 +93,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="font-display mb-2 text-lg">5. Data retention</h2>
             <p>
               We retain your account and activity data for as long as your account is active.
-              If you'd like your account and associated data deleted, contact us at{" "}
+              If you&apos;d like your account and associated data deleted, contact us at{" "}
               <a href={`mailto:${SUPPORT_EMAIL}`} className="text-accent-primary hover:underline">
                 {SUPPORT_EMAIL}
               </a>{" "}
@@ -102,11 +102,11 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="font-display mb-2 text-lg">6. Children's privacy</h2>
+            <h2 className="font-display mb-2 text-lg">6. Children&apos;s privacy</h2>
             <p>
               {SITE_NAME} is built for HSC/SSC students, many of whom are minors. We collect
               only the information described above and needed to provide the service. If you
-              are a parent or guardian and have concerns about your child's information, please
+              are a parent or guardian and have concerns about your child&apos;s information, please
               contact us at the address above.
             </p>
           </section>
@@ -137,7 +137,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="font-display mb-2 text-lg">9. Changes to this policy</h2>
             <p>
-              We may update this policy as {SITE_NAME} evolves. We'll update the "Last updated"
+              We may update this policy as {SITE_NAME} evolves. We&apos;ll update the &quot;Last updated&quot;
               date above when we do. Continued use of {SITE_NAME} after changes means you accept
               the revised policy.
             </p>

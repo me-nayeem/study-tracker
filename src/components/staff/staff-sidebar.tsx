@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { STAFF_NAV, type StaffNavItem } from "@/lib/nav-config";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import type { Role } from "@/generated/prisma/client";
 
 export function StaffSidebar({
@@ -25,9 +26,7 @@ export function StaffSidebar({
       }`}
     >
       <div className="border-bg-elevated flex items-center justify-between border-b px-6 py-5">
-        <span className="font-display text-foreground text-base leading-none">
-          HSC Study Tracker
-        </span>
+        <BrandLogo size="sm" />
         <button
           onClick={onNavigate}
           className="text-text-secondary hover:text-foreground -mr-1 p-1 md:hidden"

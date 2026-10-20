@@ -8,11 +8,13 @@ import { LeaderboardHeader } from "@/components/student/leaderboard-header";
 import { RankCard } from "@/components/student/rank-card";
 import { LeaderboardTable } from "@/components/student/leaderboard-table";
 import type { LeaderboardPeriod } from "@/generated/prisma/enums";
+import { ComingSoonPanel } from "@/components/student/coming-soon";
+import { getSubscribedFeatureKeys } from "@/lib/feature-subscriptions";
 
 const PERIOD_TABS: { period: LeaderboardPeriod; label: string }[] = [
   { period: "DAILY", label: "Today" },
-  { period: "WEEKLY", label: "This week" },
-  { period: "MONTHLY", label: "This month" },
+  { period: "WEEKLY", label: "Week" },
+  { period: "MONTHLY", label: "Month" },
   { period: "ALL_TIME", label: "All-time" },
 ];
 
@@ -43,7 +45,7 @@ export default async function LeaderboardPage({
   const profile = await getStudentProfile(user.id);
   if (!profile) {
     redirect("/onboarding");
-  } 
+  }
 
   const metric = params.metric === "STUDY_TIME" ? "STUDY_TIME" : "MASTER_SCORE";
   const period = isValidPeriod(params.period) ? params.period : "ALL_TIME";
@@ -63,12 +65,12 @@ export default async function LeaderboardPage({
     return (
       <div className="space-y-6">
         <LeaderboardHeader metric={metric} buildHref={buildHref} />
-        <div className="border-bg-elevated bg-bg-surface rounded-xl border p-10 text-center">
-          <p className="font-display text-foreground text-lg">Coming soon</p>
-          <p className="text-text-secondary mt-1 text-sm">
-            The study-time leaderboard unlocks once the study timer ships.
-          </p>
-        </div>
+        <ComingSoonPanel
+          title="Coming soon"
+          message="The study-time leaderboard unlocks once the study timer ships."
+          featureKey="leaderboard:study-time"
+          subscribed={(await getSubscribedFeatureKeys(user.id)).includes("leaderboard:study-time")}
+        />
       </div>
     );
   }
@@ -83,21 +85,28 @@ export default async function LeaderboardPage({
       <LeaderboardHeader metric={metric} buildHref={buildHref} />
       <RankCard rank={myRank.rank} points={myRank.points} />
 
-      <div className="flex gap-2">
-        {PERIOD_TABS.map((tab) => (
-          <Link
-            key={tab.period}
-            href={buildHref({ period: tab.period, page: 1 })}
-            className={
-              tab.period === period
-                ? "bg-accent-primary text-background rounded-full px-3 py-1.5 text-xs font-medium"
-                : "border-bg-elevated text-text-secondary hover:text-foreground rounded-full border px-3 py-1.5 text-xs"
-            }
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </div>
+      <nav
+        aria-label="Leaderboard period"
+        className="border-gold/20 grid max-w-xl grid-cols-4 gap-1 rounded-xl border bg-black/40 p-1"
+      >
+        {PERIOD_TABS.map((tab) => {
+          const active = tab.period === period;
+          return (
+            <Link
+              key={tab.period}
+              href={buildHref({ period: tab.period, page: 1 })}
+              aria-current={active ? "page" : undefined}
+              className={`rounded-lg px-1 py-2 text-center text-[11px] whitespace-nowrap transition-colors sm:text-xs ${
+                active
+                  ? "from-gold-soft to-gold text-ink bg-linear-to-b font-semibold"
+                  : "text-text-secondary hover:text-foreground font-medium"
+              }`}
+            >
+              {tab.label}
+            </Link>
+          );
+        })}
+      </nav>
 
       <LeaderboardTable
         entries={entries}

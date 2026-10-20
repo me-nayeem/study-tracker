@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/components/shared/brand-logo";
+import { SITE_NAME } from "@/lib/site-config";
 
 const NAV_LINKS = [
   { label: "How it works", href: "#how-it-works" },
@@ -15,8 +17,8 @@ export function SiteHeader() {
   return (
     <header className="border-bg-elevated bg-bg-surface sticky top-0 z-30 border-b">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 md:h-20 md:px-16">
-        <Link href="/" className="font-display text-foreground text-base md:text-lg">
-          HSC Study Tracker
+        <Link href="/" aria-label={`${SITE_NAME} home`}>
+          <BrandLogo />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

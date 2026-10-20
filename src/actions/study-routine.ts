@@ -8,7 +8,6 @@ import { handlePrismaError, fieldErrorState, type ActionState } from "@/lib/pris
 import { formValue } from "@/lib/form-data";
 import {
   StudyRoutineSchema,
-  StudyRoutineUpdateSchema,
   StudyRoutineItemSchema,
   StudyRoutineItemUpdateSchema,
   RoutineIdSchema,

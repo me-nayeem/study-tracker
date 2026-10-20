@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { DEVELOPERS } from "@/lib/developers";
+import { SITE_NAME } from "@/lib/site-config";
+import { BrandLogo } from "@/components/shared/brand-logo";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
@@ -9,7 +11,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col gap-8 md:flex-row md:justify-between">
           <div>
-            <span className="font-display text-foreground text-lg">HSC Study Tracker</span>
+            <BrandLogo />
             <p className="text-text-secondary mt-2 max-w-xs text-sm">
               Chapter-by-chapter progress, real exam breakdowns, and a plan instead of guesswork.
             </p>
@@ -60,7 +62,7 @@ export function SiteFooter() {
 
         <div className="border-bg-elevated mt-10 flex flex-col gap-2 border-t pt-6 text-xs sm:flex-row sm:items-center sm:justify-between">
           <span className="text-text-secondary">
-            © {year} HSC Study Tracker. All rights reserved.
+            © {year} {SITE_NAME}. All rights reserved.
           </span>
           <span className="text-text-secondary">
             Built by {DEVELOPERS.map((d) => d.name).join(" & ")}

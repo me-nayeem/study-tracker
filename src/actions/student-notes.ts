@@ -84,6 +84,7 @@ export async function createStudentNote(
   }
 
   revalidatePath(chapterPath(chapterId));
+  revalidatePath(`${chapterPath(chapterId)}/notes`);
   return { success: true };
 }
 
@@ -129,6 +130,7 @@ export async function updateStudentNote(
   }
 
   revalidatePath(chapterPath(existing.chapterId));
+  revalidatePath(`${chapterPath(existing.chapterId)}/notes`);
   return { success: true };
 }
 
@@ -168,6 +170,7 @@ export async function setStudentNoteVisibility(
   }
 
   revalidatePath(chapterPath(existing.chapterId));
+  revalidatePath(`${chapterPath(existing.chapterId)}/notes`);
   return { success: true };
 }
 

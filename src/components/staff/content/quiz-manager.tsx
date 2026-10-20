@@ -17,6 +17,7 @@ import {
   errorTextClass,
 } from "@/components/shared/classes";
 import { QuizQuestionForm } from "./quiz-question-form";
+import { useConfirm, useToast } from "@/components/shared/dialog-provider";
 import type { StaffQuizRow, StaffQuizQuestionRow } from "@/lib/quiz-data";
 
 export function QuizManager({
@@ -131,6 +132,8 @@ function QuizCard({
   const [editing, setEditing] = useState(false);
   const [addingQuestion, setAddingQuestion] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
+  const toast = useToast();
 
   function handleSetActive() {
     const formData = new FormData();
@@ -138,18 +141,24 @@ function QuizCard({
     formData.set("chapterId", chapterId);
     startTransition(async () => {
       const result = await setQuizActive({ success: false }, formData);
-      if (!result.success) alert(result.error ?? "Failed to activate quiz.");
+      if (!result.success) toast(result.error ?? "Failed to activate quiz.");
     });
   }
 
-  function handleDelete() {
-    if (!confirm("Delete this quiz? This can't be undone.")) return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: "Delete this quiz?",
+      message: "This can't be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     const formData = new FormData();
     formData.set("id", quiz.id);
     formData.set("chapterId", chapterId);
     startTransition(async () => {
       const result = await deleteQuiz({ success: false }, formData);
-      if (!result.success) alert(result.error ?? "Failed to delete quiz.");
+      if (!result.success) toast(result.error ?? "Failed to delete quiz.");
     });
   }
 
@@ -253,15 +262,22 @@ function QuestionRow({
 }) {
   const [editing, setEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
+  const toast = useToast();
 
-  function handleDelete() {
-    if (!confirm("Delete this question?")) return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: "Delete this question?",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     const formData = new FormData();
     formData.set("id", question.id);
     formData.set("chapterId", chapterId);
     startTransition(async () => {
       const result = await deleteQuizQuestion({ success: false }, formData);
-      if (!result.success) alert(result.error ?? "Failed to delete question.");
+      if (!result.success) toast(result.error ?? "Failed to delete question.");
     });
   }
 

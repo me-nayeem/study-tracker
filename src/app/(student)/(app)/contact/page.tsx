@@ -1,4 +1,5 @@
 import { DEVELOPERS } from "@/lib/developers";
+import { SITE_NAME } from "@/lib/site-config";
 
 export default function ContactPage() {
   return (
@@ -6,7 +7,7 @@ export default function ContactPage() {
       <div>
         <h1 className="font-display text-foreground text-2xl">Contact</h1>
         <p className="text-text-secondary mt-1 text-sm">
-          Two people, no team — here&apos;s who&apos;s behind HSC Study Tracker.
+          Two people, no team — here&apos;s who&apos;s behind {SITE_NAME}.
         </p>
       </div>
 

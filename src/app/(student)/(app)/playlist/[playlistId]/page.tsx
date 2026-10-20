@@ -27,10 +27,10 @@ export default async function PlaylistWatchPage({
   return (
     <div>
       <Link
-        href={`/chapter/${playlist.chapter.id}`}
+        href={`/chapter/${playlist.chapter.id}/lectures`}
         className="text-text-secondary hover:text-foreground text-sm"
       >
-        ← Back to chapter
+        ← Back to lectures
       </Link>
       <h1 className="font-display text-foreground mt-2 mb-4 text-xl">{playlist.title}</h1>
 

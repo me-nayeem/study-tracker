@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
+import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/site-config";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "HSC Study Tracker",
-    short_name: "Study Tracker",
-    description: "Chapter-wise progress tracking, quizzes, and leaderboards for HSC students.",
+    name: SITE_NAME,
+    short_name: SITE_NAME,
+    description: SITE_DESCRIPTION,
     start_url: "/dashboard",
     display: "standalone",
     background_color: "#17140F",

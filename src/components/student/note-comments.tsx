@@ -6,6 +6,7 @@ import {
   updateStudentNoteComment,
   deleteStudentNoteComment,
 } from "@/actions/student-notes";
+import { useConfirm } from "@/components/shared/dialog-provider";
 
 type Comment = {
   id: string;
@@ -78,6 +79,7 @@ function CommentRow({ comment }: { comment: Comment }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(comment.body);
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function handleSave() {
     if (!draft.trim()) return;
@@ -90,8 +92,13 @@ function CommentRow({ comment }: { comment: Comment }) {
     setEditing(false);
   }
 
-  function handleDelete() {
-    if (!confirm("Delete this comment?")) return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: "Delete this comment?",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     const formData = new FormData();
     formData.set("id", comment.id);
     startTransition(() => {

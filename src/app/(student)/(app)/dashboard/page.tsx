@@ -12,6 +12,7 @@ import { evaluateLevelUpForDisplay } from "@/lib/level";
 import { LevelUpModal } from "@/components/student/level-up-modal";
 import { PwaInstallController } from "@/components/student/pwa-install-controller";
 import { isInstallPromptEligible } from "@/lib/pwa-eligibility";
+import { getSubscribedFeatureKeys } from "@/lib/feature-subscriptions";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -21,11 +22,12 @@ export default async function DashboardPage() {
     redirect("/onboarding");
   }
 
-  const [data, notices, streakResult, levelUpResult] = await Promise.all([
+  const [data, notices, streakResult, levelUpResult, subscribedKeys] = await Promise.all([
     getStudentDashboardData(profile.trackId, profile.id),
     getUnreadChapterReviewNotices(user.id),
     prisma.$transaction((tx) => evaluateStreak(tx, profile.id, new Date())),
     prisma.$transaction((tx) => evaluateLevelUpForDisplay(tx, profile.id)),
+    getSubscribedFeatureKeys(user.id),
   ]);
 
   const displayTotalPoints = profile.totalPoints + streakResult.pointsAwarded;
@@ -51,8 +53,12 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <div className="mt-6">
-        <SubjectList data={data} />
+      <div className="mt-8">
+        <div className="mb-4 flex items-end justify-between gap-3">
+          <h2 className="font-display text-foreground text-lg">Your subjects</h2>
+          <p className="text-text-secondary text-xs">Tap a card to choose a paper</p>
+        </div>
+        <SubjectList data={data} subscribedKeys={subscribedKeys} />
       </div>
 
       {showLevelUp && <LevelUpModal level={levelUpResult.level!} title={levelUpResult.title} />}

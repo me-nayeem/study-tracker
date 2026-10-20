@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SITE_NAME, SUPPORT_EMAIL, LEGAL_LAST_UPDATED } from "@/lib/site-config";
 
 export const metadata = {
-  title: `Terms of Service — ${SITE_NAME}`,
+  title: "Terms of Service",
 };
 
 export default function TermsOfServicePage() {
@@ -37,8 +37,8 @@ export default function TermsOfServicePage() {
           <section>
             <h2 className="font-display mb-2 text-lg">3. Your account</h2>
             <p>
-              You can sign in with Google or with a one-time email code. You're responsible for
-              keeping access to your email/Google account secure, since that's how your
+              You can sign in with Google or with a one-time email code. You&apos;re responsible for
+              keeping access to your email/Google account secure, since that&apos;s how your
               {" " + SITE_NAME} account is protected. We may suspend or deactivate accounts that
               violate these terms or show signs of abuse.
             </p>
@@ -49,8 +49,8 @@ export default function TermsOfServicePage() {
             <p>
               You retain ownership of notes and other content you upload. By uploading content
               and marking it public, you grant {SITE_NAME} a license to store, display, and
-              distribute it to other students on the platform. You're responsible for making
-              sure content you upload doesn't infringe on anyone else's rights and isn't
+              distribute it to other students on the platform. You&apos;re responsible for making
+              sure content you upload doesn&apos;t infringe on anyone else&apos;s rights and isn&apos;t
               abusive, spam, or otherwise inappropriate. We may remove content or reject it
               during moderation at our discretion.
             </p>
@@ -60,10 +60,10 @@ export default function TermsOfServicePage() {
             <h2 className="font-display mb-2 text-lg">5. Acceptable use</h2>
             <p>You agree not to:</p>
             <ul className="mt-2 list-disc space-y-1.5 pl-5">
-              <li>Upload content you don't have the right to share.</li>
+              <li>Upload content you don&apos;t have the right to share.</li>
               <li>Attempt to farm points through spam, duplicate, or junk uploads.</li>
-              <li>Interfere with or attempt to disrupt the platform's operation.</li>
-              <li>Use another person's account or phone number without permission.</li>
+              <li>Interfere with or attempt to disrupt the platform&apos;s operation.</li>
+              <li>Use another person&apos;s account or phone number without permission.</li>
               <li>Harass, abuse, or post inappropriate content toward other students.</li>
             </ul>
           </section>
@@ -72,7 +72,7 @@ export default function TermsOfServicePage() {
             <h2 className="font-display mb-2 text-lg">6. Points, levels, and leaderboards</h2>
             <p>
               Points, levels, and leaderboard rankings are for engagement and motivation only.
-              They have no cash or monetary value, aren't transferable, and may be adjusted,
+              They have no cash or monetary value, aren&apos;t transferable, and may be adjusted,
               recalculated, or reset if we identify abuse or scoring errors.
             </p>
           </section>
@@ -93,7 +93,7 @@ export default function TermsOfServicePage() {
             <p>
               {SITE_NAME} does not currently process payments. If we introduce paid
               subscriptions or paid content batches in the future, additional terms specific to
-              billing and refunds will be presented before you're charged anything.
+              billing and refunds will be presented before you&apos;re charged anything.
             </p>
           </section>
 
@@ -122,10 +122,10 @@ export default function TermsOfServicePage() {
           <section>
             <h2 className="font-display mb-2 text-lg">11. Disclaimer and limitation of liability</h2>
             <p>
-              {SITE_NAME} is provided "as is" without warranties of any kind. We don't guarantee
+              {SITE_NAME} is provided &quot;as is&quot; without warranties of any kind. We don&apos;t guarantee
               the platform will be uninterrupted, error-free, or that quiz/exam outcomes will
               reflect your actual exam performance. To the fullest extent permitted by law, we
-              aren't liable for indirect or consequential damages arising from your use of the
+              aren&apos;t liable for indirect or consequential damages arising from your use of the
               platform.
             </p>
           </section>
@@ -138,7 +138,7 @@ export default function TermsOfServicePage() {
           <section>
             <h2 className="font-display mb-2 text-lg">13. Changes to these terms</h2>
             <p>
-              We may update these terms as {SITE_NAME} evolves. We'll update the "Last updated"
+              We may update these terms as {SITE_NAME} evolves. We&apos;ll update the &quot;Last updated&quot;
               date above when we do. Continued use after changes means you accept the revised
               terms.
             </p>

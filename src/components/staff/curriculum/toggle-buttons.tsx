@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { deleteTopic } from "@/actions/curriculum";
 import type { ActionState } from "@/lib/prisma-errors";
 import { buttonGhostClass } from "./classes";
+import { useConfirm, useToast } from "@/components/shared/dialog-provider";
 
 export function ArchiveToggleButton({
   id,
@@ -15,6 +16,7 @@ export function ArchiveToggleButton({
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
 }) {
   const [isPending, startTransition] = useTransition();
+  const toast = useToast();
 
   function handleClick() {
     const formData = new FormData();
@@ -23,7 +25,7 @@ export function ArchiveToggleButton({
     startTransition(async () => {
       const result = await action({ success: false }, formData);
       if (!result.success) {
-        alert(result.error ?? "Failed to update.");
+        toast(result.error ?? "Failed to update.");
       }
     });
   }
@@ -37,15 +39,23 @@ export function ArchiveToggleButton({
 
 export function DeleteTopicButton({ id }: { id: string }) {
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
+  const toast = useToast();
 
-  function handleClick() {
-    if (!confirm("Delete this topic? This cannot be undone.")) return;
+  async function handleClick() {
+    const ok = await confirm({
+      title: "Delete this topic?",
+      message: "This cannot be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     const formData = new FormData();
     formData.set("id", id);
     startTransition(async () => {
       const result = await deleteTopic({ success: false }, formData);
       if (!result.success) {
-        alert(result.error ?? "Failed to delete topic.");
+        toast(result.error ?? "Failed to delete topic.");
       }
     });
   }
