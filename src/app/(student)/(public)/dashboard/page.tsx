@@ -13,6 +13,7 @@ import { PwaInstallController } from "@/components/student/pwa-install-controlle
 import { isInstallPromptEligible } from "@/lib/pwa-eligibility";
 import { getSubscribedFeatureKeys } from "@/lib/feature-subscriptions";
 import { SignInBanner } from "@/components/student/sign-in-banner";
+import { AppCredits } from "@/components/shared/app-credits";
 
 export default async function DashboardPage() {
   const viewer = await getViewer();
@@ -49,6 +50,8 @@ async function GuestDashboard({ trackId }: { trackId: string | null }) {
         </div>
         <SubjectList data={data} subscribedKeys={[]} guest />
       </div>
+
+      <AppCredits className="mt-8 max-w-6xl" />
     </div>
   );
 }
@@ -98,6 +101,8 @@ async function StudentDashboard({ viewer }: { viewer: Extract<Viewer, { kind: "s
         </div>
         <SubjectList data={data} subscribedKeys={subscribedKeys} />
       </div>
+
+      <AppCredits className="mt-8 max-w-6xl" />
 
       {showLevelUp && <LevelUpModal level={levelUpResult.level!} title={levelUpResult.title} />}
 

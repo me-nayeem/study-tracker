@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { ArrowUpRight, Mail } from "lucide-react";
-import { COMPANY, SITE_NAME } from "@/lib/site-config";
+import { COMPANY } from "@/lib/site-config";
+import { AppCredits } from "@/components/shared/app-credits";
 import { headerTileClass } from "@/components/shared/classes";
 import { FacebookIcon, LinkedinIcon, WhatsappIcon } from "@/components/shared/icons/social-icons";
 
@@ -86,21 +86,7 @@ export default function ContactPage() {
         ))}
       </div>
 
-      <footer className="flex flex-col-reverse gap-4 border-t border-white/6 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-text-secondary text-xs">
-          © {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
-        </p>
-        <div className="text-text-secondary flex items-center gap-2.5 text-xs">
-          <span>A product by</span>
-          <Image
-            src={COMPANY.logo.src}
-            alt={COMPANY.name}
-            width={COMPANY.logo.width}
-            height={COMPANY.logo.height}
-            className="h-6 w-auto"
-          />
-        </div>
-      </footer>
+      <AppCredits />
     </div>
   );
 }
