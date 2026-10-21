@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, X } from "lucide-react";
+import { ArrowUpRight, ChevronRight, X } from "lucide-react";
 import { getSubjectArt, type SubjectArt } from "@/lib/subject-art";
 import type { FeatureKey } from "@/lib/coming-soon";
 import { NotifyMeButton } from "@/components/shared/notify-me-button";
 import { ProgressBar } from "@/components/shared/progress-bar";
+import { PORISSHROMI } from "@/lib/site-config";
 
 export type SubjectCardPaper = {
   id: string;
@@ -32,12 +33,17 @@ export type UpcomingSubjectCardData = {
   subscribed: boolean;
 };
 
+/** Visitor who isn't signed in: no progress numbers, and "Notify me" asks them to sign in. */
+const GuestContext = createContext(false);
+
 export function SubjectCardDeck({
   subjects,
   upcoming = [],
+  guest = false,
 }: {
   subjects: SubjectCardData[];
   upcoming?: UpcomingSubjectCardData[];
+  guest?: boolean;
 }) {
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -62,24 +68,27 @@ export function SubjectCardDeck({
   }, [openId]);
 
   return (
-    <div className="grid max-w-6xl grid-cols-2 gap-x-3 gap-y-7 pt-2 pb-4 sm:gap-x-4 sm:gap-y-8 lg:grid-cols-3 xl:grid-cols-4">
-      {subjects.map((subject, index) => (
-        <SubjectCard
-          key={subject.id}
-          index={index}
-          subject={subject}
-          flipped={openId === subject.id}
-          onFlip={(next) => setOpenId(next ? subject.id : null)}
-        />
-      ))}
-      {upcoming.map((subject, index) => (
-        <UpcomingSubjectCard
-          key={subject.featureKey}
-          subject={subject}
-          index={subjects.length + index}
-        />
-      ))}
-    </div>
+    <GuestContext value={guest}>
+      <div className="grid max-w-6xl grid-cols-2 gap-x-3 gap-y-7 pt-2 pb-4 sm:gap-x-4 sm:gap-y-8 lg:grid-cols-3 xl:grid-cols-4">
+        {subjects.map((subject, index) => (
+          <SubjectCard
+            key={subject.id}
+            index={index}
+            subject={subject}
+            flipped={openId === subject.id}
+            onFlip={(next) => setOpenId(next ? subject.id : null)}
+          />
+        ))}
+        {upcoming.map((subject, index) => (
+          <UpcomingSubjectCard
+            key={subject.featureKey}
+            subject={subject}
+            index={subjects.length + index}
+          />
+        ))}
+        <PorisshromiCard index={subjects.length + upcoming.length} />
+      </div>
+    </GuestContext>
   );
 }
 
@@ -95,6 +104,7 @@ function SubjectCard({
   onFlip: (next: boolean) => void;
 }) {
   const art = getSubjectArt(subject.name);
+  const guest = useContext(GuestContext);
   const frontRef = useRef<HTMLButtonElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
   // Only move focus when this card was flipped by the user, not when another card closes it.
@@ -136,7 +146,11 @@ function SubjectCard({
             onClick={() => flip(true)}
             inert={flipped}
             aria-expanded={flipped}
-            aria-label={`${subject.name}, ${Math.round(subject.percent)}% complete. Show papers`}
+            aria-label={
+              guest
+                ? `${subject.name}. Show papers`
+                : `${subject.name}, ${Math.round(subject.percent)}% complete. Show papers`
+            }
             className="deck-face subject-card-face--front @container"
           >
             {/* the first two rows are above the fold on phones and hold the page's LCP image */}
@@ -211,6 +225,7 @@ function CardFront({
   eager: boolean;
 }) {
   const paperCount = subject.papers.length;
+  const guest = useContext(GuestContext);
 
   return (
     <>
@@ -225,20 +240,26 @@ function CardFront({
           <span className="text-foreground truncate text-sm font-semibold @min-[200px]:text-base">
             {subject.name}
           </span>
-          <span className="text-gold shrink-0 text-xs font-semibold tabular-nums @min-[200px]:text-sm">
-            {Math.round(subject.percent)}%
-          </span>
+          {!guest && (
+            <span className="text-gold shrink-0 text-xs font-semibold tabular-nums @min-[200px]:text-sm">
+              {Math.round(subject.percent)}%
+            </span>
+          )}
         </span>
         <span className="text-text-secondary mt-0.5 mb-2.5 block truncate text-[11px] @min-[200px]:text-xs">
-          {subject.masteredCount}/{subject.chapterCount} chapters mastered
+          {guest
+            ? `${subject.chapterCount} ${subject.chapterCount === 1 ? "chapter" : "chapters"}`
+            : `${subject.masteredCount}/${subject.chapterCount} chapters mastered`}
         </span>
-        <ProgressBar percent={subject.percent} />
+        {!guest && <ProgressBar percent={subject.percent} />}
       </span>
     </>
   );
 }
 
 function CardBack({ subject, onClose }: { subject: SubjectCardData; onClose: () => void }) {
+  const guest = useContext(GuestContext);
+
   return (
     <div className="flex h-full flex-col p-3 @min-[200px]:p-4">
       <div className="flex items-start gap-2">
@@ -278,15 +299,19 @@ function CardBack({ subject, onClose }: { subject: SubjectCardData; onClose: () 
                   </span>
                 </span>
                 <span className="flex shrink-0 items-center gap-1">
-                  <span className="text-gold text-[11px] font-semibold tabular-nums @min-[200px]:text-xs">
-                    {Math.round(paper.percent)}%
-                  </span>
+                  {!guest && (
+                    <span className="text-gold text-[11px] font-semibold tabular-nums @min-[200px]:text-xs">
+                      {Math.round(paper.percent)}%
+                    </span>
+                  )}
                   <ChevronRight className="text-foreground/50 group-hover:text-foreground h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </span>
               </span>
-              <span className="mt-2 block">
-                <ProgressBar percent={paper.percent} />
-              </span>
+              {!guest && (
+                <span className="mt-2 block">
+                  <ProgressBar percent={paper.percent} />
+                </span>
+              )}
             </Link>
           ))
         )}
@@ -304,6 +329,7 @@ function UpcomingSubjectCard({
   index: number;
 }) {
   const art = getSubjectArt(subject.name);
+  const guest = useContext(GuestContext);
 
   return (
     <div
@@ -328,7 +354,64 @@ function UpcomingSubjectCard({
                 featureKey={subject.featureKey}
                 initialSubscribed={subject.subscribed}
                 variant="card"
+                guest={guest}
               />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Promo for our admission MCQ game: same card shape, gold edge, links out once it's live. */
+function PorisshromiCard({ index }: { index: number }) {
+  const url = PORISSHROMI.url;
+
+  return (
+    <div
+      className={`subject-card ${url ? "" : "subject-card--soon"}`}
+      style={{ "--float-delay": `${-(index % 4) * 1.3}s` } as React.CSSProperties}
+    >
+      <div className="subject-card-float">
+        <div className="relative aspect-3/4">
+          <div className="deck-face border-gold/35 @container">
+            <span className="card-well relative m-1.5 block min-h-0 flex-1 rounded-[0.95rem]">
+              <span className="absolute inset-[11%]">
+                <Image
+                  src={PORISSHROMI.logo.src}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1280px) 220px, (min-width: 1024px) 26vw, 40vw"
+                  quality={90}
+                  className="object-contain mix-blend-lighten"
+                />
+              </span>
+              <Chip>🎮 MCQ game</Chip>
+            </span>
+
+            <div className="px-3 pt-1.5 pb-3 @min-[200px]:px-4 @min-[200px]:pb-4">
+              <p className="text-foreground truncate text-sm font-semibold @min-[200px]:text-base">
+                {PORISSHROMI.name}
+              </p>
+              <p className="text-text-secondary mt-0.5 mb-2 truncate text-[11px] @min-[200px]:text-xs">
+                {PORISSHROMI.tagline}
+              </p>
+              {url ? (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gold text-ink hover:bg-gold-soft inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors active:scale-[0.97] @min-[200px]:text-xs"
+                >
+                  Play now
+                  <ArrowUpRight className="h-3 w-3" />
+                </a>
+              ) : (
+                <span className="bg-gold/10 text-gold inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold @min-[200px]:text-xs">
+                  Launching soon
+                </span>
+              )}
             </div>
           </div>
         </div>

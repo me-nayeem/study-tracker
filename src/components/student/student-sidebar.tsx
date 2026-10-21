@@ -3,17 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { PanelLeftClose, PanelLeftOpen, LogOut, X } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, LogIn, LogOut, X } from "lucide-react";
 import { STUDENT_NAV } from "@/lib/nav-config";
+import { loginHref } from "@/lib/login-redirect";
 
 export function StudentSidebar({
   open,
   collapsed,
+  guest,
   onNavigate,
   onToggleCollapse,
 }: {
   open: boolean;
   collapsed: boolean;
+  guest: boolean;
   onNavigate: () => void;
   onToggleCollapse: () => void;
 }) {
@@ -81,16 +84,30 @@ export function StudentSidebar({
       </nav>
 
       <div className="border-bg-elevated border-t px-3 py-3">
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          title={collapsed ? "Sign out" : undefined}
-          className={`text-text-secondary hover:text-foreground hover:bg-bg-elevated flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-            collapsed ? "md:justify-center" : ""
-          }`}
-        >
-          <LogOut className="h-4 w-4 shrink-0" />
-          <span className={collapsed ? "md:hidden" : ""}>Sign out</span>
-        </button>
+        {guest ? (
+          <Link
+            href={loginHref(pathname)}
+            onClick={onNavigate}
+            title={collapsed ? "Sign in" : undefined}
+            className={`text-gold hover:bg-bg-elevated flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+              collapsed ? "md:justify-center" : ""
+            }`}
+          >
+            <LogIn className="h-4 w-4 shrink-0" />
+            <span className={collapsed ? "md:hidden" : ""}>Sign in</span>
+          </Link>
+        ) : (
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            title={collapsed ? "Sign out" : undefined}
+            className={`text-text-secondary hover:text-foreground hover:bg-bg-elevated flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+              collapsed ? "md:justify-center" : ""
+            }`}
+          >
+            <LogOut className="h-4 w-4 shrink-0" />
+            <span className={collapsed ? "md:hidden" : ""}>Sign out</span>
+          </button>
+        )}
       </div>
     </aside>
   );

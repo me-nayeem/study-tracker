@@ -8,7 +8,7 @@ import { requestOtp, type RequestOtpState } from "@/actions/auth";
 const initialRequestState: RequestOtpState = { success: false, message: "" };
 const CODE_LENGTH = 6;
 
-export function LoginForm() {
+export function LoginForm({ callbackUrl = "/" }: { callbackUrl?: string }) {
   const router = useRouter();
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
@@ -79,14 +79,14 @@ export function LoginForm() {
         return;
       }
 
-      router.push("/");
+      router.push(callbackUrl);
       router.refresh();
     });
   }
 
   async function handleGoogleSignIn() {
     setIsGoogleLoading(true);
-    await signIn("google", { callbackUrl: "/" });
+    await signIn("google", { callbackUrl });
   }
 
   return (

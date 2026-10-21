@@ -1,24 +1,12 @@
-import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/dal";
-import { getStudentProfile } from "@/lib/student-data";
-import { hasProAccess } from "@/lib/access";
-import { StudentShell } from "@/components/student/student-shell";
-import { FloatingCalculator } from "@/components/student/floating-calculator";
+import { getViewer } from "@/lib/viewer";
+import { StudentFrame } from "@/components/student/student-frame";
 
+/** Signed-in student pages. Visitors are sent to /login (by the proxy, and again here). */
 export default async function StudentAppLayout({ children }: { children: React.ReactNode }) {
-  const user = await requireUser();
-  const profile = await getStudentProfile(user.id);
+  await requireUser();
+  // signed in, so this is a student (or a redirect to onboarding when the profile is missing)
+  const viewer = await getViewer();
 
-  if (!profile) {
-    redirect("/onboarding");
-  }
-
-  const isProActive = await hasProAccess(profile.id);
-
-  return (
-    <StudentShell name={user.name} email={user.email} image={user.image} isProActive={isProActive}>
-      {children}
-      <FloatingCalculator />
-    </StudentShell>
-  );
+  return <StudentFrame viewer={viewer}>{children}</StudentFrame>;
 }

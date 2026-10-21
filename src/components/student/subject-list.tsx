@@ -10,9 +10,12 @@ import {
 export function SubjectList({
   data,
   subscribedKeys,
+  guest = false,
 }: {
   data: StudentDashboardData;
   subscribedKeys: string[];
+  /** visitor who isn't signed in: cards without progress */
+  guest?: boolean;
 }) {
   const { track, topicProgressByTopicId, chapterMasteryByChapterId } = data;
 
@@ -58,5 +61,5 @@ export function SubjectList({
     );
   }
 
-  return <SubjectCardDeck subjects={subjects} upcoming={upcoming} />;
+  return <SubjectCardDeck subjects={subjects} upcoming={upcoming} guest={guest} />;
 }

@@ -18,21 +18,39 @@ export type ChapterSectionCard = {
   subscribed?: boolean;
 };
 
-export function ChapterSectionCards({ cards }: { cards: ChapterSectionCard[] }) {
+/**
+ * `guest`: visitor who isn't signed in. Cards still link to their sections (the proxy sends
+ * the visitor through login and back), and "Notify me" becomes a sign-in link.
+ */
+export function ChapterSectionCards({
+  cards,
+  guest = false,
+}: {
+  cards: ChapterSectionCard[];
+  guest?: boolean;
+}) {
   return (
     <div className="grid max-w-5xl grid-cols-2 gap-x-3 gap-y-6 pt-1 pb-4 sm:grid-cols-3 sm:gap-x-4 sm:gap-y-8">
       {cards.map((card, index) => (
-        <SectionCard key={card.key} card={card} index={index} />
+        <SectionCard key={card.key} card={card} index={index} guest={guest} />
       ))}
     </div>
   );
 }
 
-function SectionCard({ card, index }: { card: ChapterSectionCard; index: number }) {
+function SectionCard({
+  card,
+  index,
+  guest,
+}: {
+  card: ChapterSectionCard;
+  index: number;
+  guest: boolean;
+}) {
   const toast = useToast();
   const meta = CHAPTER_SECTIONS[card.key];
   const faceClass = "subject-card-face";
-  const content = <CardContent card={card} />;
+  const content = <CardContent card={card} guest={guest} />;
 
   let face: React.ReactNode;
   if (card.state === "open" && card.href) {
@@ -72,7 +90,7 @@ function SectionCard({ card, index }: { card: ChapterSectionCard; index: number 
   );
 }
 
-function CardContent({ card }: { card: ChapterSectionCard }) {
+function CardContent({ card, guest }: { card: ChapterSectionCard; guest: boolean }) {
   const meta = CHAPTER_SECTIONS[card.key];
   const soon = card.state === "soon";
 
@@ -108,6 +126,7 @@ function CardContent({ card }: { card: ChapterSectionCard }) {
               featureKey={card.featureKey}
               initialSubscribed={card.subscribed ?? false}
               variant="card"
+              guest={guest}
             />
           </span>
         ) : (

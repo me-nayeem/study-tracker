@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ChevronLeft, Lock, PlayCircle, RotateCcw, Trophy } from "lucide-react";
+import { ChevronLeft, Lock, LogIn, PlayCircle, RotateCcw, Trophy } from "lucide-react";
 import type { MasteryStatus } from "@/generated/prisma/enums";
 import { backPillClass, buttonGoldClass } from "@/components/shared/classes";
 import { ProgressBar } from "@/components/shared/progress-bar";
+import { loginHref } from "@/lib/login-redirect";
 import { MarkCompleteButton } from "./mark-complete-button";
 import { MasteryPill } from "./mastery-badge";
 
@@ -13,6 +14,7 @@ export function ChapterHero({
   topicCount,
   status,
   hasCoreAccess,
+  guest = false,
 }: {
   chapter: {
     id: string;
@@ -25,6 +27,8 @@ export function ChapterHero({
   topicCount: number;
   status: MasteryStatus;
   hasCoreAccess: boolean;
+  /** visitor who isn't signed in: no progress, and a sign-in button instead of the chapter action */
+  guest?: boolean;
 }) {
   const clamped = Math.min(100, Math.max(0, percent));
 
@@ -43,31 +47,50 @@ export function ChapterHero({
             {chapter.name}
           </h1>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <MasteryPill status={status} />
-            {!hasCoreAccess && (
-              <span className="bg-gold/10 text-gold inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
-                <Lock className="h-3 w-3" />
-                Pro
-              </span>
-            )}
-            {topicCount > 0 && (
-              <span className="text-text-secondary text-xs">
-                {topicsDone}/{topicCount} topics done
-              </span>
-            )}
-          </div>
+          {guest ? (
+            <p className="text-text-secondary mt-2 text-xs sm:text-sm">
+              {topicCount > 0 ? `${topicCount} topics · ` : ""}Sign in to track your progress and
+              take the chapter quiz.
+            </p>
+          ) : (
+            <>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <MasteryPill status={status} />
+                {!hasCoreAccess && (
+                  <span className="bg-gold/10 text-gold inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
+                    <Lock className="h-3 w-3" />
+                    Pro
+                  </span>
+                )}
+                {topicCount > 0 && (
+                  <span className="text-text-secondary text-xs">
+                    {topicsDone}/{topicCount} topics done
+                  </span>
+                )}
+              </div>
 
-          <div className="mt-3 flex items-center gap-3 sm:w-96">
-            <ProgressBar percent={clamped} className="h-1.5 flex-1" />
-            <span className="text-gold text-sm font-semibold tabular-nums">
-              {Math.round(clamped)}%
-            </span>
-          </div>
+              <div className="mt-3 flex items-center gap-3 sm:w-96">
+                <ProgressBar percent={clamped} className="h-1.5 flex-1" />
+                <span className="text-gold text-sm font-semibold tabular-nums">
+                  {Math.round(clamped)}%
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="shrink-0">
-          <ChapterAction chapterId={chapter.id} status={status} hasCoreAccess={hasCoreAccess} />
+          {guest ? (
+            <Link
+              href={loginHref(`/chapter/${chapter.id}`)}
+              className={`${buttonGoldClass} w-full sm:w-auto`}
+            >
+              <LogIn className="h-4 w-4" />
+              Sign in to start
+            </Link>
+          ) : (
+            <ChapterAction chapterId={chapter.id} status={status} hasCoreAccess={hasCoreAccess} />
+          )}
         </div>
       </div>
     </section>

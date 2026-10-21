@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Bell, CheckCircle2 } from "lucide-react";
 import { subscribeToFeature } from "@/actions/feature-subscriptions";
 import { COMING_SOON_FEATURES, type FeatureKey } from "@/lib/coming-soon";
+import { loginHref } from "@/lib/login-redirect";
 import { useToast } from "@/components/shared/dialog-provider";
 
 /**
@@ -12,16 +15,21 @@ import { useToast } from "@/components/shared/dialog-provider";
  *
  * - `card`: compact, for small floating cards
  * - `panel`: roomier, for full-width coming-soon panels
+ *
+ * For a visitor who isn't signed in (`guest`) it is a link to sign in that returns to this page.
  */
 export function NotifyMeButton({
   featureKey,
   initialSubscribed,
   variant = "panel",
+  guest = false,
 }: {
   featureKey: FeatureKey;
   initialSubscribed: boolean;
   variant?: "card" | "panel";
+  guest?: boolean;
 }) {
+  const pathname = usePathname();
   const [subscribed, setSubscribed] = useState(initialSubscribed);
   const [isPending, startTransition] = useTransition();
   const toast = useToast();
@@ -59,17 +67,22 @@ export function NotifyMeButton({
     );
   }
 
+  const className =
+    variant === "card"
+      ? "bg-gold text-ink hover:bg-gold-soft relative z-10 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors active:scale-[0.97] disabled:opacity-60 @min-[200px]:text-xs"
+      : "bg-gold text-ink hover:bg-gold-soft inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors active:scale-[0.98] disabled:opacity-60";
+
+  if (guest) {
+    return (
+      <Link href={loginHref(pathname)} className={className}>
+        <Bell className={variant === "card" ? "h-3 w-3" : "h-4 w-4"} />
+        Notify me
+      </Link>
+    );
+  }
+
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      disabled={isPending}
-      className={
-        variant === "card"
-          ? "bg-gold text-ink hover:bg-gold-soft relative z-10 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors active:scale-[0.97] disabled:opacity-60 @min-[200px]:text-xs"
-          : "bg-gold text-ink hover:bg-gold-soft inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors active:scale-[0.98] disabled:opacity-60"
-      }
-    >
+    <button type="button" onClick={handleClick} disabled={isPending} className={className}>
       <Bell className={variant === "card" ? "h-3 w-3" : "h-4 w-4"} />
       {isPending ? "Saving…" : "Notify me"}
     </button>

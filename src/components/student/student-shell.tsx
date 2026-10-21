@@ -32,12 +32,15 @@ export function StudentShell({
   email,
   image,
   isProActive,
+  guest = false,
   children,
 }: {
   name?: string | null;
   email?: string | null;
   image?: string | null;
   isProActive: boolean;
+  /** visitor who isn't signed in: sign-in buttons instead of account and sign-out */
+  guest?: boolean;
   children: React.ReactNode;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -68,6 +71,7 @@ export function StudentShell({
       <StudentSidebar
         open={mobileOpen}
         collapsed={collapsed}
+        guest={guest}
         onNavigate={() => setMobileOpen(false)}
         onToggleCollapse={toggleCollapse}
       />
@@ -82,6 +86,7 @@ export function StudentShell({
           email={email}
           image={image}
           isProActive={isProActive}
+          guest={guest}
           onMenuClick={() => setMobileOpen((v) => !v)}
         />
         <main className="animate-card-in flex-1 px-4 py-6 pb-20 md:px-8 md:py-8 md:pb-8">

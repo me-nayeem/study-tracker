@@ -1,24 +1,18 @@
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import type { MasteryStatus } from "@/generated/prisma/enums";
 import { MasteryPill } from "./mastery-badge";
 
 export function ChapterCard({
   chapter,
-  percent,
-  status,
+  progress,
   index,
 }: {
   chapter: { id: string; name: string };
-  percent: number;
-  status: MasteryStatus;
+  /** the signed-in student's progress; left out for visitors */
+  progress?: { percent: number; status: MasteryStatus };
   index: number;
 }) {
-  const clamped = Math.min(100, Math.max(0, percent));
-  const radius = 17;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (clamped / 100) * circumference;
-  const mastered = status === "MASTERED";
-
   return (
     <Link
       href={`/chapter/${chapter.id}`}
@@ -36,41 +30,50 @@ export function ChapterCard({
               <p className="text-foreground line-clamp-2 text-sm leading-snug font-medium sm:text-base">
                 {chapter.name}
               </p>
-              <div className="mt-1.5">
-                <MasteryPill status={status} size="sm" />
-              </div>
+              {progress && (
+                <div className="mt-1.5">
+                  <MasteryPill status={progress.status} size="sm" />
+                </div>
+              )}
             </div>
 
-            {/* progress ring */}
-            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
-              <svg viewBox="0 0 40 40" className="h-12 w-12 -rotate-90">
-                <circle
-                  cx="20"
-                  cy="20"
-                  r={radius}
-                  fill="none"
-                  strokeWidth="3"
-                  className="stroke-white/8"
-                />
-                <circle
-                  cx="20"
-                  cy="20"
-                  r={radius}
-                  fill="none"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={offset}
-                  className={`transition-all duration-500 ${mastered ? "stroke-state-success" : "stroke-gold"}`}
-                />
-              </svg>
-              <span className="text-foreground absolute text-[10px] font-semibold tabular-nums">
-                {Math.round(clamped)}%
-              </span>
-            </div>
+            {progress ? (
+              <ProgressRing percent={progress.percent} mastered={progress.status === "MASTERED"} />
+            ) : (
+              <ChevronRight className="text-foreground/40 h-5 w-5 shrink-0" />
+            )}
           </div>
         </div>
       </div>
     </Link>
+  );
+}
+
+function ProgressRing({ percent, mastered }: { percent: number; mastered: boolean }) {
+  const clamped = Math.min(100, Math.max(0, percent));
+  const radius = 17;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (clamped / 100) * circumference;
+
+  return (
+    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
+      <svg viewBox="0 0 40 40" className="h-12 w-12 -rotate-90">
+        <circle cx="20" cy="20" r={radius} fill="none" strokeWidth="3" className="stroke-white/8" />
+        <circle
+          cx="20"
+          cy="20"
+          r={radius}
+          fill="none"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          className={`transition-all duration-500 ${mastered ? "stroke-state-success" : "stroke-gold"}`}
+        />
+      </svg>
+      <span className="text-foreground absolute text-[10px] font-semibold tabular-nums">
+        {Math.round(clamped)}%
+      </span>
+    </div>
   );
 }

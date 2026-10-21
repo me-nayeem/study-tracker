@@ -58,9 +58,10 @@ export type StudentDashboardData = {
   chapterMasteryByChapterId: Map<string, ChapterMasteryLite>;
 };
 
+/** `studentId` is null for a visitor who isn't signed in: same tree, no progress. */
 export async function getStudentDashboardData(
   trackId: string,
-  studentId: string
+  studentId: string | null
 ): Promise<StudentDashboardData> {
   const track = await getDashboardTrackTree(trackId);
 
@@ -86,13 +87,13 @@ export async function getStudentDashboardData(
   }
 
   const [topicProgressRows, chapterMasteryRows] = await Promise.all([
-    topicIds.length > 0
+    studentId && topicIds.length > 0
       ? prisma.topicProgress.findMany({
           where: { studentId, topicId: { in: topicIds } },
           select: { topicId: true, readDone: true, lectureDone: true, solvedDone: true },
         })
       : Promise.resolve([]),
-    chapterIds.length > 0
+    studentId && chapterIds.length > 0
       ? prisma.chapterMastery.findMany({
           where: { studentId, chapterId: { in: chapterIds } },
           select: { chapterId: true, status: true, markedCompleteAt: true, masteredAt: true },
@@ -146,9 +147,10 @@ export type ChapterDetailData = {
   chapterMastery: ChapterMasteryLite | null;
 };
 
+/** `studentId` is null for a visitor who isn't signed in: same chapter, no progress. */
 export async function getChapterDetail(
   chapterId: string,
-  studentId: string,
+  studentId: string | null,
   trackId: string
 ): Promise<ChapterDetailData | null> {
   const chapter = await getChapterWithOwnership(chapterId);
@@ -160,16 +162,18 @@ export async function getChapterDetail(
   const topicIds = chapter.topics.map((t) => t.id);
 
   const [topicProgressRows, mastery] = await Promise.all([
-    topicIds.length > 0
+    studentId && topicIds.length > 0
       ? prisma.topicProgress.findMany({
           where: { studentId, topicId: { in: topicIds } },
           select: { topicId: true, readDone: true, lectureDone: true, solvedDone: true },
         })
       : Promise.resolve([]),
-    prisma.chapterMastery.findUnique({
-      where: { studentId_chapterId: { studentId, chapterId } },
-      select: { status: true, markedCompleteAt: true, masteredAt: true },
-    }),
+    studentId
+      ? prisma.chapterMastery.findUnique({
+          where: { studentId_chapterId: { studentId, chapterId } },
+          select: { status: true, markedCompleteAt: true, masteredAt: true },
+        })
+      : Promise.resolve(null),
   ]);
 
   return {
@@ -208,9 +212,10 @@ export type PaperDetailData = {
   chapterMasteryByChapterId: Map<string, ChapterMasteryLite>;
 };
 
+/** `studentId` is null for a visitor who isn't signed in: same paper, no progress. */
 export async function getPaperDetail(
   paperId: string,
-  studentId: string,
+  studentId: string | null,
   trackId: string
 ): Promise<PaperDetailData | null> {
   const paper = await getPaperWithOwnership(paperId);
@@ -223,13 +228,13 @@ export async function getPaperDetail(
   const topicIds = paper.chapters.flatMap((c) => c.topics.map((t) => t.id));
 
   const [topicProgressRows, chapterMasteryRows] = await Promise.all([
-    topicIds.length > 0
+    studentId && topicIds.length > 0
       ? prisma.topicProgress.findMany({
           where: { studentId, topicId: { in: topicIds } },
           select: { topicId: true, readDone: true, lectureDone: true, solvedDone: true },
         })
       : Promise.resolve([]),
-    chapterIds.length > 0
+    studentId && chapterIds.length > 0
       ? prisma.chapterMastery.findMany({
           where: { studentId, chapterId: { in: chapterIds } },
           select: { chapterId: true, status: true, markedCompleteAt: true, masteredAt: true },

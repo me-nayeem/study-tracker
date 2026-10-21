@@ -1,17 +1,18 @@
 "use client";
 
-import { useActionState, useEffect,useRef } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { CheckCircle2, Lock, Save } from "lucide-react";
 import { updateAccount } from "@/actions/account";
 import type { ActionState } from "@/lib/prisma-errors";
 import { Board } from "@/generated/prisma/enums";
-import {
-  inputClass,
-  labelClass,
-  errorTextClass,
-  buttonPrimaryClass,
-} from "@/components/shared/classes";
+import { buttonGoldClass } from "@/components/shared/classes";
+
+const inputClass =
+  "text-foreground placeholder:text-text-secondary focus-visible:border-gold/60 w-full rounded-xl border border-white/8 bg-white/4 px-3.5 py-2.5 text-sm outline-none transition-colors";
+const labelClass = "text-foreground mb-1.5 block text-sm font-medium";
+const errorTextClass = "text-state-warning mt-1 text-xs";
 
 const initialState: ActionState = { success: false };
 
@@ -55,7 +56,7 @@ export function AccountForm({
   }, [state, update, router]);
 
   return (
-    <form action={formAction} className="space-y-5">
+    <form action={formAction} className="grid gap-4 sm:grid-cols-2">
       <div>
         <label htmlFor="name" className={labelClass}>
           Name
@@ -69,32 +70,33 @@ export function AccountForm({
           defaultValue={user.name ?? ""}
           className={inputClass}
         />
-        {state.fieldErrors?.name && (
-          <p className={errorTextClass}>{state.fieldErrors.name[0]}</p>
-        )}
+        {state.fieldErrors?.name && <p className={errorTextClass}>{state.fieldErrors.name[0]}</p>}
       </div>
 
       <div>
         <label htmlFor="email" className={labelClass}>
           Email
         </label>
-        <input
-          id="email"
-          value={user.email ?? ""}
-          disabled
-          className={`${inputClass} cursor-not-allowed opacity-60`}
-        />
+        <div className="relative">
+          <input
+            id="email"
+            value={user.email ?? ""}
+            disabled
+            className={`${inputClass} cursor-not-allowed pr-9 opacity-60`}
+          />
+          <Lock className="text-text-secondary absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+        </div>
       </div>
 
       <div>
         <label htmlFor="board" className={labelClass}>
-          Board <span className="font-normal">(optional)</span>
+          Board <span className="text-text-secondary font-normal">(optional)</span>
         </label>
         <select
           id="board"
           name="board"
           defaultValue={profile.board ?? ""}
-          className={inputClass}
+          className={`${inputClass} cursor-pointer`}
         >
           <option value="">Not specified</option>
           {BOARD_OPTIONS.map((board) => (
@@ -135,30 +137,34 @@ export function AccountForm({
           maxLength={11}
           placeholder="01712345678"
           defaultValue={profile.phoneNumber ?? ""}
-          className={`${inputClass} font-mono`}
+          className={`${inputClass} tabular-nums`}
         />
         {state.fieldErrors?.phoneNumber && (
           <p className={errorTextClass}>{state.fieldErrors.phoneNumber[0]}</p>
         )}
       </div>
 
-      {state.error && !state.fieldErrors && (
-        <p className={errorTextClass}>{state.error}</p>
-      )}
+      <div className="space-y-3 sm:col-span-2">
+        {state.error && !state.fieldErrors && <p className={errorTextClass}>{state.error}</p>}
 
-      {state.success && (
-        <p className="rounded-lg bg-state-success/10 px-3 py-2 text-sm text-state-success">
-          Changes saved successfully.
-        </p>
-      )}
+        {state.success && (
+          <p className="bg-state-success/10 text-state-success inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium">
+            <CheckCircle2 className="h-4 w-4" />
+            Changes saved.
+          </p>
+        )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className={`${buttonPrimaryClass} w-full py-2.5`}
-      >
-        {pending ? "Saving..." : "Save changes"}
-      </button>
+        <div>
+          <button
+            type="submit"
+            disabled={pending}
+            className={`${buttonGoldClass} w-full sm:w-auto`}
+          >
+            <Save className="h-4 w-4" />
+            {pending ? "Saving…" : "Save changes"}
+          </button>
+        </div>
+      </div>
     </form>
   );
 }

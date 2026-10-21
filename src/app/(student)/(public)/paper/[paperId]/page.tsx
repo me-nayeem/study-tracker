@@ -1,23 +1,22 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
-import { requireUser } from "@/lib/dal";
-import { getStudentProfile, getPaperDetail } from "@/lib/student-data";
+import { getViewer } from "@/lib/viewer";
+import { getPaperDetail } from "@/lib/student-data";
 import { computeSubjectProgress, computeChapterProgress } from "@/lib/progress";
 import { ChapterCard } from "@/components/student/chapter-card";
 import { ProgressBar } from "@/components/shared/progress-bar";
 import { backPillClass } from "@/components/shared/classes";
+import { SignInBanner } from "@/components/student/sign-in-banner";
 
 export default async function PaperPage({ params }: { params: Promise<{ paperId: string }> }) {
   const { paperId } = await params;
-  const user = await requireUser();
-  const profile = await getStudentProfile(user.id);
+  const viewer = await getViewer();
+  const guest = viewer.kind === "guest";
 
-  if (!profile) {
-    redirect("/onboarding");
-  }
-
-  const data = await getPaperDetail(paperId, profile.id, profile.trackId);
+  const data = viewer.trackId
+    ? await getPaperDetail(paperId, viewer.profile?.id ?? null, viewer.trackId)
+    : null;
   if (!data) {
     notFound();
   }
@@ -44,18 +43,28 @@ export default async function PaperPage({ params }: { params: Promise<{ paperId:
           {paper.name}
         </h1>
 
-        <div className="mt-3 flex items-center gap-3 sm:max-w-md">
-          <ProgressBar percent={paperPercent} className="h-1.5 flex-1" />
-          <span className="text-gold text-sm font-semibold tabular-nums">
-            {Math.round(paperPercent)}%
-          </span>
-        </div>
-        {paper.chapters.length > 0 && (
+        {guest ? (
           <p className="text-text-secondary mt-2 text-xs">
-            {masteredCount}/{paper.chapters.length} chapters mastered
+            {paper.chapters.length} {paper.chapters.length === 1 ? "chapter" : "chapters"}
           </p>
+        ) : (
+          <>
+            <div className="mt-3 flex items-center gap-3 sm:max-w-md">
+              <ProgressBar percent={paperPercent} className="h-1.5 flex-1" />
+              <span className="text-gold text-sm font-semibold tabular-nums">
+                {Math.round(paperPercent)}%
+              </span>
+            </div>
+            {paper.chapters.length > 0 && (
+              <p className="text-text-secondary mt-2 text-xs">
+                {masteredCount}/{paper.chapters.length} chapters mastered
+              </p>
+            )}
+          </>
         )}
       </section>
+
+      {guest && <SignInBanner returnTo={`/paper/${paper.id}`} />}
 
       {paper.chapters.length === 0 ? (
         <div className="card-surface px-6 py-10 text-center">
@@ -67,8 +76,14 @@ export default async function PaperPage({ params }: { params: Promise<{ paperId:
             <ChapterCard
               key={chapter.id}
               chapter={chapter}
-              percent={computeChapterProgress(chapter.topics, topicProgressByTopicId)}
-              status={chapterMasteryByChapterId.get(chapter.id)?.status ?? "NOT_STARTED"}
+              progress={
+                guest
+                  ? undefined
+                  : {
+                      percent: computeChapterProgress(chapter.topics, topicProgressByTopicId),
+                      status: chapterMasteryByChapterId.get(chapter.id)?.status ?? "NOT_STARTED",
+                    }
+              }
               index={index}
             />
           ))}

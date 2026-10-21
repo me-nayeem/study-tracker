@@ -1,4 +1,4 @@
-import { requireStudentChapter } from "@/lib/chapter-page";
+import { getChapterForViewer } from "@/lib/chapter-page";
 import { hasChapterCoreAccess } from "@/lib/access";
 import { getSubscribedFeatureKeys } from "@/lib/feature-subscriptions";
 import { computeChapterProgress } from "@/lib/progress";
@@ -14,13 +14,17 @@ export default async function ChapterDetailPage({
   params: Promise<{ chapterId: string }>;
 }) {
   const { chapterId } = await params;
-  const { user, profile, chapter, topicProgressByTopicId, chapterMastery } =
-    await requireStudentChapter(chapterId);
+  const { viewer, chapter, topicProgressByTopicId, chapterMastery } =
+    await getChapterForViewer(chapterId);
+  const guest = viewer.kind === "guest";
 
-  const [hasCoreAccess, subscribedKeys] = await Promise.all([
-    hasChapterCoreAccess(profile.id, chapter),
-    getSubscribedFeatureKeys(user.id),
-  ]);
+  // visitors: every section opens through login, so there is nothing to lock or subscribe yet
+  const [hasCoreAccess, subscribedKeys] = guest
+    ? [true, [] as string[]]
+    : await Promise.all([
+        hasChapterCoreAccess(viewer.profile.id, chapter),
+        getSubscribedFeatureKeys(viewer.user.id),
+      ]);
 
   const percent = computeChapterProgress(chapter.topics, topicProgressByTopicId);
   const status = chapterMastery?.status ?? "NOT_STARTED";
@@ -36,9 +40,12 @@ export default async function ChapterDetailPage({
     { key: "lectures", subtitle: "Video playlists", state: "open", href: `${base}/lectures` },
     {
       key: "checklist",
-      subtitle: chapter.topics.length
-        ? `${topicsDone}/${chapter.topics.length} topics`
-        : "Track topics",
+      subtitle:
+        chapter.topics.length === 0
+          ? "Track topics"
+          : guest
+            ? `${chapter.topics.length} topics`
+            : `${topicsDone}/${chapter.topics.length} topics`,
       state: gated,
       href: `${base}/checklist`,
     },
@@ -73,8 +80,9 @@ export default async function ChapterDetailPage({
         topicCount={chapter.topics.length}
         status={status}
         hasCoreAccess={hasCoreAccess}
+        guest={guest}
       />
-      <ChapterSectionCards cards={cards} />
+      <ChapterSectionCards cards={cards} guest={guest} />
     </div>
   );
 }
