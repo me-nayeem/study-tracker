@@ -125,37 +125,142 @@ body {
   animation-play-state: paused;
 }
 
-/* ── Subject cards (dashboard) ─────────────────────────────────── */
+/* ── Cards ─────────────────────────────────────────────────────────
+   One clean look everywhere: dark surface, hairline border, soft shadow,
+   gold only as an accent. In the components layer so utilities can override. */
 
-.gold-text {
-  background: linear-gradient(180deg, #fff4d3 0%, var(--gold-soft) 32%, var(--gold) 68%, #a8781f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+@layer components {
+  .card-surface,
+  .subject-card-face,
+  .deck-face {
+    border: 1px solid rgb(255 255 255 / 0.07);
+    border-radius: 1.25rem;
+    background: var(--bg-surface);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.04),
+      0 18px 36px -18px rgb(0 0 0 / 0.8);
+  }
 
-.subject-card {
-  position: relative;
-}
+  /* inset panel for artwork, emoji and logos */
+  .card-well {
+    background:
+      radial-gradient(75% 65% at 50% 42%, rgb(255 255 255 / 0.07), transparent 72%),
+      var(--bg-elevated);
+  }
 
-/* Lives between the card and the flipping body so the idle float and the flip
-   don't fight over `transform`; perspective sits here so the flip keeps its depth. */
-.subject-card-float {
-  perspective: 1400px;
-  transition: translate 0.3s ease-out;
-}
+  .subject-card {
+    position: relative;
+  }
 
-/* soft ground shadow that tightens as the card rises */
-.subject-card::after {
-  content: "";
-  position: absolute;
-  left: 14%;
-  right: 14%;
-  bottom: -14px;
-  height: 14px;
-  pointer-events: none;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgb(0 0 0 / 0.7), transparent 70%);
+  /* Lives between the card and the flipping body so the idle float and the flip
+     don't fight over `transform`; perspective sits here so the flip keeps its depth. */
+  .subject-card-float {
+    perspective: 1400px;
+    transition: translate 0.3s ease-out;
+  }
+
+  /* soft ground shadow that tightens as the card rises */
+  .subject-card::after {
+    content: "";
+    position: absolute;
+    left: 14%;
+    right: 14%;
+    bottom: -14px;
+    height: 14px;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgb(0 0 0 / 0.6), transparent 70%);
+  }
+
+  .subject-card-body {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.2, 0.75, 0.2, 1);
+  }
+
+  .subject-card[data-flipped="true"] .subject-card-body {
+    transform: rotateY(180deg);
+  }
+
+  .subject-card-face {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    text-align: left;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transition:
+      border-color 0.25s ease-out,
+      box-shadow 0.25s ease-out;
+  }
+
+  .deck-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+    text-align: left;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transition:
+      border-color 0.25s ease-out,
+      box-shadow 0.25s ease-out;
+  }
+
+  .subject-card-face--front {
+    transform: rotateY(0deg);
+    cursor: pointer;
+  }
+
+  .subject-card-face--back {
+    transform: rotateY(180deg);
+  }
+
+  /* auto-height face: grows with its content instead of filling a fixed aspect box */
+  .subject-card-face--panel {
+    position: relative;
+    inset: auto;
+  }
+
+  .subject-card-inner {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: calc(1.25rem - 1px);
+  }
+
+  /* list rows float less */
+  .subject-card--row {
+    --float-amp: 4px;
+  }
+
+  .subject-card--row::after {
+    left: 6%;
+    right: 6%;
+    bottom: -10px;
+    height: 10px;
+  }
+
+  @media (hover: hover) {
+    /* `translate` composes with the float animation's `transform` */
+    .subject-card:not(.subject-card--soon):hover .subject-card-float {
+      translate: 0 -4px;
+    }
+
+    /* only clickable cards get the gold edge */
+    a.subject-card:hover .subject-card-face,
+    .subject-card:hover :is(a, button).subject-card-face,
+    .subject-card:not(.subject-card--soon):hover .deck-face {
+      border-color: rgb(214 166 72 / 0.35);
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.05),
+        0 24px 44px -20px rgb(0 0 0 / 0.9);
+    }
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -195,168 +300,6 @@ body {
   50% {
     transform: scaleX(0.82);
     opacity: 0.45;
-  }
-}
-
-.subject-card-body {
-  position: relative;
-  aspect-ratio: 3 / 4;
-  transform-style: preserve-3d;
-  transition: transform 0.7s cubic-bezier(0.2, 0.75, 0.2, 1);
-}
-
-.subject-card[data-flipped="true"] .subject-card-body {
-  transform: rotateY(180deg);
-}
-
-.subject-card-face {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  border-radius: 1.1rem;
-  padding: 1.5px;
-  text-align: left;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  /* gold frame */
-  background: linear-gradient(
-    150deg,
-    var(--gold-soft) 0%,
-    var(--gold) 22%,
-    var(--gold-deep) 48%,
-    var(--gold) 74%,
-    var(--gold-soft) 100%
-  );
-  box-shadow:
-    0 14px 32px -14px rgb(0 0 0 / 0.85),
-    0 0 26px -8px color-mix(in srgb, var(--card-accent) 55%, transparent);
-  transition: box-shadow 0.3s ease-out;
-}
-
-.subject-card-face--front {
-  transform: rotateY(0deg);
-  cursor: pointer;
-}
-
-.subject-card-face--back {
-  transform: rotateY(180deg);
-}
-
-.subject-card-inner {
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-  border-radius: calc(1.1rem - 1.5px);
-  background:
-    radial-gradient(
-      120% 70% at 50% 22%,
-      color-mix(in srgb, var(--card-accent) 34%, transparent),
-      transparent 62%
-    ),
-    linear-gradient(180deg, #1d1810 0%, var(--ink) 72%);
-}
-
-/* faint dot texture, fading out toward the bottom */
-.subject-card-inner::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: radial-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px);
-  background-size: 10px 10px;
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 75%);
-  mask-image: linear-gradient(180deg, #000 0%, transparent 75%);
-}
-
-/* inner gold hairline */
-.subject-card-inner::after {
-  content: "";
-  position: absolute;
-  inset: 6px;
-  pointer-events: none;
-  border: 1px solid rgb(214 166 72 / 0.3);
-  border-radius: calc(1.1rem - 6px);
-}
-
-/* ── Row variant: same gold card, but auto height for list rows ── */
-
-.subject-card--row {
-  --float-amp: 4px;
-}
-
-.subject-card--row::after {
-  left: 6%;
-  right: 6%;
-  bottom: -10px;
-  height: 10px;
-}
-
-/* auto-height face: grows with its content instead of filling a fixed aspect box */
-.subject-card-face--panel {
-  position: relative;
-  inset: auto;
-}
-
-.subject-card--row .subject-card-inner {
-  background:
-    radial-gradient(
-      55% 140% at 0% 50%,
-      color-mix(in srgb, var(--card-accent) 28%, transparent),
-      transparent 70%
-    ),
-    linear-gradient(90deg, #1d1810 0%, var(--ink) 80%);
-}
-
-.subject-card--row .subject-card-inner::before {
-  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 60%);
-  mask-image: linear-gradient(90deg, #000 0%, transparent 60%);
-}
-
-.subject-card-sheen {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    transparent 35%,
-    rgb(255 240 200 / 0.16) 50%,
-    transparent 65%
-  );
-  background-size: 250% 100%;
-  background-position: 130% 0;
-}
-
-@media (hover: hover) {
-  /* `translate` composes with the float animation's `transform` */
-  .subject-card:hover .subject-card-float {
-    translate: 0 -4px;
-  }
-
-  .subject-card:hover .subject-card-face {
-    box-shadow:
-      0 20px 40px -16px rgb(0 0 0 / 0.9),
-      0 0 36px -6px color-mix(in srgb, var(--card-accent) 75%, transparent);
-  }
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .subject-card:hover .subject-card-sheen {
-    background-position: -30% 0;
-    transition: background-position 0.9s ease-out;
-  }
-}
-
-/* "Coming soon" cards still float, but don't react to hover */
-@media (hover: hover) {
-  .subject-card--soon:hover .subject-card-float {
-    translate: none;
-  }
-
-  .subject-card--soon:hover .subject-card-face {
-    box-shadow:
-      0 14px 32px -14px rgb(0 0 0 / 0.85),
-      0 0 26px -8px color-mix(in srgb, var(--card-accent) 55%, transparent);
   }
 }
 

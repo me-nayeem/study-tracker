@@ -62,11 +62,11 @@ export function Modal({
         aria-labelledby={titleId}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        className={`animate-card-in border-gold/25 from-bg-surface to-ink flex max-h-[85vh] w-full flex-col rounded-t-2xl border bg-linear-to-b shadow-2xl outline-none sm:rounded-2xl ${
+        className={`animate-card-in bg-bg-surface flex max-h-[85vh] w-full flex-col rounded-t-2xl border border-white/8 shadow-2xl outline-none sm:rounded-2xl ${
           size === "md" ? "sm:max-w-lg" : "sm:max-w-sm"
         }`}
       >
-        <div className="border-gold/15 flex items-center justify-between gap-3 border-b px-5 py-3.5">
+        <div className="flex items-center justify-between gap-3 border-b border-white/6 px-5 py-3.5">
           <h2 id={titleId} className="font-display text-foreground min-w-0 truncate text-lg">
             {title}
           </h2>
@@ -74,7 +74,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="border-gold/40 text-gold-soft hover:border-gold hover:text-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-black/40 transition-colors"
+            className="text-foreground/70 hover:text-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/6 transition-colors hover:bg-white/12"
           >
             <X className="h-4 w-4" />
           </button>

@@ -2,7 +2,7 @@ import { Lock } from "lucide-react";
 
 export function LockedSectionNotice({ label }: { label: string }) {
   return (
-    <div className="border-gold/30 from-gold/10 to-ink rounded-2xl border bg-linear-to-b p-8 text-center">
+    <div className="card-surface p-8 text-center">
       <span className="bg-gold/10 text-gold mx-auto flex h-12 w-12 items-center justify-center rounded-full">
         <Lock className="h-5 w-5" />
       </span>

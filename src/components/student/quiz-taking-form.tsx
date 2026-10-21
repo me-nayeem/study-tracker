@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { submitQuizAttempt, type SubmitQuizAttemptState } from "@/actions/quiz-attempt";
 import { AlertTriangle, Clock, LogOut, Send } from "lucide-react";
 import { buttonGoldClass } from "@/components/shared/classes";
+import { ProgressBar } from "@/components/shared/progress-bar";
 import { Modal } from "@/components/shared/modal";
 import { useConfirm, useToast } from "@/components/shared/dialog-provider";
 
@@ -197,8 +198,8 @@ export function QuizTakingForm({
 
   if (leaving) {
     return (
-      <div className="border-gold/20 from-bg-surface to-ink rounded-2xl border bg-linear-to-b px-6 py-12 text-center">
-        <span className="border-gold/30 border-t-gold mx-auto block h-8 w-8 animate-spin rounded-full border-2" />
+      <div className="card-surface px-6 py-12 text-center">
+        <span className="border-t-gold mx-auto block h-8 w-8 animate-spin rounded-full border-2 border-white/15" />
         <p className="font-display text-foreground mt-4 text-lg">Finishing your exam…</p>
         <p className="text-text-secondary mt-1 text-sm">Submitting your answers, then leaving.</p>
       </div>
@@ -243,22 +244,15 @@ export function QuizTakingForm({
             role="radiogroup"
             aria-labelledby={`q-${q.id}-label`}
             className="subject-card-face subject-card-face--panel"
-            style={{ "--card-accent": answered ? "#e3a857" : "#5b8def" } as React.CSSProperties}
           >
             <div className="subject-card-inner p-4 sm:p-5">
-              <div className="relative z-10 flex items-start gap-3">
+              <div className="flex items-start gap-3">
                 <span
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br p-[1.5px] ${
-                    answered ? "from-gold-soft via-gold to-gold-deep" : "from-white/25 to-white/5"
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-semibold tabular-nums transition-colors ${
+                    answered ? "bg-gold text-ink" : "bg-bg-elevated text-foreground/70"
                   }`}
                 >
-                  <span className="bg-ink flex h-full w-full items-center justify-center rounded-full">
-                    <span
-                      className={`font-mono text-xs font-bold ${answered ? "gold-text" : "text-text-secondary"}`}
-                    >
-                      {i + 1}
-                    </span>
-                  </span>
+                  {i + 1}
                 </span>
                 <p
                   id={`q-${q.id}-label`}
@@ -268,7 +262,7 @@ export function QuizTakingForm({
                 </p>
               </div>
 
-              <div className="relative z-10 mt-4 grid gap-2 sm:grid-cols-2">
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 {q.options.map((opt, optIndex) => {
                   const selected = answers[q.id] === opt.index;
                   return (
@@ -276,8 +270,8 @@ export function QuizTakingForm({
                       key={opt.index}
                       className={`has-[input:focus-visible]:ring-gold flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition-colors has-[input:focus-visible]:ring-2 ${
                         selected
-                          ? "border-gold bg-gold/10 text-foreground"
-                          : "border-gold/15 text-foreground/90 hover:border-gold/45 bg-black/40"
+                          ? "border-gold/70 bg-gold/10 text-foreground"
+                          : "text-foreground/90 border-white/8 bg-white/3 hover:bg-white/6"
                       }`}
                     >
                       <input
@@ -288,10 +282,8 @@ export function QuizTakingForm({
                         className="sr-only"
                       />
                       <span
-                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold ${
-                          selected
-                            ? "from-gold-soft to-gold text-ink border-transparent bg-linear-to-b"
-                            : "border-gold/30 text-gold-soft"
+                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
+                          selected ? "bg-gold text-ink" : "text-foreground/70 bg-white/6"
                         }`}
                       >
                         {OPTION_LETTERS[optIndex] ?? optIndex + 1}
@@ -351,7 +343,7 @@ export function QuizTakingForm({
                 submitted with the answers you have given.
               </p>
               <p className="text-text-secondary mt-2 text-xs">
-                <span className="gold-text font-mono font-semibold">
+                <span className="text-gold font-semibold tabular-nums">
                   {answeredCount}/{totalCount}
                 </span>{" "}
                 answered · unanswered questions count as wrong.
@@ -399,7 +391,7 @@ function QuizStatusBar({
   return (
     <div
       className={`sticky top-[68px] z-20 rounded-2xl border px-4 py-2.5 shadow-lg backdrop-blur md:top-[78px] ${
-        low ? "border-state-warning/60 bg-state-warning/15" : "border-gold/25 bg-ink/90"
+        low ? "border-state-warning/60 bg-state-warning/15" : "bg-bg-surface/90 border-white/8"
       }`}
     >
       <div className="flex items-center justify-between gap-3">
@@ -412,7 +404,7 @@ function QuizStatusBar({
             role="timer"
             aria-label="Time left"
             className={`flex items-center gap-1.5 font-mono text-sm font-semibold tabular-nums ${
-              low ? "text-state-warning" : "text-gold-soft"
+              low ? "text-state-warning" : "text-gold"
             }`}
           >
             <Clock className="h-4 w-4" />
@@ -420,12 +412,7 @@ function QuizStatusBar({
           </span>
         )}
       </div>
-      <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/5">
-        <div
-          className="from-gold-deep via-gold to-gold-soft h-full rounded-full bg-linear-to-r transition-all duration-300"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
+      <ProgressBar percent={pct} className="mt-2 h-1" />
     </div>
   );
 }
@@ -439,22 +426,18 @@ function QuizResultView({
 }) {
   const { percent, passed, questionResults } = result;
   const wrong = questionResults.filter((q) => !q.isCorrect);
-  const accent = passed ? "#34c08a" : "#e0605b";
   const radius = 42;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (Math.min(100, Math.max(0, percent)) / 100) * circumference;
 
   return (
     <div className="space-y-5">
-      <div
-        className="subject-card-face subject-card-face--panel"
-        style={{ "--card-accent": accent } as React.CSSProperties}
-      >
+      <div className="subject-card-face subject-card-face--panel">
         <div className="subject-card-inner flex flex-col items-center px-6 py-8 text-center">
-          <span className="relative z-10 text-4xl" aria-hidden="true">
+          <span className="text-4xl" aria-hidden="true">
             {passed ? "🎉" : "📚"}
           </span>
-          <div className="relative z-10 mt-3 flex h-28 w-28 items-center justify-center">
+          <div className="relative mt-3 flex h-28 w-28 items-center justify-center">
             <svg viewBox="0 0 100 100" className="h-28 w-28 -rotate-90">
               <circle
                 cx="50"
@@ -477,17 +460,17 @@ function QuizResultView({
               />
             </svg>
             <span
-              className={`absolute font-mono text-2xl font-bold tabular-nums ${
+              className={`absolute text-2xl font-semibold tabular-nums ${
                 passed ? "text-state-success" : "text-state-warning"
               }`}
             >
               {percent}%
             </span>
           </div>
-          <p className="font-display text-foreground relative z-10 mt-3 text-2xl">
+          <p className="font-display text-foreground mt-3 text-2xl">
             {passed ? "Chapter mastered!" : "Needs review"}
           </p>
-          <p className="text-text-secondary relative z-10 mt-1 max-w-sm text-sm">
+          <p className="text-text-secondary mt-1 max-w-sm text-sm">
             {passed
               ? "Great work — this chapter now counts toward your mastery."
               : "You can retake this quiz in 60 minutes. Review the questions below first."}
@@ -499,13 +482,10 @@ function QuizResultView({
         <div className="space-y-3">
           <h2 className="font-display text-foreground text-lg">What to review</h2>
           {wrong.map((q) => (
-            <div
-              key={q.questionId}
-              className="border-state-warning/25 rounded-xl border bg-black/40 p-4"
-            >
+            <div key={q.questionId} className="card-surface p-4">
               <p className="text-foreground text-sm font-medium">{q.questionText}</p>
               {q.topicName && (
-                <span className="border-gold/30 text-gold-soft mt-2 inline-block rounded-full border bg-black/40 px-2 py-0.5 text-[10px] font-medium">
+                <span className="text-foreground/75 mt-2 inline-block rounded-full bg-white/6 px-2 py-0.5 text-[11px] font-medium">
                   {q.topicName}
                 </span>
               )}

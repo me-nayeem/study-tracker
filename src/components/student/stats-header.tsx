@@ -27,7 +27,7 @@ export function StatsHeader({
         iconClass="bg-accent-gamify/10 text-accent-gamify"
         label="Points"
         value={totalPoints.toLocaleString()}
-        valueClass="gold-text font-mono tabular-nums"
+        valueClass="text-gold tabular-nums"
         caption="Total earned"
       />
       <StatTile
@@ -35,7 +35,7 @@ export function StatsHeader({
         iconClass="bg-accent-primary/10 text-accent-primary"
         label="Streak"
         value={String(streakCount)}
-        valueClass="text-state-success font-mono tabular-nums"
+        valueClass="text-state-success tabular-nums"
         caption={streakCount === 1 ? "Day" : "Days"}
       />
     </div>
@@ -58,11 +58,9 @@ function StatTile({
   caption: string;
 }) {
   return (
-    <div className="border-gold/20 from-bg-surface to-ink relative min-w-0 overflow-hidden rounded-2xl border bg-linear-to-b p-3 sm:p-4">
+    <div className="card-surface min-w-0 overflow-hidden p-3 sm:p-4">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-text-secondary truncate text-[10px] font-medium tracking-[0.18em] uppercase sm:text-xs">
-          {label}
-        </span>
+        <span className="text-text-secondary truncate text-xs font-medium">{label}</span>
         <span
           className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full sm:h-7 sm:w-7 ${iconClass}`}
         >

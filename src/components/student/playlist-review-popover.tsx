@@ -90,12 +90,12 @@ export function PlaylistReviewPopover({
             placeholder="Add a comment (optional)"
             maxLength={1000}
             rows={3}
-            className="border-gold/20 bg-ink text-foreground placeholder:text-text-secondary focus-visible:border-gold w-full rounded-xl border px-3 py-2 text-sm outline-none"
+            className="text-foreground placeholder:text-text-secondary focus-visible:border-gold/60 w-full rounded-xl border border-white/8 bg-white/4 px-3 py-2 text-sm outline-none"
           />
           <button
             type="submit"
             disabled={isPending || rating === 0}
-            className="from-gold-soft to-gold text-ink w-full rounded-xl bg-linear-to-b py-2.5 text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-40"
+            className="bg-gold text-ink hover:bg-gold-soft w-full rounded-xl py-2.5 text-sm font-semibold transition-colors active:scale-[0.98] disabled:opacity-40"
           >
             {isPending ? "Saving..." : "Submit review"}
           </button>

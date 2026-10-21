@@ -62,7 +62,7 @@ function NotesPanel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-gold/20 from-bg-surface to-ink rounded-2xl border bg-linear-to-b p-4">
+    <section className="card-surface p-4">
       <div className="flex items-center gap-2">
         <span
           className={`flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 ${accentClass}`}

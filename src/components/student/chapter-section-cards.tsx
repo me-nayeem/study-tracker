@@ -57,22 +57,13 @@ function SectionCard({ card, index }: { card: ChapterSectionCard; index: number 
       </button>
     );
   } else {
-    face = (
-      <div className={faceClass}>
-        {content}
-      </div>
-    );
+    face = <div className={faceClass}>{content}</div>;
   }
 
   return (
     <div
       className={`subject-card ${card.state === "soon" ? "subject-card--soon" : ""}`}
-      style={
-        {
-          "--card-accent": meta.accent,
-          "--float-delay": `${-(index % 6) * 0.9}s`,
-        } as React.CSSProperties
-      }
+      style={{ "--float-delay": `${-(index % 6) * 0.9}s` } as React.CSSProperties}
     >
       <div className="subject-card-float">
         <div className="relative aspect-4/3 sm:aspect-5/4">{face}</div>
@@ -86,51 +77,45 @@ function CardContent({ card }: { card: ChapterSectionCard }) {
   const soon = card.state === "soon";
 
   return (
-    <span className="subject-card-inner @container flex flex-col items-center justify-center p-3 text-center">
-      {card.state === "locked" && (
-        <span className="border-gold/40 text-gold-soft absolute top-2.5 right-2.5 z-10 inline-flex items-center gap-1 rounded-full border bg-black/50 px-2 py-0.5 text-[9px] font-semibold tracking-wider uppercase">
-          <Lock className="h-2.5 w-2.5" />
-          Pro
-        </span>
-      )}
-      {soon && (
-        <span className="text-gold-soft/80 absolute top-2.5 right-2.5 z-10 rounded-full border border-white/15 bg-black/50 px-2 py-0.5 text-[9px] font-semibold tracking-wider uppercase">
-          Soon
-        </span>
-      )}
-
-      <span
-        className={`relative z-10 flex items-center justify-center ${soon ? "opacity-60 grayscale-[0.6]" : ""}`}
-      >
-        <span className="absolute h-16 w-16 rounded-full bg-(--card-accent) opacity-25 blur-xl" />
+    <span className="subject-card-inner @container flex flex-col p-1.5">
+      <span className="card-well relative flex min-h-0 flex-1 items-center justify-center rounded-[0.95rem]">
         <span
           aria-hidden="true"
-          className="relative text-4xl leading-none @min-[200px]:text-5xl @min-[260px]:text-6xl"
+          className={`text-3xl leading-none @min-[200px]:text-4xl @min-[260px]:text-5xl ${soon ? "opacity-50 grayscale" : ""}`}
         >
           {meta.emoji}
         </span>
+        {card.state === "locked" && (
+          <span className="text-gold absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-medium backdrop-blur-sm">
+            <Lock className="h-2.5 w-2.5" />
+            Pro
+          </span>
+        )}
+        {soon && (
+          <span className="text-foreground/80 absolute top-2 left-2 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-medium backdrop-blur-sm">
+            Soon
+          </span>
+        )}
       </span>
 
-      <span
-        className={`gold-text font-display relative z-10 mt-2.5 text-sm leading-tight font-semibold tracking-wide uppercase @min-[200px]:mt-3 @min-[200px]:text-lg ${soon ? "opacity-70" : ""}`}
-      >
-        {meta.title}
+      <span className="block px-1.5 pt-2 pb-1 @min-[200px]:px-2.5 @min-[200px]:pb-2">
+        <span className="text-foreground block truncate text-sm font-semibold @min-[200px]:text-base">
+          {meta.title}
+        </span>
+        {soon && card.featureKey ? (
+          <span className="mt-1 block">
+            <NotifyMeButton
+              featureKey={card.featureKey}
+              initialSubscribed={card.subscribed ?? false}
+              variant="card"
+            />
+          </span>
+        ) : (
+          <span className="text-text-secondary block truncate text-[11px] @min-[200px]:text-xs">
+            {soon ? "Coming soon" : card.subtitle}
+          </span>
+        )}
       </span>
-      {soon && card.featureKey ? (
-        <span className="relative z-10 mt-1.5">
-          <NotifyMeButton
-            featureKey={card.featureKey}
-            initialSubscribed={card.subscribed ?? false}
-            variant="card"
-          />
-        </span>
-      ) : (
-        <span className="text-gold-soft/60 relative z-10 mt-1 text-[9px] font-medium tracking-[0.18em] uppercase @min-[200px]:text-[10px]">
-          {soon ? "Coming soon" : card.subtitle}
-        </span>
-      )}
-
-      <span className="subject-card-sheen" />
     </span>
   );
 }

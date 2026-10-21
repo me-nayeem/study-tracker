@@ -52,7 +52,7 @@ export function NotifyMeButton({
         You&apos;re on the list
       </span>
     ) : (
-      <p className="border-state-success/30 bg-state-success/10 text-state-success inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium">
+      <p className="bg-state-success/10 text-state-success inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium">
         <CheckCircle2 className="h-4 w-4 shrink-0" />
         You&apos;re on the list — we&apos;ll inform you as soon as it&apos;s live.
       </p>
@@ -66,8 +66,8 @@ export function NotifyMeButton({
       disabled={isPending}
       className={
         variant === "card"
-          ? "from-gold-soft to-gold text-ink relative z-10 inline-flex items-center gap-1 rounded-full bg-linear-to-b px-2.5 py-1 text-[10px] font-semibold transition-transform active:scale-[0.97] disabled:opacity-60 @min-[200px]:text-xs"
-          : "from-gold-soft to-gold text-ink inline-flex items-center gap-2 rounded-xl bg-linear-to-b px-5 py-2.5 text-sm font-semibold shadow-[0_8px_24px_-10px_rgba(214,166,72,0.7)] transition-transform active:scale-[0.98] disabled:opacity-60"
+          ? "bg-gold text-ink hover:bg-gold-soft relative z-10 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors active:scale-[0.97] disabled:opacity-60 @min-[200px]:text-xs"
+          : "bg-gold text-ink hover:bg-gold-soft inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors active:scale-[0.98] disabled:opacity-60"
       }
     >
       <Bell className={variant === "card" ? "h-3 w-3" : "h-4 w-4"} />

@@ -7,6 +7,7 @@ import { ChevronRight, X } from "lucide-react";
 import { getSubjectArt, type SubjectArt } from "@/lib/subject-art";
 import type { FeatureKey } from "@/lib/coming-soon";
 import { NotifyMeButton } from "@/components/shared/notify-me-button";
+import { ProgressBar } from "@/components/shared/progress-bar";
 
 export type SubjectCardPaper = {
   id: string;
@@ -123,11 +124,8 @@ function SubjectCard({
       data-flipped={flipped}
       className="subject-card"
       style={
-        {
-          "--card-accent": art.accent,
-          // stagger the idle float so the cards don't bob in unison
-          "--float-delay": `${-(index % 4) * 1.3}s`,
-        } as React.CSSProperties
+        // stagger the idle float so the cards don't bob in unison
+        { "--float-delay": `${-(index % 4) * 1.3}s` } as React.CSSProperties
       }
     >
       <div className="subject-card-float">
@@ -139,13 +137,17 @@ function SubjectCard({
             inert={flipped}
             aria-expanded={flipped}
             aria-label={`${subject.name}, ${Math.round(subject.percent)}% complete. Show papers`}
-            className="subject-card-face subject-card-face--front"
+            className="deck-face subject-card-face--front @container"
           >
             <CardFront subject={subject} art={art} />
           </button>
 
-          <div ref={backRef} inert={!flipped} className="subject-card-face subject-card-face--back">
-            <CardBack subject={subject} art={art} onClose={() => flip(false)} />
+          <div
+            ref={backRef}
+            inert={!flipped}
+            className="deck-face subject-card-face--back @container"
+          >
+            <CardBack subject={subject} onClose={() => flip(false)} />
           </div>
         </div>
       </div>
@@ -153,43 +155,19 @@ function SubjectCard({
   );
 }
 
-function Emblem({ art, size = "md" }: { art: SubjectArt; size?: "sm" | "md" }) {
-  const Icon = art.icon;
-  const box = size === "sm" ? "h-7 w-7" : "h-8 w-8 @min-[220px]:h-10 @min-[220px]:w-10";
-  const icon = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4 @min-[220px]:h-5 @min-[220px]:w-5";
-
+/** Subject illustration on its inset panel; falls back to the subject icon. */
+function ArtPanel({
+  art,
+  muted = false,
+  children,
+}: {
+  art: SubjectArt;
+  muted?: boolean;
+  children?: React.ReactNode;
+}) {
   return (
-    <span
-      className={`from-gold-soft via-gold to-gold-deep flex shrink-0 items-center justify-center rounded-full bg-linear-to-br p-[1.5px] shadow-md ${box}`}
-    >
-      <span className="bg-ink flex h-full w-full items-center justify-center rounded-full text-(--card-accent)">
-        <Icon className={icon} />
-      </span>
-    </span>
-  );
-}
-
-function CardFront({ subject, art }: { subject: SubjectCardData; art: SubjectArt }) {
-  const paperCount = subject.papers.length;
-
-  return (
-    <span className="subject-card-inner @container flex flex-col">
-      {/* header: emblem + progress "rating" */}
-      <span className="relative z-10 flex items-start justify-between p-3 @min-[220px]:p-4">
-        <Emblem art={art} />
-        <span className="flex flex-col items-end leading-none">
-          <span className="gold-text font-display text-2xl font-semibold @min-[220px]:text-3xl">
-            {Math.round(subject.percent)}
-            <span className="text-sm @min-[220px]:text-base">%</span>
-          </span>
-          <span className="text-gold-soft/60 mt-1 text-[8px] font-medium tracking-[0.2em] uppercase @min-[220px]:text-[9px]">
-            Done
-          </span>
-        </span>
-      </span>
-
-      {/* artwork */}
-      <span className="absolute inset-x-[10%] top-[24%] bottom-[37%] @min-[220px]:inset-x-[12%] @min-[220px]:top-[19%] @min-[220px]:bottom-[35%]">
+    <span className="card-well relative m-1.5 block min-h-0 flex-1 rounded-[0.95rem]">
+      <span className={`absolute inset-[12%] ${muted ? "opacity-45 grayscale" : ""}`}>
         {art.image ? (
           <Image
             src={art.image}
@@ -199,69 +177,74 @@ function CardFront({ subject, art }: { subject: SubjectCardData; art: SubjectArt
             className="object-contain"
           />
         ) : (
-          <span className="flex h-full items-center justify-center text-(--card-accent) opacity-80">
+          <span className="text-foreground/35 flex h-full items-center justify-center">
             <art.icon className="h-1/2 w-1/2" strokeWidth={1.25} />
           </span>
         )}
       </span>
-
-      {/* name plate */}
-      <span className="via-ink/85 to-ink relative z-10 mt-auto flex flex-col items-center bg-linear-to-b from-transparent px-3 pt-6 pb-3.5 text-center @min-[220px]:pb-5">
-        <span className="gold-text font-display line-clamp-2 text-[15px] leading-tight font-semibold tracking-wide uppercase @min-[200px]:text-lg @min-[260px]:text-2xl">
-          {subject.name}
-        </span>
-        <span className="text-gold-soft/65 mt-1 text-[8px] font-medium tracking-[0.28em] uppercase @min-[200px]:text-[10px]">
-          {paperCount} {paperCount === 1 ? "Paper" : "Papers"}
-        </span>
-        <span className="border-gold/45 text-foreground/90 mt-2 rounded-full border bg-black/40 px-2.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase @min-[200px]:text-[10px]">
-          {subject.masteredCount}/{subject.chapterCount} mastered
-        </span>
-      </span>
-
-      <span className="subject-card-sheen" />
+      {children}
     </span>
   );
 }
 
-function CardBack({
-  subject,
-  art,
-  onClose,
-}: {
-  subject: SubjectCardData;
-  art: SubjectArt;
-  onClose: () => void;
-}) {
+function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <div className="subject-card-inner @container flex flex-col p-3 @min-[220px]:p-4">
-      {/* watermark art */}
-      {art.image && (
-        <span className="pointer-events-none absolute inset-[18%] opacity-[0.08]">
-          <Image src={art.image} alt="" fill sizes="200px" className="object-contain" />
-        </span>
-      )}
+    <span className="text-foreground/80 absolute top-2 left-2 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-medium backdrop-blur-sm @min-[200px]:top-2.5 @min-[200px]:left-2.5 @min-[200px]:text-[11px]">
+      {children}
+    </span>
+  );
+}
 
-      <div className="relative z-10 flex items-center gap-2">
-        <Emblem art={art} size="sm" />
+function CardFront({ subject, art }: { subject: SubjectCardData; art: SubjectArt }) {
+  const paperCount = subject.papers.length;
+
+  return (
+    <>
+      <ArtPanel art={art}>
+        <Chip>
+          {paperCount} {paperCount === 1 ? "paper" : "papers"}
+        </Chip>
+      </ArtPanel>
+
+      <span className="block px-3 pt-1.5 pb-3 @min-[200px]:px-4 @min-[200px]:pb-4">
+        <span className="flex items-baseline justify-between gap-2">
+          <span className="text-foreground truncate text-sm font-semibold @min-[200px]:text-base">
+            {subject.name}
+          </span>
+          <span className="text-gold shrink-0 text-xs font-semibold tabular-nums @min-[200px]:text-sm">
+            {Math.round(subject.percent)}%
+          </span>
+        </span>
+        <span className="text-text-secondary mt-0.5 mb-2.5 block truncate text-[11px] @min-[200px]:text-xs">
+          {subject.masteredCount}/{subject.chapterCount} chapters mastered
+        </span>
+        <ProgressBar percent={subject.percent} />
+      </span>
+    </>
+  );
+}
+
+function CardBack({ subject, onClose }: { subject: SubjectCardData; onClose: () => void }) {
+  return (
+    <div className="flex h-full flex-col p-3 @min-[200px]:p-4">
+      <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
-          <p className="gold-text font-display truncate text-xs leading-tight font-semibold uppercase @min-[220px]:text-base">
+          <p className="text-foreground truncate text-sm font-semibold @min-[200px]:text-base">
             {subject.name}
           </p>
-          <p className="text-gold-soft/60 text-[8px] tracking-[0.2em] uppercase @min-[220px]:text-[9px]">
-            Choose a paper
-          </p>
+          <p className="text-text-secondary text-[11px] @min-[200px]:text-xs">Choose a paper</p>
         </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="border-gold/45 text-gold-soft hover:border-gold hover:text-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded-full border bg-black/50 transition-colors @min-[220px]:h-8 @min-[220px]:w-8"
+          className="text-foreground/70 hover:text-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/6 transition-colors hover:bg-white/12 @min-[200px]:h-8 @min-[200px]:w-8"
         >
-          <X className="h-3.5 w-3.5 @min-[220px]:h-4 @min-[220px]:w-4" />
+          <X className="h-3.5 w-3.5 @min-[200px]:h-4 @min-[200px]:w-4" />
         </button>
       </div>
 
-      <div className="relative z-10 mt-3 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+      <div className="mt-3 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
         {subject.papers.length === 0 ? (
           <p className="text-text-secondary m-auto text-center text-xs">No papers added yet.</p>
         ) : (
@@ -269,25 +252,26 @@ function CardBack({
             <Link
               key={paper.id}
               href={`/paper/${paper.id}`}
-              className="group border-gold/35 hover:border-gold relative overflow-hidden rounded-xl border bg-black/45 px-2.5 py-2 transition-colors hover:bg-black/60 @min-[220px]:px-3 @min-[220px]:py-2.5"
+              className="group bg-bg-elevated/70 hover:bg-bg-elevated block rounded-xl border border-white/5 px-2.5 py-2 transition-colors hover:border-white/10 @min-[200px]:px-3 @min-[200px]:py-2.5"
             >
               <span className="flex items-center justify-between gap-2">
                 <span className="min-w-0">
-                  <span className="text-foreground block truncate text-xs font-semibold capitalize @min-[220px]:text-sm">
+                  <span className="text-foreground block truncate text-xs font-semibold capitalize @min-[200px]:text-sm">
                     {paper.name}
                   </span>
-                  <span className="text-text-secondary block text-[10px] @min-[220px]:text-xs">
-                    {paper.chapterCount} {paper.chapterCount === 1 ? "chapter" : "chapters"} ·{" "}
-                    {Math.round(paper.percent)}%
+                  <span className="text-text-secondary block text-[10px] @min-[200px]:text-xs">
+                    {paper.chapterCount} {paper.chapterCount === 1 ? "chapter" : "chapters"}
                   </span>
                 </span>
-                <ChevronRight className="text-gold h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                <span className="flex shrink-0 items-center gap-1">
+                  <span className="text-gold text-[11px] font-semibold tabular-nums @min-[200px]:text-xs">
+                    {Math.round(paper.percent)}%
+                  </span>
+                  <ChevronRight className="text-foreground/50 group-hover:text-foreground h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </span>
               </span>
-              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-white/5">
-                <span
-                  className="from-gold-deep to-gold-soft block h-full bg-linear-to-r"
-                  style={{ width: `${Math.min(100, Math.max(0, paper.percent))}%` }}
-                />
+              <span className="mt-2 block">
+                <ProgressBar percent={paper.percent} />
               </span>
             </Link>
           ))
@@ -310,57 +294,27 @@ function UpcomingSubjectCard({
   return (
     <div
       className="subject-card subject-card--soon"
-      style={
-        {
-          "--card-accent": art.accent,
-          "--float-delay": `${-(index % 4) * 1.3}s`,
-        } as React.CSSProperties
-      }
+      style={{ "--float-delay": `${-(index % 4) * 1.3}s` } as React.CSSProperties}
     >
       <div className="subject-card-float">
         <div className="relative aspect-3/4">
-          <div className="subject-card-face">
-            <div className="subject-card-inner @container flex flex-col">
-              <div className="relative z-10 flex items-start justify-between p-3 @min-[220px]:p-4">
-                <Emblem art={art} />
-                <span className="text-gold-soft/90 rounded-full border border-white/15 bg-black/50 px-2 py-0.5 text-[9px] font-semibold tracking-wider uppercase @min-[220px]:text-[10px]">
-                  Soon
-                </span>
-              </div>
+          <div className="deck-face @container">
+            <ArtPanel art={art} muted>
+              <Chip>Coming soon</Chip>
+            </ArtPanel>
 
-              <span className="absolute inset-x-[10%] top-[24%] bottom-[40%] opacity-60 grayscale-[0.5] @min-[220px]:inset-x-[12%] @min-[220px]:top-[19%] @min-[220px]:bottom-[38%]">
-                {art.image ? (
-                  <Image
-                    src={art.image}
-                    alt=""
-                    fill
-                    sizes="(min-width: 1280px) 220px, (min-width: 1024px) 26vw, 40vw"
-                    className="object-contain"
-                  />
-                ) : (
-                  <span className="flex h-full items-center justify-center text-(--card-accent)">
-                    <art.icon className="h-1/2 w-1/2" strokeWidth={1.25} />
-                  </span>
-                )}
-              </span>
-
-              <div className="via-ink/85 to-ink relative z-10 mt-auto flex flex-col items-center bg-linear-to-b from-transparent px-3 pt-6 pb-3.5 text-center @min-[220px]:pb-5">
-                <span className="gold-text font-display line-clamp-2 text-[15px] leading-tight font-semibold tracking-wide uppercase @min-[200px]:text-lg @min-[260px]:text-2xl">
-                  {subject.name}
-                </span>
-                <span className="text-gold-soft/65 mt-1 text-[8px] font-medium tracking-[0.28em] uppercase @min-[200px]:text-[10px]">
-                  Coming soon
-                </span>
-                <span className="mt-2">
-                  <NotifyMeButton
-                    featureKey={subject.featureKey}
-                    initialSubscribed={subject.subscribed}
-                    variant="card"
-                  />
-                </span>
-              </div>
-
-              <span className="subject-card-sheen" />
+            <div className="px-3 pt-1.5 pb-3 @min-[200px]:px-4 @min-[200px]:pb-4">
+              <p className="text-foreground truncate text-sm font-semibold @min-[200px]:text-base">
+                {subject.name}
+              </p>
+              <p className="text-text-secondary mt-0.5 mb-2 text-[11px] @min-[200px]:text-xs">
+                {subject.papers} {subject.papers === 1 ? "paper" : "papers"}
+              </p>
+              <NotifyMeButton
+                featureKey={subject.featureKey}
+                initialSubscribed={subject.subscribed}
+                variant="card"
+              />
             </div>
           </div>
         </div>

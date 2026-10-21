@@ -6,9 +6,8 @@ import { ChevronDown, Search } from "lucide-react";
 import type { TrackFilterOptions } from "@/lib/content-data";
 
 const fieldClass =
-  "border-gold/20 bg-ink/80 text-foreground placeholder:text-text-secondary focus-visible:border-gold w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition-colors disabled:opacity-45";
-const labelClass =
-  "text-gold-soft/70 mb-1.5 block text-[10px] font-medium tracking-[0.18em] uppercase";
+  "text-foreground placeholder:text-text-secondary focus-visible:border-gold/60 w-full rounded-xl border border-white/8 bg-white/4 px-3.5 py-2.5 text-sm outline-none transition-colors disabled:opacity-45";
+const labelClass = "text-text-secondary mb-1.5 block text-xs font-medium";
 
 export function LecturesFilter({ options }: { options: TrackFilterOptions }) {
   const router = useRouter();
@@ -48,7 +47,7 @@ export function LecturesFilter({ options }: { options: TrackFilterOptions }) {
   return (
     <div className="space-y-4">
       <div className="relative">
-        <Search className="text-gold-soft/70 pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2" />
+        <Search className="text-text-secondary pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2" />
         <input
           type="text"
           value={q}
@@ -58,7 +57,7 @@ export function LecturesFilter({ options }: { options: TrackFilterOptions }) {
           className={`${fieldClass} pl-10`}
         />
         {isPending && (
-          <span className="border-gold/30 border-t-gold absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 animate-spin rounded-full border-2" />
+          <span className="border-t-gold absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 animate-spin rounded-full border-2 border-white/15" />
         )}
       </div>
 
@@ -129,7 +128,7 @@ function FilterSelect({
             </option>
           ))}
         </select>
-        <ChevronDown className="text-gold-soft/70 pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+        <ChevronDown className="text-text-secondary pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
       </span>
     </label>
   );

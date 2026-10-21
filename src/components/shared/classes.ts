@@ -7,6 +7,16 @@ export const buttonPrimaryClass =
 export const buttonSecondaryClass =
   "border-bg-elevated text-text-secondary hover:text-foreground hover:bg-bg-elevated rounded-lg border px-3 py-1.5 text-sm transition-colors disabled:opacity-60";
 export const buttonGoldClass =
-  "from-gold-soft to-gold text-ink inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-b px-5 py-2.5 text-sm font-semibold shadow-[0_8px_24px_-10px_rgba(214,166,72,0.7)] transition-transform active:scale-[0.98] disabled:opacity-60";
+  "bg-gold text-ink hover:bg-gold-soft inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors active:scale-[0.98] disabled:opacity-60";
+export const buttonOutlineClass =
+  "text-foreground inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-white/10 disabled:opacity-60";
 export const buttonGhostClass =
   "text-text-secondary hover:text-foreground text-xs underline-offset-4 hover:underline disabled:opacity-60";
+export const backPillClass =
+  "text-text-secondary hover:text-foreground relative inline-flex max-w-full items-center gap-1 rounded-full border border-white/8 bg-white/4 py-1 pr-3 pl-2 text-xs transition-colors hover:bg-white/8";
+/** Small neutral tag, e.g. "12 questions". */
+export const chipClass =
+  "text-foreground/80 inline-flex items-center gap-1 rounded-full bg-white/6 px-2.5 py-0.5 text-xs font-medium";
+/** Emoji tile used in page headers. */
+export const headerTileClass =
+  "card-well flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl leading-none";

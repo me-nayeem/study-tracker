@@ -3,13 +3,14 @@ import Link from "next/link";
 import { User } from "lucide-react";
 import type { LeaderboardEntry } from "@/lib/leaderboard-data";
 
-const PODIUM: Record<1 | 2 | 3, { medal: string; accent: string; ring: string }> = {
-  1: { medal: "🥇", accent: "#e3a857", ring: "from-gold-soft via-gold to-gold-deep" },
-  2: { medal: "🥈", accent: "#c0c7d1", ring: "from-white via-slate-300 to-slate-500" },
-  3: { medal: "🥉", accent: "#cd7f32", ring: "from-orange-200 via-amber-600 to-amber-900" },
+const PODIUM: Record<1 | 2 | 3, { medal: string; ring: string }> = {
+  1: { medal: "🥇", ring: "ring-gold" },
+  2: { medal: "🥈", ring: "ring-slate-300" },
+  3: { medal: "🥉", ring: "ring-amber-700" },
 };
 
-const YOU_ACCENT = "#d9714b";
+/** Highlights the signed-in student's own card. */
+const YOU_FACE = "border-accent-primary/50";
 
 function subtitleFor(entry: LeaderboardEntry): string | null {
   if (entry.institutionName && entry.boardLabel) {
@@ -22,7 +23,7 @@ function Avatar({
   image,
   name,
   size,
-  ring = "from-gold-soft via-gold to-gold-deep",
+  ring = "ring-white/10",
 }: {
   image: string | null;
   name: string;
@@ -31,7 +32,7 @@ function Avatar({
 }) {
   return (
     <span
-      className={`flex shrink-0 items-center justify-center rounded-full bg-linear-to-br p-0.5 ${ring}`}
+      className={`bg-bg-elevated flex shrink-0 items-center justify-center overflow-hidden rounded-full ring-2 ${ring}`}
       style={{ width: size, height: size }}
     >
       {image ? (
@@ -40,14 +41,12 @@ function Avatar({
           alt=""
           width={size}
           height={size}
-          className="bg-ink h-full w-full rounded-full object-cover"
+          className="h-full w-full object-cover"
         />
       ) : (
-        <span className="bg-ink text-gold-soft flex h-full w-full items-center justify-center rounded-full">
+        <span className="text-foreground/80 flex h-full w-full items-center justify-center">
           {name ? (
-            <span className="font-display text-sm font-semibold">
-              {name.charAt(0).toUpperCase()}
-            </span>
+            <span className="text-sm font-semibold">{name.charAt(0).toUpperCase()}</span>
           ) : (
             <User className="h-4 w-4" />
           )}
@@ -87,7 +86,7 @@ export function LeaderboardTable({
       </p>
 
       {entries.length === 0 && (
-        <div className="border-gold/20 from-bg-surface to-ink rounded-2xl border bg-linear-to-b px-6 py-12 text-center">
+        <div className="card-surface px-6 py-12 text-center">
           <p className="text-3xl" aria-hidden="true">
             🏁
           </p>
@@ -122,8 +121,8 @@ export function LeaderboardTable({
               aria-current={p === page ? "page" : undefined}
               className={`flex h-9 min-w-9 items-center justify-center rounded-lg px-3 text-xs font-semibold transition-colors ${
                 p === page
-                  ? "from-gold-soft to-gold text-ink bg-linear-to-b"
-                  : "border-gold/25 text-text-secondary hover:border-gold hover:text-foreground border bg-black/40"
+                  ? "bg-gold text-ink"
+                  : "text-text-secondary hover:text-foreground bg-white/5 hover:bg-white/10"
               }`}
             >
               {p}
@@ -159,27 +158,24 @@ function Podium({
           <div
             key={entry.studentId}
             className="subject-card"
-            style={
-              {
-                "--card-accent": isYou ? YOU_ACCENT : style.accent,
-                "--float-delay": `${-rank * 1.2}s`,
-              } as React.CSSProperties
-            }
+            style={{ "--float-delay": `${-rank * 1.2}s` } as React.CSSProperties}
           >
             <div className="subject-card-float">
-              <div className="subject-card-face subject-card-face--panel">
+              <div
+                className={`subject-card-face subject-card-face--panel ${isYou ? YOU_FACE : ""}`}
+              >
                 <div
-                  className={`subject-card-inner @container flex flex-col items-center px-2 text-center ${
+                  className={`subject-card-inner flex flex-col items-center px-2 text-center ${
                     first ? "pt-4 pb-5 sm:pt-6 sm:pb-7" : "pt-3 pb-4 sm:pt-4 sm:pb-5"
                   }`}
                 >
                   <span
                     aria-hidden="true"
-                    className={`relative z-10 leading-none ${first ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"}`}
+                    className={`leading-none ${first ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"}`}
                   >
                     {style.medal}
                   </span>
-                  <span className="relative z-10 mt-2">
+                  <span className="mt-2.5">
                     <Avatar
                       image={entry.image}
                       name={entry.name}
@@ -187,26 +183,22 @@ function Podium({
                       ring={style.ring}
                     />
                   </span>
-                  <p className="text-foreground relative z-10 mt-2 line-clamp-2 w-full text-xs leading-tight font-semibold wrap-break-word sm:text-sm">
+                  <p className="text-foreground mt-2 line-clamp-2 w-full text-xs leading-tight font-semibold wrap-break-word sm:text-sm">
                     {entry.name}
                   </p>
                   {isYou && (
-                    <span className="bg-accent-primary/15 text-accent-primary relative z-10 mt-1 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase">
+                    <span className="bg-accent-primary/15 text-accent-primary mt-1 rounded-full px-2 py-0.5 text-[10px] font-semibold">
                       You
                     </span>
                   )}
                   <p
-                    className={`gold-text relative z-10 mt-1.5 font-mono font-bold tabular-nums ${
+                    className={`text-gold mt-1.5 font-semibold tabular-nums ${
                       first ? "text-xl sm:text-2xl" : "text-base sm:text-xl"
                     }`}
                   >
                     {entry.points.toLocaleString()}
                   </p>
-                  <span className="text-gold-soft/60 relative z-10 text-[8px] font-medium tracking-[0.2em] uppercase sm:text-[9px]">
-                    Points
-                  </span>
-
-                  <span className="subject-card-sheen" />
+                  <span className="text-text-secondary text-[10px] sm:text-xs">points</span>
                 </div>
               </div>
             </div>
@@ -231,40 +223,29 @@ function RankRow({
   return (
     <div
       className="subject-card subject-card--row"
-      style={
-        {
-          "--card-accent": isYou ? YOU_ACCENT : "#8b7fd9",
-          "--float-delay": `${-(index % 5) * 1.1}s`,
-        } as React.CSSProperties
-      }
+      style={{ "--float-delay": `${-(index % 5) * 1.1}s` } as React.CSSProperties}
     >
       <div className="subject-card-float">
-        <div className="subject-card-face subject-card-face--panel">
+        <div className={`subject-card-face subject-card-face--panel ${isYou ? YOU_FACE : ""}`}>
           <div className="subject-card-inner flex items-center gap-3 p-3 sm:p-3.5">
-            <span className="border-gold/30 relative z-10 flex h-9 min-w-9 shrink-0 items-center justify-center rounded-full border bg-black/50 px-1.5">
-              <span className="gold-text font-mono text-xs font-bold tabular-nums">
-                #{entry.rank}
-              </span>
+            <span className="bg-bg-elevated text-foreground/80 flex h-9 min-w-9 shrink-0 items-center justify-center rounded-xl px-1.5 text-xs font-semibold tabular-nums">
+              #{entry.rank}
             </span>
-            <span className="relative z-10">
-              <Avatar image={entry.image} name={entry.name} size={36} />
-            </span>
-            <div className="relative z-10 min-w-0 flex-1">
+            <Avatar image={entry.image} name={entry.name} size={36} />
+            <div className="min-w-0 flex-1">
               <p className="text-foreground flex items-center gap-1.5 text-sm font-semibold">
                 <span className="truncate">{entry.name}</span>
                 {isYou && (
-                  <span className="bg-accent-primary/15 text-accent-primary shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase">
+                  <span className="bg-accent-primary/15 text-accent-primary shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
                     You
                   </span>
                 )}
               </p>
               {subtitle && <p className="text-text-secondary truncate text-xs">{subtitle}</p>}
             </div>
-            <span className="gold-text relative z-10 shrink-0 font-mono text-base font-bold tabular-nums">
+            <span className="text-gold shrink-0 text-base font-semibold tabular-nums">
               {entry.points.toLocaleString()}
             </span>
-
-            <span className="subject-card-sheen" />
           </div>
         </div>
       </div>

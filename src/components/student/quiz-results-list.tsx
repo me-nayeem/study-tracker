@@ -5,13 +5,10 @@ import Link from "next/link";
 import { CheckCircle2, AlertCircle, ChevronDown, RotateCcw } from "lucide-react";
 import type { StudentQuizResultWithReview } from "@/lib/quiz-data";
 
-const PASS_ACCENT = "#34c08a";
-const FAIL_ACCENT = "#e0605b";
-
 export function QuizResultsList({ results }: { results: StudentQuizResultWithReview[] }) {
   if (results.length === 0) {
     return (
-      <div className="border-gold/20 from-bg-surface to-ink rounded-2xl border bg-linear-to-b px-6 py-12 text-center">
+      <div className="card-surface px-6 py-12 text-center">
         <p className="text-3xl" aria-hidden="true">
           📝
         </p>
@@ -48,17 +45,12 @@ function ResultCard({ result, index }: { result: StudentQuizResultWithReview; in
   return (
     <div
       className="subject-card subject-card--row"
-      style={
-        {
-          "--card-accent": passed ? PASS_ACCENT : FAIL_ACCENT,
-          "--float-delay": `${-(index % 5) * 1.1}s`,
-        } as React.CSSProperties
-      }
+      style={{ "--float-delay": `${-(index % 5) * 1.1}s` } as React.CSSProperties}
     >
       <div className="subject-card-float">
         <div className="subject-card-face subject-card-face--panel">
           <div className="subject-card-inner p-3.5 sm:p-4">
-            <div className="relative z-10 flex items-center gap-3.5">
+            <div className="flex items-center gap-3.5">
               <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
                 {percent !== null ? (
                   <>
@@ -83,7 +75,7 @@ function ResultCard({ result, index }: { result: StudentQuizResultWithReview; in
                         className={passed ? "stroke-state-success" : "stroke-state-warning"}
                       />
                     </svg>
-                    <span className="text-foreground absolute font-mono text-xs font-bold tabular-nums">
+                    <span className="text-foreground absolute text-xs font-semibold tabular-nums">
                       {percent}%
                     </span>
                   </>
@@ -102,15 +94,15 @@ function ResultCard({ result, index }: { result: StudentQuizResultWithReview; in
                 <p className="text-foreground line-clamp-2 text-sm leading-snug font-semibold sm:text-base">
                   {mastery.chapter.name}
                 </p>
-                <p className="text-gold-soft/70 truncate text-xs">
+                <p className="text-text-secondary truncate text-xs">
                   {mastery.chapter.paper.subject.name} ·{" "}
                   <span className="capitalize">{mastery.chapter.paper.name}</span>
                 </p>
                 <span
-                  className={`mt-1.5 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${
+                  className={`mt-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
                     passed
-                      ? "border-state-success/30 bg-state-success/10 text-state-success"
-                      : "border-state-warning/30 bg-state-warning/10 text-state-warning"
+                      ? "bg-state-success/10 text-state-success"
+                      : "bg-state-warning/10 text-state-warning"
                   }`}
                 >
                   {passed ? (
@@ -124,13 +116,13 @@ function ResultCard({ result, index }: { result: StudentQuizResultWithReview; in
             </div>
 
             {!passed && (
-              <div className="border-gold/15 relative z-10 mt-3 flex items-center justify-between gap-3 border-t pt-3">
+              <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/6 pt-3">
                 {canExpand ? (
                   <button
                     type="button"
                     onClick={() => setExpanded((v) => !v)}
                     aria-expanded={expanded}
-                    className="text-gold-soft/80 hover:text-gold-soft flex items-center gap-1 text-xs font-medium transition-colors"
+                    className="text-text-secondary hover:text-foreground flex items-center gap-1 text-xs font-medium transition-colors"
                   >
                     <ChevronDown
                       className={`h-3.5 w-3.5 transition-transform ${expanded ? "rotate-180" : ""}`}
@@ -143,7 +135,7 @@ function ResultCard({ result, index }: { result: StudentQuizResultWithReview; in
                 {!passed && (
                   <Link
                     href={`/chapter/${mastery.chapterId}/quiz`}
-                    className="from-gold-soft to-gold text-ink flex shrink-0 items-center gap-1.5 rounded-lg bg-linear-to-b px-3.5 py-2 text-xs font-semibold transition-transform active:scale-[0.98]"
+                    className="bg-gold text-ink hover:bg-gold-soft flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors active:scale-[0.98]"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                     Retake
@@ -153,15 +145,12 @@ function ResultCard({ result, index }: { result: StudentQuizResultWithReview; in
             )}
 
             {expanded && review && (
-              <div className="relative z-10 mt-3 space-y-2">
+              <div className="mt-3 space-y-2">
                 {review.map((q) => (
-                  <div
-                    key={q.id}
-                    className="border-state-warning/20 rounded-xl border bg-black/40 p-3"
-                  >
+                  <div key={q.id} className="rounded-xl border border-white/6 bg-white/3 p-3">
                     <p className="text-foreground text-sm font-medium">{q.questionText}</p>
                     {q.topicName && (
-                      <span className="border-gold/30 text-gold-soft mt-1.5 inline-block rounded-full border bg-black/40 px-2 py-0.5 text-[10px] font-medium">
+                      <span className="text-foreground/75 mt-1.5 inline-block rounded-full bg-white/6 px-2 py-0.5 text-[11px] font-medium">
                         {q.topicName}
                       </span>
                     )}
@@ -174,8 +163,6 @@ function ResultCard({ result, index }: { result: StudentQuizResultWithReview; in
                 ))}
               </div>
             )}
-
-            <span className="subject-card-sheen" />
           </div>
         </div>
       </div>

@@ -87,7 +87,7 @@ export default async function LeaderboardPage({
 
       <nav
         aria-label="Leaderboard period"
-        className="border-gold/20 grid max-w-xl grid-cols-4 gap-1 rounded-xl border bg-black/40 p-1"
+        className="grid max-w-xl grid-cols-4 gap-1 rounded-xl bg-white/5 p-1"
       >
         {PERIOD_TABS.map((tab) => {
           const active = tab.period === period;
@@ -98,7 +98,7 @@ export default async function LeaderboardPage({
               aria-current={active ? "page" : undefined}
               className={`rounded-lg px-1 py-2 text-center text-[11px] whitespace-nowrap transition-colors sm:text-xs ${
                 active
-                  ? "from-gold-soft to-gold text-ink bg-linear-to-b font-semibold"
+                  ? "bg-bg-elevated text-foreground font-semibold shadow-sm"
                   : "text-text-secondary hover:text-foreground font-medium"
               }`}
             >

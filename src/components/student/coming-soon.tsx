@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import type { FeatureKey } from "@/lib/coming-soon";
 import { NotifyMeButton } from "@/components/shared/notify-me-button";
+import { backPillClass } from "@/components/shared/classes";
 
 /** Themed "coming soon" panel, optionally with a "Notify me" waitlist button. */
 export function ComingSoonPanel({
@@ -18,7 +19,7 @@ export function ComingSoonPanel({
   subscribed?: boolean;
 }) {
   return (
-    <div className="border-gold/20 from-bg-surface to-ink rounded-2xl border bg-linear-to-b px-6 py-12 text-center">
+    <div className="card-surface px-6 py-12 text-center">
       <p className="text-4xl" aria-hidden="true">
         {emoji}
       </p>
@@ -48,10 +49,7 @@ export function ComingSoon({
 }) {
   return (
     <div className="max-w-2xl space-y-5">
-      <Link
-        href={backHref}
-        className="border-gold/30 text-gold-soft/80 hover:border-gold hover:text-gold-soft inline-flex items-center gap-1 rounded-full border bg-black/30 py-1 pr-3 pl-2 text-xs transition-colors"
-      >
+      <Link href={backHref} className={backPillClass}>
         <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
         {backLabel}
       </Link>

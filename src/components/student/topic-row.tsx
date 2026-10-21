@@ -15,8 +15,6 @@ const CHECK_CONFIG: Record<TopicProgressField, { label: string; icon: typeof Boo
 
 const FIELDS = Object.keys(CHECK_CONFIG) as TopicProgressField[];
 
-const CHECKLIST_ACCENT = "#34c08a";
-
 export function TopicRow({
   topicId,
   name,
@@ -57,34 +55,21 @@ export function TopicRow({
   return (
     <div
       className="subject-card subject-card--row"
-      style={
-        {
-          "--card-accent": CHECKLIST_ACCENT,
-          "--float-delay": `${-(index % 5) * 1.1}s`,
-        } as React.CSSProperties
-      }
+      style={{ "--float-delay": `${-(index % 5) * 1.1}s` } as React.CSSProperties}
     >
       <div className="subject-card-float">
         <div className="subject-card-face subject-card-face--panel">
           <div className="subject-card-inner p-3.5 sm:p-4">
-            <div className="relative z-10 flex items-center gap-3">
-              {/* topic number coin — turns into a green seal when all three checks are done */}
+            <div className="flex items-center gap-3">
+              {/* topic number tile: turns into a green check when all three checks are done */}
               <span
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br p-[1.5px] shadow-md ${
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-semibold tabular-nums ${
                   allDone
-                    ? "from-state-success to-state-success/60"
-                    : "from-gold-soft via-gold to-gold-deep"
+                    ? "bg-state-success/15 text-state-success"
+                    : "bg-bg-elevated text-foreground/80"
                 }`}
               >
-                <span className="bg-ink flex h-full w-full items-center justify-center rounded-full">
-                  {allDone ? (
-                    <Check className="text-state-success h-4 w-4" />
-                  ) : (
-                    <span className="gold-text font-display text-sm font-semibold">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                  )}
-                </span>
+                {allDone ? <Check className="h-4 w-4" /> : String(index + 1).padStart(2, "0")}
               </span>
 
               <p className="text-foreground min-w-0 flex-1 text-sm leading-snug font-medium sm:text-base">
@@ -92,17 +77,17 @@ export function TopicRow({
               </p>
 
               <span
-                className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-xs font-semibold tabular-nums ${
+                className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ${
                   allDone
-                    ? "border-state-success/40 bg-state-success/10 text-state-success"
-                    : "border-gold/30 text-gold-soft bg-black/40"
+                    ? "bg-state-success/15 text-state-success"
+                    : "text-foreground/70 bg-white/6"
                 }`}
               >
                 {doneCount}/{FIELDS.length}
               </span>
             </div>
 
-            <div className="relative z-10 mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-2">
               {FIELDS.map((field) => {
                 const { label, icon: Icon } = CHECK_CONFIG[field];
                 const checked = flags[field];
@@ -116,7 +101,7 @@ export function TopicRow({
                     className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-60 ${
                       checked
                         ? "border-state-success/40 bg-state-success/15 text-state-success"
-                        : "border-gold/25 text-text-secondary hover:border-gold/60 hover:text-foreground bg-black/40"
+                        : "text-text-secondary hover:text-foreground border-white/8 bg-white/4 hover:bg-white/8"
                     }`}
                   >
                     {checked ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
@@ -125,8 +110,6 @@ export function TopicRow({
                 );
               })}
             </div>
-
-            <span className="subject-card-sheen" />
           </div>
         </div>
       </div>

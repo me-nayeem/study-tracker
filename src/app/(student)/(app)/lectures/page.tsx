@@ -5,6 +5,7 @@ import { getTrackFilterOptions, getPlaylistsIndexForTrack } from "@/lib/content-
 import { CHAPTER_SECTIONS } from "@/lib/chapter-sections";
 import { LecturesFilter } from "@/components/student/lectures-filter";
 import { LecturesList } from "@/components/student/lectures-list";
+import { headerTileClass } from "@/components/shared/classes";
 
 export default async function LecturesPage({
   searchParams,
@@ -33,18 +34,10 @@ export default async function LecturesPage({
 
   return (
     <div className="space-y-6">
-      <section
-        className="border-gold/20 from-bg-surface to-ink relative overflow-hidden rounded-2xl border bg-linear-to-b p-4 sm:p-6"
-        style={{ "--card-accent": meta.accent } as React.CSSProperties}
-      >
-        <span className="pointer-events-none absolute -top-20 -right-16 h-56 w-56 rounded-full bg-(--card-accent) opacity-20 blur-3xl" />
-
-        <div className="relative flex items-center gap-3">
-          <span className="border-gold/30 relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-black/40">
-            <span className="absolute h-8 w-8 rounded-full bg-(--card-accent) opacity-30 blur-md" />
-            <span aria-hidden="true" className="relative text-2xl leading-none">
-              {meta.emoji}
-            </span>
+      <section className="card-surface p-4 sm:p-6">
+        <div className="flex items-center gap-3">
+          <span aria-hidden="true" className={headerTileClass}>
+            {meta.emoji}
           </span>
           <div className="min-w-0">
             <h1 className="font-display text-foreground text-2xl leading-tight sm:text-3xl">
@@ -56,16 +49,14 @@ export default async function LecturesPage({
           </div>
         </div>
 
-        <div className="relative mt-5">
+        <div className="mt-5">
           <LecturesFilter options={options} />
         </div>
       </section>
 
       <div className="flex items-center justify-between gap-3">
         <h2 className="font-display text-foreground text-lg">Playlists</h2>
-        <span className="text-gold-soft/70 text-xs tracking-wider uppercase">
-          {playlists.length} found
-        </span>
+        <span className="text-text-secondary text-xs">{playlists.length} found</span>
       </div>
 
       <LecturesList playlists={playlists} />
