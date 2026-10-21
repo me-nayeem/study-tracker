@@ -8,6 +8,7 @@ import { AlertTriangle, Clock, LogOut, Send } from "lucide-react";
 import { buttonGoldClass } from "@/components/shared/classes";
 import { ProgressBar } from "@/components/shared/progress-bar";
 import { Modal } from "@/components/shared/modal";
+import { MathText } from "@/components/shared/math-text";
 import { useConfirm, useToast } from "@/components/shared/dialog-provider";
 
 type ClientOption = { index: number; text: string };
@@ -258,7 +259,7 @@ export function QuizTakingForm({
                   id={`q-${q.id}-label`}
                   className="text-foreground pt-1 text-sm leading-relaxed font-medium sm:text-base"
                 >
-                  {q.questionText}
+                  <MathText text={q.questionText} />
                 </p>
               </div>
 
@@ -288,7 +289,10 @@ export function QuizTakingForm({
                       >
                         {OPTION_LETTERS[optIndex] ?? optIndex + 1}
                       </span>
-                      <span className="min-w-0 flex-1 leading-snug">{opt.text}</span>
+                      <MathText
+                        text={opt.text}
+                        className="min-w-0 flex-1 leading-snug break-words"
+                      />
                     </label>
                   );
                 })}
@@ -483,14 +487,18 @@ function QuizResultView({
           <h2 className="font-display text-foreground text-lg">What to review</h2>
           {wrong.map((q) => (
             <div key={q.questionId} className="card-surface p-4">
-              <p className="text-foreground text-sm font-medium">{q.questionText}</p>
+              <p className="text-foreground text-sm font-medium">
+                <MathText text={q.questionText} />
+              </p>
               {q.topicName && (
                 <span className="text-foreground/75 mt-2 inline-block rounded-full bg-white/6 px-2 py-0.5 text-[11px] font-medium">
                   {q.topicName}
                 </span>
               )}
               {q.explanation && (
-                <p className="text-text-secondary mt-2 text-sm leading-relaxed">{q.explanation}</p>
+                <p className="text-text-secondary mt-2 text-sm leading-relaxed">
+                  <MathText text={q.explanation} />
+                </p>
               )}
             </div>
           ))}

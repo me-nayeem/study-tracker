@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, AlertCircle, ChevronDown, RotateCcw } from "lucide-react";
 import type { StudentQuizResultWithReview } from "@/lib/quiz-data";
+import { MathText } from "@/components/shared/math-text";
 
 export function QuizResultsList({ results }: { results: StudentQuizResultWithReview[] }) {
   if (results.length === 0) {
@@ -148,7 +149,9 @@ function ResultCard({ result, index }: { result: StudentQuizResultWithReview; in
               <div className="mt-3 space-y-2">
                 {review.map((q) => (
                   <div key={q.id} className="rounded-xl border border-white/6 bg-white/3 p-3">
-                    <p className="text-foreground text-sm font-medium">{q.questionText}</p>
+                    <p className="text-foreground text-sm font-medium">
+                      <MathText text={q.questionText} />
+                    </p>
                     {q.topicName && (
                       <span className="text-foreground/75 mt-1.5 inline-block rounded-full bg-white/6 px-2 py-0.5 text-[11px] font-medium">
                         {q.topicName}
@@ -156,7 +159,7 @@ function ResultCard({ result, index }: { result: StudentQuizResultWithReview; in
                     )}
                     {q.explanation && (
                       <p className="text-text-secondary mt-1.5 text-xs leading-relaxed">
-                        {q.explanation}
+                        <MathText text={q.explanation} />
                       </p>
                     )}
                   </div>

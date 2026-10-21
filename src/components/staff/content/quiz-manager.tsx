@@ -19,6 +19,7 @@ import {
 import { QuizQuestionForm } from "./quiz-question-form";
 import { useConfirm, useToast } from "@/components/shared/dialog-provider";
 import type { StaffQuizRow, StaffQuizQuestionRow } from "@/lib/quiz-data";
+import { MathText } from "@/components/shared/math-text";
 
 export function QuizManager({
   chapterId,
@@ -287,9 +288,11 @@ function QuestionRow({
     <div className="border-bg-elevated bg-bg-elevated/40 rounded-lg border p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-foreground text-sm font-medium">{question.questionText}</p>
+          <p className="text-foreground text-sm font-medium">
+            <MathText text={question.questionText} />
+          </p>
           <p className="text-text-secondary mt-1 text-xs">
-            Correct: {options[question.correctIndex]}
+            Correct: <MathText text={options[question.correctIndex] ?? ""} />
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-3">

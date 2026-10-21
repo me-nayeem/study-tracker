@@ -139,7 +139,8 @@ function SubjectCard({
             aria-label={`${subject.name}, ${Math.round(subject.percent)}% complete. Show papers`}
             className="deck-face subject-card-face--front @container"
           >
-            <CardFront subject={subject} art={art} />
+            {/* the first two rows are above the fold on phones and hold the page's LCP image */}
+            <CardFront subject={subject} art={art} eager={index < 4} />
           </button>
 
           <div
@@ -159,10 +160,12 @@ function SubjectCard({
 function ArtPanel({
   art,
   muted = false,
+  eager = false,
   children,
 }: {
   art: SubjectArt;
   muted?: boolean;
+  eager?: boolean;
   children?: React.ReactNode;
 }) {
   return (
@@ -174,6 +177,9 @@ function ArtPanel({
             alt=""
             fill
             sizes="(min-width: 1280px) 220px, (min-width: 1024px) 26vw, 40vw"
+            // flat illustrations show compression blur at the default 75
+            quality={90}
+            loading={eager ? "eager" : undefined}
             className="object-contain"
           />
         ) : (
@@ -195,12 +201,20 @@ function Chip({ children }: { children: React.ReactNode }) {
   );
 }
 
-function CardFront({ subject, art }: { subject: SubjectCardData; art: SubjectArt }) {
+function CardFront({
+  subject,
+  art,
+  eager,
+}: {
+  subject: SubjectCardData;
+  art: SubjectArt;
+  eager: boolean;
+}) {
   const paperCount = subject.papers.length;
 
   return (
     <>
-      <ArtPanel art={art}>
+      <ArtPanel art={art} eager={eager}>
         <Chip>
           {paperCount} {paperCount === 1 ? "paper" : "papers"}
         </Chip>

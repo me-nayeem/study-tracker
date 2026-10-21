@@ -3,7 +3,7 @@ export const COMING_SOON_FEATURES = {
   "subject:bangla": "Bangla",
   "subject:english": "English",
   "subject:ict": "ICT",
-  "chapter:topic-exams": "Topic-wise exams",
+  "chapter:topic-exams": "Topic exams & videos",
   "chapter:tips": "Tips & tricks",
   "topic:videos": "Topic videos",
   "leaderboard:study-time": "Study-time leaderboard",

@@ -36,7 +36,7 @@ export function NotifyMeButton({
       if (result.success) {
         setSubscribed(true);
         toast(
-          `You're on the list! We'll let you know as soon as ${featureName} is live.`,
+          `You're on the list for ${featureName}! We'll let you know as soon as it's live.`,
           "success"
         );
       } else {

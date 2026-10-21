@@ -51,10 +51,9 @@ export default async function ChapterDetailPage({
     },
     {
       key: "topics",
-      subtitle: "Topic-wise exams",
-      state: "soon",
-      featureKey: "chapter:topic-exams",
-      subscribed: subscribedKeys.includes("chapter:topic-exams"),
+      subtitle: chapter.topics.length ? `${chapter.topics.length} topics` : "Exams & videos",
+      state: "open",
+      href: `${base}/topics`,
     },
     {
       key: "tips",
