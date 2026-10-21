@@ -56,11 +56,15 @@ async function GuestDashboard({ trackId }: { trackId: string | null }) {
 async function StudentDashboard({ viewer }: { viewer: Extract<Viewer, { kind: "student" }> }) {
   const { user, profile } = viewer;
 
-  const [data, notices, streakResult, levelUpResult, subscribedKeys] = await Promise.all([
+  const [data, notices, { streakResult, levelUpResult }, subscribedKeys] = await Promise.all([
     getStudentDashboardData(profile.trackId, profile.id),
     getUnreadChapterReviewNotices(user.id),
-    prisma.$transaction((tx) => evaluateStreak(tx, profile.id, new Date())),
-    prisma.$transaction((tx) => evaluateLevelUpForDisplay(tx, profile.id)),
+    // one transaction, in order: the streak bonus can raise the level, so check level-up after it
+    prisma.$transaction(async (tx) => {
+      const streakResult = await evaluateStreak(tx, profile.id, new Date());
+      const levelUpResult = await evaluateLevelUpForDisplay(tx, profile.id);
+      return { streakResult, levelUpResult };
+    }),
     getSubscribedFeatureKeys(user.id),
   ]);
 
